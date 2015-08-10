@@ -1,8 +1,18 @@
 Package: refund.shiny
-Title: What the Package Does (one line, title case)
-Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph)
-Depends: R (>= 3.2.0)
-License: What license is it under?
+Title: Interactive plotting for functional data analyses
+Version: 0.1
+Authors@R: c(person("Jeff", "Goldsmith", role = "aut", email = "jeff.goldsmith@columbia.edu"), person("Julia", "Wrobel", role = c("aut", "cre"), email =
+    "jw3134@cumc.columbia.edu"))
+Description: Interactive plotting for functional data analyses
+Depends: R (>= 3.0.1)
+Imports:
+    ggplot2,
+    Matrix,
+    mgcv,
+    pbs,
+    shiny (>= 0.11),
+    splines,
+    reshape2,
+    gamm4
+License: GPL (>= 2)
 LazyData: true
