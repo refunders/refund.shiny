@@ -1,9 +1,7 @@
 
 
-##########################################################
-# Function for fast MBD calculation
-##########################################################
 
+#' combinat
 #' function used in method for fast modified band depth (MBD) calculation
 #' 
 #' @param n 
