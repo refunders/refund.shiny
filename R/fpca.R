@@ -79,7 +79,6 @@
 ##' @examples
 ##' \dontrun{
 ##' 
-##' install.packages("refund")
 ##' library(refund)
 ##' library(ggplot2)
 ##' library(reshape2)

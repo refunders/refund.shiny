@@ -88,7 +88,6 @@ rather than figuring that out, I just set this to 10 everywhere.)
 \examples{
 \dontrun{
 
-install.packages("refund")
 library(refund)
 library(ggplot2)
 library(reshape2)
