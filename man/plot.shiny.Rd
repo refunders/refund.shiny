@@ -7,7 +7,7 @@
 plot.shiny(x, ...)
 }
 \arguments{
-\item{x}{object to be plotted. Currenlty, allowed data types are \code{fpca} and \code{fosr}.}
+\item{x}{object to be plotted. Currently, allowed data types are \code{fpca} and \code{fosr}.}
 
 \item{...}{additional arguments passed to plotting functions}
 }
@@ -19,7 +19,7 @@ This package builds on the \code{refund} package: tools in \code{refund} are use
 conduct analyses and functions in this package create interactive visualizations of the results
 of those analyses. There are two major categories of analyses that can be viewed:
 \enumerate{
-\item{Functional principal componenents analyses implemented by \code{\link{fpca.sc}}, \code{\link{fpca.face}},
+\item{Functional principal components analyses implemented by \code{\link{fpca.sc}}, \code{\link{fpca.face}},
 \code{\link{fpca.ssvd}}, and \code{\link{fpca2}}. Plots show the mean +/- 2SD times each FPC; scree plots;
 linear combinations of score values and FPCs; reconstructions for each subject; and score scatterplots.}
 \item{Function-on-scalar regression analyses implemented by \code{\link{bayes_fosr}}. Plots show the raw data

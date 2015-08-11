@@ -2,7 +2,8 @@
 % Please edit documentation in R/detectOutliers.R
 \name{combinat}
 \alias{combinat}
-\title{function used in method for fast modified band depth (MBD) calculation}
+\title{combinat
+function used in method for fast modified band depth (MBD) calculation}
 \usage{
 combinat(n, p)
 }
@@ -12,6 +13,7 @@ combinat(n, p)
 \item{p}{}
 }
 \description{
+combinat
 function used in method for fast modified band depth (MBD) calculation
 }
 \author{
