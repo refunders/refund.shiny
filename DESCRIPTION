@@ -13,6 +13,7 @@ Imports:
     shiny (>= 0.11),
     splines,
     reshape2,
-    gamm4
+    gamm4,
+    refund
 License: GPL (>= 2)
 LazyData: true
