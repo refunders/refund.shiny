@@ -7,9 +7,9 @@
 outliers(data, factor = 1.5)
 }
 \arguments{
-\item{name}{variable name}
+\item{data}{matrix or df of functional observations}
 
-\item{variable}{variable values from dataset}
+\item{factor}{a constant that determines the fences for outliers. Defaults to 1.5, as in classical definition for Tukey outliers.}
 }
 \description{
 Internal method that assigns band depth values to curves based on exact fast MBD computation (Sun & Genton, 2012).

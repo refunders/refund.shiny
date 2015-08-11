@@ -42,8 +42,8 @@ fMBD=function(data){
 #' Code modified from fbplot in fda package. 
 #' A dataframe of residuals is passed as an argument, and depths and outlying curves are returned
 #' 
-#' @param name variable name
-#' @param variable variable values from dataset
+#' @param data matrix or df of functional observations
+#' @param factor a constant that determines the fences for outliers. Defaults to 1.5, as in classical definition for Tukey outliers. 
 #' 
 #' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu}
 #'

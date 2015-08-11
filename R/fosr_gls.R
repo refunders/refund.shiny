@@ -30,6 +30,8 @@
 #' @author Jeff Goldsmith \email{ajg2202@@cumc.columbia.edu}
 #' @importFrom splines bs
 #' @importFrom pbs pbs
+#' @importFrom lme4 mkReTrms
+#' @importFrom lme4 findbars
 #' @export
 #' 
 #' @examples
@@ -74,9 +76,9 @@ fosr_gls = function(formula, data=NULL, Kt=5, basis = "bs", sigma = NULL, verbos
     mf <- model.frame(formula2, data = data)
     
     # creates the Z matrix. get rid of $zt if you want a list with more stuff.
-    if(length(data)==0){Z = lme4::mkReTrms(lme4::findbars(newfrml),fr=mf)$Zt
+    if(length(data)==0){Z = mkReTrms(findbars(newfrml),fr=mf)$Zt
     }else
-    {Z = lme4::mkReTrms(lme4::findbars(newfrml),fr=data)$Zt}
+    {Z = mkReTrms(findbars(newfrml),fr=data)$Zt}
     
     
   } else {

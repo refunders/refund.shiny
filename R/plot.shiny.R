@@ -7,7 +7,7 @@
 #' of those analyses. There are two major categories of analyses that can be viewed:
 #' \enumerate{
 #' \item{Functional principal components analyses implemented by \code{\link{fpca.sc}}, \code{\link{fpca.face}}, 
-#' \code{\link{fpca.ssvd}}, and \code{\link{fpca2}}. Plots show the mean +/- 2SD times each FPC; scree plots;
+#' \code{\link{fpca.ssvd}}, and \code{\link{fpca2s}}. Plots show the mean +/- 2SD times each FPC; scree plots;
 #' linear combinations of score values and FPCs; reconstructions for each subject; and score scatterplots.}
 #' \item{Function-on-scalar regression analyses implemented by \code{\link{bayes_fosr}}. Plots show the raw data
 #' colored by covariate values; fitted values depending on covariates; coefficient functions; and residuals.}
@@ -19,7 +19,7 @@
 #' @author Jeff Goldsmith \email{jeff.goldsmith@@columbia.edu}, 
 #' Julia Wrobel \email{jw3134@@cumc.columbia.edu}
 #' @seealso \code{\link{plot.shiny.fpca}}, \code{\link{plot.shiny.fosr}}
-#' @export
+#' @export plot.shiny
 #' 
 #' @examples
 #' 
