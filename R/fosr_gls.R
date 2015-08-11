@@ -34,7 +34,6 @@
 #' 
 #' @examples
 #' 
-#' install.packages("refund", repos="http://cran.rstudio.com/")
 #' library(refund)
 #' library(dplyr)
 #' 
