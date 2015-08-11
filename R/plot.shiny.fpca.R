@@ -14,6 +14,7 @@
 #' @seealso \code{\link{plot.shiny}}
 #' @import shiny
 #' @import ggplot2
+#' @importFrom reshape2 melt
 #' @export
 #' 
 plot.shiny.fpca = function(fpca.obj, xlab = "", ylab="", title = "") {
