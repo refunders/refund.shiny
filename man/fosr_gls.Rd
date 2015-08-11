@@ -38,7 +38,7 @@ of spline coefficients is estimated. Although this is in the `BayesFoSR` package
 there is nothing Bayesian about this FoSR.
 }
 \examples{
-install.packages("refund")
+install.packages("refund", repos="http://cran.rstudio.com/")
 library(refund)
 library(dplyr)
 

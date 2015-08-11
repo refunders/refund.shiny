@@ -1,11 +1,12 @@
 
 
 
-#' combinat
+#' internal function from 'fda' package
+#' 
 #' function used in method for fast modified band depth (MBD) calculation
 #' 
-#' @param n 
-#' @param p 
+#' @param n number of columns in your dataset
+#' @param p number of rows in your dataset
 #' 
 #' @author Ying Sun and Marc G.Genton
 #'
@@ -16,7 +17,8 @@ combinat=function(n,p){
 }
 
 
-#' fMBD  
+#' fast modified band depth calculation for fda
+#'  
 #' Method for fast modified band depth (fMBD) calculation
 #' 
 #' @param data name of dataset

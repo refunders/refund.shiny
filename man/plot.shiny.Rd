@@ -29,7 +29,7 @@ colored by covariate values; fitted values depending on covariates; coefficient 
 \examples{
 \dontrun{
 
-install.packages("refund")
+install.packages("refund", repos="http://cran.rstudio.com/")
 library(refund)
 library(dplyr)
 

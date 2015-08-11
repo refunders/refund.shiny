@@ -2,8 +2,7 @@
 % Please edit documentation in R/detectOutliers.R
 \name{fMBD}
 \alias{fMBD}
-\title{fMBD
-Method for fast modified band depth (fMBD) calculation}
+\title{fast modified band depth calculation for fda}
 \usage{
 fMBD(data)
 }
@@ -11,7 +10,6 @@ fMBD(data)
 \item{data}{name of dataset}
 }
 \description{
-fMBD
 Method for fast modified band depth (fMBD) calculation
 }
 \author{

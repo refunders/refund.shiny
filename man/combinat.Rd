@@ -2,18 +2,16 @@
 % Please edit documentation in R/detectOutliers.R
 \name{combinat}
 \alias{combinat}
-\title{combinat
-function used in method for fast modified band depth (MBD) calculation}
+\title{internal function from 'fda' package}
 \usage{
 combinat(n, p)
 }
 \arguments{
-\item{n}{}
+\item{n}{number of columns in your dataset}
 
-\item{p}{}
+\item{p}{number of rows in your dataset}
 }
 \description{
-combinat
 function used in method for fast modified band depth (MBD) calculation
 }
 \author{
