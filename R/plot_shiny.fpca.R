@@ -7,6 +7,7 @@
 #' @param xlab x axis label
 #' @param ylab y axis label
 #' @param title plot title
+#' @param ... additional arguments passed to plotting functions
 #' 
 #' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu},
 #' Jeff Goldsmith \email{jeff.goldsmith@@columbia.edu} 
@@ -18,7 +19,7 @@
 #' 
 #' @export
 #' 
-plot_shiny.fpca = function(x, xlab = "", ylab="", title = "") {
+plot_shiny.fpca = function(x, xlab = "", ylab="", title = "", ...) {
     
   fpca.obj <- x
   ################################

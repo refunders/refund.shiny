@@ -7,6 +7,7 @@
 #' @param xlab x axis label
 #' @param ylab y axis label
 #' @param title plot title
+#' @param ... additional arguments passed to plotting functions
 #' 
 #' @author Jeff Goldsmith \email{jeff.goldsmith@@columbia.edu}, 
 #' Julia Wrobel \email{jw3134@@cumc.columbia.edu}
@@ -18,7 +19,7 @@
 #' 
 #' @export
 #' 
-plot_shiny.fosr = function(x, xlab = "", ylab="", title = "") {
+plot_shiny.fosr = function(x, xlab = "", ylab="", title = "", ...) {
     
   fosr.obj <- x
   
