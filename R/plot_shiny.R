@@ -13,6 +13,7 @@
 #' colored by covariate values; fitted values depending on covariates; coefficient functions; and residuals.}
 #' }
 #' 
+#' @title plot_shiny: The generic function for interactive plots of functional data analyses
 #' @param x object to be plotted. Currently, allowed data types are \code{fpca} and \code{fosr}.
 #' @param ... additional arguments passed to plotting functions
 #' 

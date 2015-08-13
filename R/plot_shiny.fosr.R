@@ -15,6 +15,7 @@
 #' @import shiny
 #' @import ggplot2
 #' @importFrom reshape2 melt
+#' @rdname plot_shiny
 #' @export
 #' 
 plot_shiny.fosr = function(x, xlab = "", ylab="", title = "") {
