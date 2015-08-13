@@ -88,5 +88,5 @@
 #' }
 #' 
 plot_shiny <- function(x, ...){
-  UseMethod("plot_shiny", x)
+  UseMethod("plot_shiny")
 }

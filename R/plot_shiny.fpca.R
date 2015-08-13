@@ -3,7 +3,7 @@
 #' Produces an interactive plot illustrating a functional principal component 
 #' analysis.
 #' 
-#' @param fpca.obj fpca object to be plotted. 
+#' @param x fpca object to be plotted. 
 #' @param xlab x axis label
 #' @param ylab y axis label
 #' @param title plot title
@@ -17,8 +17,9 @@
 #' @importFrom reshape2 melt
 #' @export
 #' 
-plot_shiny.fpca = function(fpca.obj, xlab = "", ylab="", title = "") {
+plot_shiny.fpca = function(x, xlab = "", ylab="", title = "") {
     
+  fpca.obj <- x
   ################################
   ## code for processing tabs
   ################################

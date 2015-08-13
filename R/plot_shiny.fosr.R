@@ -3,7 +3,7 @@
 #' Produces an interactive plot illustrating a function-on-scalar 
 #' regression analysis. 
 #' 
-#' @param fosr.obj fosr object to be plotted. 
+#' @param x fosr object to be plotted. 
 #' @param xlab x axis label
 #' @param ylab y axis label
 #' @param title plot title
@@ -17,8 +17,10 @@
 #' @importFrom reshape2 melt
 #' @export
 #' 
-plot_shiny.fosr = function(fosr.obj, xlab = "", ylab="", title = "") {
+plot_shiny.fosr = function(x, xlab = "", ylab="", title = "") {
     
+  fosr.obj <- x
+  
   ################################
   ## code for processing tabs
   ################################
