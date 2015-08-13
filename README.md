@@ -1,4 +1,5 @@
 # `refund.shiny`
+[![](https://travis-ci.org/julia-wrobel/refund.shiny.svg?branch=master)](https://travis-ci.org/julia-wrobel/refund.shiny)
 
 ## Interactive plots of functional data analyses.
 
