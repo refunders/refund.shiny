@@ -1,5 +1,5 @@
 # `refund.shiny`
-[![](https://travis-ci.org/julia-wrobel/refund.shiny.svg?branch=master)](https://travis-ci.org/julia-wrobel/refund.shiny)
+[![](https://travis-ci.org/refunders/refund.shiny.svg?branch=master)](https://travis-ci.org/refunders/refund.shiny)
 
 ## Interactive plots of functional data analyses.
 
@@ -11,5 +11,5 @@ The primary function is `plot.shiny`, which calls other functions depending on t
 
 To install the latest version directly from Github, please use:
 <pre><code>install.packages("devtools")
-devtools::install_github("julia-wrobel/refund.shiny")
+devtools::install_github("refunders/refund.shiny")
 </code></pre>
