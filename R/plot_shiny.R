@@ -18,8 +18,8 @@
 #' 
 #' @author Jeff Goldsmith \email{jeff.goldsmith@@columbia.edu}, 
 #' Julia Wrobel \email{jw3134@@cumc.columbia.edu}
-#' @seealso \code{\link{plot.shiny.fpca}}, \code{\link{plot.shiny.fosr}}
-#' @export plot.shiny
+#' @seealso \code{\link{plot_shiny.fpca}}, \code{\link{plot_shiny.fosr}}
+#' @export plot_shiny
 #' 
 #' @examples
 #' 
@@ -32,7 +32,7 @@
 #' 
 #' data(cd4)
 #' SC = fpca.sc(cd4)
-#' plot.shiny(SC)
+#' plot_shiny(SC)
 #' 
 #' ##### FPCA Examples on simulated data #####
 #' 
@@ -56,10 +56,10 @@
 #' SSVD = fpca.ssvd(Y, verbose=FALSE)
 #' S = fpca2s(Y)
 #'  
-#' plot.shiny(SC)
-#' plot.shiny(FACE)
-#' plot.shiny(SSVD)
-#' plot.shiny(S)
+#' plot_shiny(SC)
+#' plot_shiny(FACE)
+#' plot_shiny(SSVD)
+#' plot_shiny(S)
 #' 
 #' 
 #' ##### FoSR Example #####
@@ -71,10 +71,10 @@
 #' DTI$status = factor(sample(c("RRMS", "SPMS", "PPMS"), dim(DTI)[1], replace = TRUE))
 #' 
 #' fosr.dti1 = fosr_gls(cca ~ pasat, data = DTI)
-#' plot.shiny(fosr.dti1)
+#' plot_shiny(fosr.dti1)
 #' 
 #' fosr.dti2 = fosr_gls(cca ~ pasat * gender + status, data = DTI)
-#' plot.shiny(fosr.dti2)
+#' plot_shiny(fosr.dti2)
 #' 
 #' 
 #' ##### FoSR Example with outliers #####
@@ -83,10 +83,10 @@
 #' DTI$cca[2,] = DTI$cca[2,] + .4
 #' 
 #' fosr.dti3 = fosr_gls(cca ~ pasat * gender + status, data = DTI)
-#' plot.shiny(fosr.dti3)
+#' plot_shiny(fosr.dti3)
 #' 
 #' }
 #' 
-plot.shiny <- function(x, ...){
-  UseMethod("plot.shiny", x)
+plot_shiny <- function(x, ...){
+  UseMethod("plot_shiny", x)
 }

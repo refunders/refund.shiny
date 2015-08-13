@@ -11,13 +11,13 @@
 #' @author Jeff Goldsmith \email{jeff.goldsmith@@columbia.edu}, 
 #' Julia Wrobel \email{jw3134@@cumc.columbia.edu}
 #' 
-#' @seealso \code{\link{plot.shiny}}
+#' @seealso \code{\link{plot_shiny}}
 #' @import shiny
 #' @import ggplot2
 #' @importFrom reshape2 melt
 #' @export
 #' 
-plot.shiny.fosr = function(fosr.obj, xlab = "", ylab="", title = "") {
+plot_shiny.fosr = function(fosr.obj, xlab = "", ylab="", title = "") {
     
   ################################
   ## code for processing tabs

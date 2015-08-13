@@ -1,6 +1,6 @@
-#' Create input calls for plot.shiny.fosr()
+#' Create input calls for plot_shiny.fosr()
 #' 
-#' Internal method that constructs the input calls for plot.shiny.fosr(). The
+#' Internal method that constructs the input calls for plot_shiny.fosr(). The
 #' variable name and values are passed as arguments, and a corresponding slider (for
 #' numeric) or drop-down (for factor) input is constructed.
 #' 

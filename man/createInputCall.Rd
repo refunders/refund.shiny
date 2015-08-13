@@ -2,7 +2,7 @@
 % Please edit documentation in R/createInputCall.R
 \name{createInputCall}
 \alias{createInputCall}
-\title{Create input calls for plot.shiny.fosr()}
+\title{Create input calls for plot_shiny.fosr()}
 \usage{
 createInputCall(name, variable)
 }
@@ -12,7 +12,7 @@ createInputCall(name, variable)
 \item{variable}{variable values from dataset}
 }
 \description{
-Internal method that constructs the input calls for plot.shiny.fosr(). The
+Internal method that constructs the input calls for plot_shiny.fosr(). The
 variable name and values are passed as arguments, and a corresponding slider (for
 numeric) or drop-down (for factor) input is constructed.
 }

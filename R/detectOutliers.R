@@ -36,7 +36,7 @@ fMBD=function(data){
 }
 
 
-#' Identifies outliers for plot.shiny.fosr()
+#' Identifies outliers for plot_shiny.fosr()
 #' 
 #' Internal method that assigns band depth values to curves based on exact fast MBD computation (Sun & Genton, 2012).
 #' Code modified from fbplot in fda package. 

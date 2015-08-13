@@ -2,7 +2,7 @@
 % Please edit documentation in R/detectOutliers.R
 \name{outliers}
 \alias{outliers}
-\title{Identifies outliers for plot.shiny.fosr()}
+\title{Identifies outliers for plot_shiny.fosr()}
 \usage{
 outliers(data, factor = 1.5)
 }
