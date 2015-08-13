@@ -15,7 +15,7 @@
 #' @import shiny
 #' @import ggplot2
 #' @importFrom reshape2 melt
-#' @rdname plot_shiny
+#' 
 #' @export
 #' 
 plot_shiny.fpca = function(x, xlab = "", ylab="", title = "") {
