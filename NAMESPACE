@@ -2,6 +2,7 @@
 
 S3method(plot_shiny,fosr)
 S3method(plot_shiny,fpca)
+S3method(plot_shiny,mfpca)
 export(fosr_gls)
 export(fpca)
 export(plot_shiny)

@@ -7,7 +7,7 @@
 plot_shiny(x, ...)
 }
 \arguments{
-\item{x}{object to be plotted. Currently, allowed data types are \code{fpca} and \code{fosr}.}
+\item{x}{object to be plotted. Currently, allowed data types are \code{fpca} \code{mfpca} and \code{fosr}.}
 
 \item{...}{additional arguments passed to plotting functions}
 }
@@ -19,13 +19,15 @@ Function for interactive plotting of functional data analysis results.
 
 This package builds on the \code{refund} package: tools in \code{refund} are used to
 conduct analyses and functions in this package create interactive visualizations of the results
-of those analyses. There are two major categories of analyses that can be viewed:
+of those analyses. There are three major categories of analyses that can be viewed:
 \enumerate{
 \item{Functional principal components analyses implemented by \code{\link{fpca.sc}}, \code{\link{fpca.face}},
 \code{\link{fpca.ssvd}}, and \code{\link{fpca2s}}. Plots show the mean +/- 2SD times each FPC; scree plots;
 linear combinations of score values and FPCs; reconstructions for each subject; and score scatterplots.}
 \item{Function-on-scalar regression analyses implemented by \code{\link{bayes_fosr}}. Plots show the raw data
 colored by covariate values; fitted values depending on covariates; coefficient functions; and residuals.}
+\item{Multilevel functional principal components analyses implemented by \code{\link{fpca.sc}}.  Plots show the mean +/- 2SD times each FPC;
+scree plots; linear combinations of score values and FPCs; reconstructions for each subject; and score scatterplots for levels 1 and 2.}
 }
 }
 \examples{
@@ -98,6 +100,6 @@ Jeff Goldsmith \email{jeff.goldsmith@columbia.edu},
 Julia Wrobel \email{jw3134@cumc.columbia.edu}
 }
 \seealso{
-\code{\link{plot_shiny.fpca}}, \code{\link{plot_shiny.fosr}}
+\code{\link{plot_shiny.fpca}}, \code{\link{plot_shiny.mfpca}},  \code{\link{plot_shiny.fosr}}
 }
 
