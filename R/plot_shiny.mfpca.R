@@ -28,6 +28,13 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
   
   ## Tab 2: scree plot
   
+  
+  ################################
+  #
+  #  start with edits to the scree plots
+  #
+  ###############
+  
   scree <- data.frame(k = rep(1:mfpca.obj$npc, 2), 
                       lambda = c(mfpca.obj$evalues, cumsum(mfpca.obj$evalues)/ sum(mfpca.obj$evalues)),
                       type = rep(c("Eigenvalue", "Percent Variance Explained"), each = mfpca.obj$npc))
@@ -57,7 +64,7 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
   ## UI
   #################################
     
-    ui = navbarPage(title = strong(style = "color: #ACD6FF; padding: 0px 0px 10px 10px; opacity: 0.95; ", "MFPCA Plot"), windowTitle = "PlotInteractive", 
+    ui = navbarPage(title = strong(style = "color: #ACD6FF; padding: 0px 0px 10px 10px; opacity: 0.95; ", "MFPCA Plot"), windowTitle = "refund.shiny", 
                     collapsible = FALSE, id = "nav",
                     inverse = TRUE, header = NULL,
                     tabPanel("Mean +/- FPCs", icon = icon("stats", lib = "glyphicon"),

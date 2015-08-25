@@ -57,7 +57,7 @@ plot_shiny.fpca = function(x, xlab = "", ylab="", title = "", ...) {
   ## UI
   #################################
     
-    ui = navbarPage(title = strong(style = "color: #ACD6FF; padding: 0px 0px 10px 10px; opacity: 0.95; ", "FPCA Plot"), windowTitle = "PlotInteractive", 
+    ui = navbarPage(title = strong(style = "color: #ACD6FF; padding: 0px 0px 10px 10px; opacity: 0.95; ", "FPCA Plot"), windowTitle = "refund.shiny", 
                     collapsible = FALSE, id = "nav",
                     inverse = TRUE, header = NULL,
                     tabPanel("Mean +/- FPCs", icon = icon("stats", lib = "glyphicon"),

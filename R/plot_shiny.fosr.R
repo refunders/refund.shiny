@@ -59,7 +59,7 @@ plot_shiny.fosr = function(x, xlab = "", ylab="", title = "", ...) {
   ## UI
   #################################
     
-    ui = navbarPage(title = strong(style = "color: #ACD6FF; padding: 0px 0px 10px 10px; opacity: 0.95; ", "FoSR Plot"), windowTitle = "PlotInteractive", 
+    ui = navbarPage(title = strong(style = "color: #ACD6FF; padding: 0px 0px 10px 10px; opacity: 0.95; ", "FoSR Plot"), windowTitle = "refund.shiny", 
                     collapsible = FALSE, id = "nav",
                     inverse = TRUE, header = NULL,
                     tabPanel("Observed Data", icon = icon("stats", lib = "glyphicon"),
