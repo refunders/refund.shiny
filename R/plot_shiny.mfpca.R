@@ -59,6 +59,12 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
     PCs$level2[i] = PCnum
   }  
   
+  ### Tab 4: subject fits
+  ids = unique(mfpca.obj$Y.df$id)
+  Y.df = mfpca.obj$Y.df; Yhat.subj = mfpca.obj$Yhat.subject; Yhat = mfpca.obj$Yhat
+  rownames(Yhat) = rownames(Yhat.subj) = rownames(Y.df)  ## set consistent rownames for grouping by visit in ggplot
+  
+  
   #################################
   ## App
   #################################
@@ -135,7 +141,7 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
                     tabPanel("Subject Fits",  icon = icon("user"),
                              column(3,
                                     helpText("Plot shows observed data and fitted values for the subject selected below"), 
-                                    selectInput("subject", label = ("Select Subject"), choices = 1:dim(mfpca.obj$Yhat)[1], selected =1),
+                                    selectInput("subject", label = ("Select Subject"), choices = ids, selected =ids[1]),
                                     br(), br(), downloadButton('downloadPlotSubject', 'Download Plot')
                                     ),
                              column(9, h4("Fitted and Observed Values for Selected Subject"),
@@ -265,7 +271,39 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
       #################################
       ## Code for subject plots
       #################################
-            
+
+      ### change axes so they are the same as fpca.sc
+      ### do not show black curves- only show Yhat.subject and mean
+      #### add labels for Yhat.subject and mean
+      
+      ### add clickbox option so people can see Yhat values for each visit colored by visit
+      ### see if you can do this with a different color
+      plotInputSubject <- reactive({
+        id.cur = as.numeric(input$subject)
+        
+        df.obs = mutate(melt(as.matrix(subset(Y.df, id == id.cur, select = Y))), grid=rep(1:ncol(Y.df$Y), each = length(which(Y.df$id == id.cur))))
+        df.Yhat.subj = mutate(melt(as.matrix(subset(Yhat.subj, Y.df$id == id.cur))), grid=rep(1:ncol(Y.df$Y), each = length(which(Y.df$id == id.cur))))
+        df.Yhat = mutate(melt(as.matrix(subset(Yhat, Y.df$id == id.cur))), grid=rep(1:ncol(Y.df$Y), each = length(which(Y.df$id == id.cur))))
+        names(df.obs) = names(df.Yhat.subj) =  names(df.Yhat) = c("visit", "Ynames", "value", "time")
+        
+        p4 <- ggplot(df.obs, aes(x = time, y = value, group = visit)) + geom_point() +theme_bw() + 
+          geom_line(data = mu, aes(x=V1, y=V2, group=NULL), col="gray")+
+          geom_path(data = df.Yhat.subj, col="blue")+
+          geom_path(data=df.Yhat)
+        
+       })
+      
+      output$Subject <- renderPlot( 
+        print(plotInputSubject())        
+      )
+      
+      output$downloadPlotSubject <- downloadHandler(
+        filename = function(){'subjectPlot.png' },
+        content = function(file) {
+          ggsave(file,plotInputSubject())
+        }
+      )
+      
       
       #################################
       ## Code for score plots
