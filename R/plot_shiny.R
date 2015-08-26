@@ -88,6 +88,15 @@
 #' fosr.dti3 = fosr_gls(cca ~ pasat * gender + status, data = DTI)
 #' plot_shiny(fosr.dti3)
 #' 
+#' ##### MFPCA Example #####
+#' 
+#' data(DTI)
+#' Y = DTI$cca
+#' id = DTI$ID
+#' 
+#' mfpca.dti = mfpca.sc(Y=Y, id = id, twoway = FALSE)
+#' plot_shiny(mfpca.dti)
+#' 
 #' }
 #' 
 plot_shiny <- function(x, ...){
