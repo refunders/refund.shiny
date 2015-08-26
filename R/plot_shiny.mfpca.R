@@ -15,6 +15,7 @@
 #' @seealso \code{\link{plot_shiny}}
 #' @import shiny
 #' @import ggplot2
+#' @importFrom dplyr mutate
 #' @importFrom reshape2 melt
 #' 
 #' @export
