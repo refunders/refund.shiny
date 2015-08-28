@@ -151,7 +151,28 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
                              column(9, h4("Fitted and Observed Values for Selected Subject"),
                                       plotOutput("Subject")
                                     )
-                    )
+                    ),
+                    tabPanel("Score Scatterplot",icon = icon("binoculars"),
+                             column(3,
+                                    fluidRow( helpText("Use the drop down menus to select FPCs for the X and Y axis. Plot shows observed 
+                                                       score scatterplot for selected FPCs; click and drag on the scatterplot to 
+                                                       select subjects."), hr(),
+                                              selectInput("PCX", label = ("Select X-axis FPC"), choices = 1:4, selected = 1),
+                                              selectInput("PCY", label = ("Select Y-axis FPC"), choices = 1:4, selected = 2), hr()
+                                    ),
+                                    fluidRow( helpText("Black curves are fitted values for all subjects. Blue curves correspond to subjects 
+                                                  selected in the graph above. If no points are selected, the mean curve is shown.")
+                                    )
+                               
+                             ),
+                             column(9,
+                               tabsetPanel(
+                                 tabPanel("Level 1"),
+                                 tabPanel("Level 2")
+                               )
+                               
+                             )
+                     )
                     ),
     
     #################################
@@ -297,8 +318,8 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
           geom_line(data = mu, aes(x=V1, y=V2, group=NULL), col="gray")+
           geom_path(data=df.Yhat, col = "indianred") + geom_path(data = df.Yhat.subj, col="cornflowerblue", lty = 6, lwd = 1.25) 
         
-        if(input$colVisit) {p4 = p4 + geom_point(aes(col = factor(visit))) + geom_path(data=df.Yhat, aes(col = factor(visit)))+ theme(legend.position="none")
-                                                                                       
+        if(input$colVisit) {p4 = p4 + geom_point(aes(col = factor(visit))) + geom_path(data=df.Yhat, aes(col = factor(visit)))+ 
+                              theme(legend.position="none")                                                         
         } else{p4 = p4   }
         
        })
