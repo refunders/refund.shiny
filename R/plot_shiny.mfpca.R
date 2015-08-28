@@ -20,6 +20,7 @@
 #' 
 #' @export
 #' 
+#' 
 plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
     
   mfpca.obj <- x
@@ -38,25 +39,27 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
   names(scree) <- c("level1", "level2")  
   
   ## Tab 3: linear combination of PCs
+  evalues.all = c(mfpca.obj$evalues$level1, mfpca.obj$evalues$level2)
+  varpercent1 = lapply(evalues.all[1:mfpca.obj$npc$level1], function(i){100*round(i/sum(mfpca.obj$evalues$level1), 3)}) 
+  varpercent2 = lapply(evalues.all[(mfpca.obj$npc$level1+1):length(evalues.all)], function(i){100*round(i/sum(mfpca.obj$evalues$level2) ,3)}) 
+  #varpercent.all = lapply(evalues.all, function(i){100*round(k/sum(evalues.all), 3)})
   
-  #varpercent = lapply(mfpca.obj$evalues, function(i){100*round(i/sum(mfpca.obj$evalues),3)}) # calculates percent variance explained
-  calls <- lapply(mfpca.obj$npc, function(x) as.list(rep(NA, x)))
-  PCs <- lapply(mfpca.obj$npc, function(x) rep(NA, x))
-  names(calls) <- names(PCs) <- c("level1", "level2")
   
-  for(i in 1:mfpca.obj$npc$level1){
-    PCnum = paste("PC", "1.", i, sep="")    
-    calls$level1[[i]] =  eval(call("sliderInput", inputId= PCnum, label = paste("Level 1 ", PCnum, ": ", "varpercent[[i]]",  "% Variance", sep=""),
+  calls <- lapply(mfpca.obj$npc, function(x) as.list(rep(NA, 3)))
+  PCs <- lapply(mfpca.obj$npc, function(x) rep(NA, 3))
+  #names(calls) <- names(PCs) <- c("level1", "level2")
+  
+  for(i in 1:3){
+    PCnum = paste("PC", " 1.", i, sep="")    
+    calls$level1[[i]] =  eval(call("sliderInput", inputId= PCnum, label = paste(PCnum, ": ", varpercent1[[i]],  "% of Level 1 Variance", sep=""),
                                    min = -2, max = 2, step = .1, value = 0, post = " SD", animate = animationOptions(interval=400, loop=T)))
-    
     PCs$level1[i] = PCnum
   }  
   
-  for(i in 1:mfpca.obj$npc$level2){
-    PCnum = paste("PC", "2.", i, sep="")    
-    calls$level2[[i]] =  eval(call("sliderInput", inputId= PCnum, label = paste("Level 2 ", PCnum, ": ", "varpercent[[i]]",  "% Variance", sep=""),
+  for(i in 1:3){
+    PCnum = paste("PC", " 2.", i, sep="")    
+    calls$level2[[i]] =  eval(call("sliderInput", inputId= PCnum, label = paste(PCnum, ": ", varpercent2[[i]],  "% of Level 2 Variance", sep=""),
                                    min = -2, max = 2, step = .1, value = 0, post = " SD", animate = animationOptions(interval=400, loop=T)))
-    
     PCs$level2[i] = PCnum
   }  
   
@@ -64,7 +67,6 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
   ids = unique(mfpca.obj$Y.df$id)
   Y.df = mfpca.obj$Y.df; Yhat.subj = mfpca.obj$Yhat.subject; Yhat = mfpca.obj$Yhat
   rownames(Yhat) = rownames(Yhat.subj) = rownames(Y.df)  ## set consistent rownames for grouping by visit in ggplot
-  
   
   #################################
   ## App
@@ -126,22 +128,20 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
                     ),
                     tabPanel("Linear Combinations", icon = icon("line-chart"),
                              withMathJax(),
-                             column(2, h4("Sliders for Level 1"),
+                             column(3, h4("Sliders for Levels 1 and 2"),
                                     helpText("Plot shows the linear combination of mean and FPCs with the scores 
                                              specified using the sliders below."), hr(),
-                                    eval(calls[[1]]),
+                                    eval(calls),
                                     br(), br(), downloadButton('downloadPlotLinCom', 'Download Plot')
                              ),
-                             column(2, h4("Sliders for Level 2"), br(), br(), br(), hr(),
-                                    eval(calls[[2]])
-                             ),
-                             column(8, h4("Linear Combination of Mean and FPCs"), 
+                             column(9, h4("Linear Combination of Mean and FPCs"), 
                                     plotOutput('LinCom')
                              )
                     ),
                     tabPanel("Subject Fits",  icon = icon("user"),
                              column(3,
-                                    helpText("Plot shows observed data and fitted values for the subject selected below"), 
+                                    helpText("Plot shows observed data and fitted values for the subject selected below. Blue curves are
+                                             subject-specific fitted values and red curves are subject-visit specific fitted values."), 
                                     selectInput("subject", label = ("Select Subject"), choices = ids, selected =ids[1]),
                                     br(), br(), downloadButton('downloadPlotSubject', 'Download Plot')
                                     ),
@@ -242,18 +242,23 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
       #################################
       
       plotInputLinCom <- reactive({
-        PCweights = lapply(1:2, function(x) rep(NA, length(PCs[[x]]))) ; names(PCweights) <- c("level1", "level2")
-        for(i in 1:length(PCs$level1)){PCweights$level1[i] = input[[PCs$level1[i]]]}
-        for(i in 1:length(PCs$level2)){PCweights$level2[i] = input[[PCs$level2[i]]]}
+        PCweights = lapply(1:2, function(x) rep(NA, 3)) ; 
+        names(PCweights) <- c("level1", "level2")
+        for(i in 1:3){PCweights$level1[i] = input[[PCs$level1[i]]]}
+        for(i in 1:3){PCweights$level2[i] = input[[PCs$level2[i]]]}
         
         df = as.data.frame(cbind(1:length(mfpca.obj$mu), 
-                                 as.matrix(mfpca.obj$mu)+efunctions$level1 %*% sqrt.evalues$level1 %*% PCweights$level1
-                                 + efunctions$level2 %*% sqrt.evalues$level2 %*% PCweights$level2))
+                                 as.matrix(mfpca.obj$mu)+efunctions$level1[,1:3] %*% sqrt.evalues$level1[1:3,1:3] %*% PCweights$level1
+                                 + efunctions$level2[,1:3] %*% sqrt.evalues$level2[1:3,1:3] %*% PCweights$level2,
+                                 as.matrix(mfpca.obj$mu) +efunctions$level1[,1:3] %*% sqrt.evalues$level1[1:3,1:3] %*% PCweights$level1 ))
         
+        names(df) = c("grid", "mu_visit", "mu_subj")
         p3 <- ggplot(mu, aes(x=V1, y=V2))+geom_line(lwd=1, aes(color= "mu"))+theme_bw()+
           scale_x_continuous(breaks = seq(0, length(mfpca.obj$mu)-1, length=6), labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1)))+
-          geom_line(data = df, lwd = 1.5, aes(color = "subject")) + xlab(xlab) + ylab(ylab) + ggtitle(title)+
-          scale_color_manual("Line Legend", values = c(mu = "black", subject = "cornflowerblue"), guide = FALSE)+ 
+          geom_line(data = df, lwd = 1.5, aes(x=grid, y = mu_visit, color = "visit")) + 
+          geom_line(data = df, lwd = 1.5, aes(x=grid, y = mu_subj, color = "subject")) + 
+          xlab(xlab) + ylab(ylab) + ggtitle(title)+
+          scale_color_manual("Line Legend", values = c(mu = "black", visit = "indianred",  subject = "cornflowerblue"), guide = FALSE)+ 
           theme(legend.key = element_blank()) + ylim(c(range(mfpca.obj$Yhat)[1], range(mfpca.obj$Yhat)[2]))
       })
       
@@ -287,10 +292,10 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
         df.Yhat = mutate(melt(as.matrix(subset(Yhat, Y.df$id == id.cur))), grid=rep(1:ncol(Y.df$Y), each = length(which(Y.df$id == id.cur))))
         names(df.obs) = names(df.Yhat.subj) =  names(df.Yhat) = c("visit", "Ynames", "value", "time")
         
-        p4 <- ggplot(df.obs, aes(x = time, y = value, group = visit)) + geom_point() +theme_bw() + 
+        p4 <- ggplot(df.obs, aes(x = time, y = value, group = visit)) + geom_point(col = "blue") +theme_bw() + 
           geom_line(data = mu, aes(x=V1, y=V2, group=NULL), col="gray")+
           geom_path(data = df.Yhat.subj, col="blue")+
-          geom_path(data=df.Yhat)
+          geom_path(data=df.Yhat, col = "indianred")
         
        })
       
