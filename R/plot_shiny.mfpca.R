@@ -68,6 +68,11 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
   Y.df = mfpca.obj$Y.df; Yhat.subj = mfpca.obj$Yhat.subject; Yhat = mfpca.obj$Yhat
   rownames(Yhat) = rownames(Yhat.subj) = rownames(Y.df)  ## set consistent rownames for grouping by visit in ggplot
   
+  ### Tab 5: score plots
+  
+  ## changing Yhat.subject so we only have one curve for subject, by ignoring ETA differences. Update this
+      # if you decide to do something else. Make sure mfpca.sc reflects these changes.
+    
   #################################
   ## App
   #################################
@@ -165,10 +170,22 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
                                     )
                                
                              ),
-                             column(9,
+                             column(9,  h4("Score Scatterplot for Selected FPCs"),
                                tabsetPanel(
-                                 tabPanel("Level 1"),
-                                 tabPanel("Level 2")
+                                 tabPanel("Level 1",
+                                          fluidRow(
+                                            plotOutput("ScorePlot",
+                                                       brush=brushOpts(
+                                                         id = "ScorePlot_brush",
+                                                         resetOnNew = TRUE)
+                                            )
+                                          ),
+                                          fluidRow( plotOutput("ScorePlot2")
+                                          )
+
+                                 ),
+                                 tabPanel("Level 2"
+                                 )
                                )
                                
                              )
@@ -335,11 +352,60 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
         }
       )
       
-      
       #################################
       ## Code for score plots
       #################################
             
+      scoredata = data.frame(mfpca.obj$scores$level1); colnames(scoredata) = c(paste0("PC", 1:mfpca.obj$npc[[1]]))
+      ###
+      #
+      # right now only plot 1 is shown... need to update so we see plot 2... maybe use code from the other plot where you
+          ## melt Yhat values instead, and take Yhat.subject out of the scoredata matrix so you don't have dimension problem
+          ## and don't have ot reduce the data in  weird way, which will naturally deal with the eta problem.
+      #
+      #scoredata = as.data.frame(cbind(mfpca.obj$scores[[1]], mfpca.obj$Yhat.subject)) 
+      #colnames(scoredata) = c(paste0("PC", 1:mfpca.obj$npc[[1]]), paste0("subj", 1:dim(mfpca.obj$Yhat.subject)[2]))
+      
+      ## get PCs selected for X and Y axis
+      PCX <- reactive({ paste0("PC", input$PCX) })
+      PCY <- reactive({ paste0("PC", input$PCY) })
+      
+      
+      ## Tab 5 Plot
+      output$ScorePlot <- renderPlot({
+        ggplot(scoredata, aes_string(x = PCX(), y = PCY()))+geom_point(color = "blue", alpha = 1/5, size = 3)+theme_bw()+
+          xlab(paste("Scores for FPC", input$PCX))+ylab(paste("Scores for FPC", input$PCY))  
+      })
+      
+      ### 
+      ## 
+      ## second score plot:  edit all of this stuff!
+      ##
+      ###################
+      
+      ##df.Yhat.subj = mutate(melt(as.matrix(subset(Yhat.subj, Y.df$id == id.cur))), grid=rep(1:ncol(Y.df$Y), each = length(which(Y.df$id == id.cur))))
+      
+      #Yhat.all.m = melt(mfpca.obj$Yhat)
+      #colnames(Yhat.all.m) = c("subj", "time", "value")   
+      #baseplot = ggplot(Yhat.all.m, aes(x=time, y=value, group = subj)) + geom_line(alpha = 1/5, color="black") + 
+       # xlab(xlab) + ylab(ylab) + theme_bw()
+      
+      #output$ScorePlot2 <- renderPlot({
+        
+       # brush <- input$ScorePlot_brush
+        #if(!is.null(brush)){           
+        #  points = brushedPoints(scoredata, input$ScorePlot_brush, xvar=PCX(), yvar = PCY())
+        #  Yhat.m = melt(as.matrix(points[,-c(1:mfpca.obj$npc[[1]])]))
+        ##  
+        #}else{
+        #  Yhat.m = as.data.frame(cbind(1, 1:length(mfpca.obj$mu), mfpca.obj$mu))
+        #}
+        
+      #  colnames(Yhat.m) <- c("subj", "time", "value")  
+       # baseplot+geom_line(data= Yhat.m, aes(x=as.numeric(time), y=value, group = subj), color="blue")
+        
+    #  })
+      
     } ## end server
   )
 }
