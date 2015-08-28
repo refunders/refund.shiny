@@ -140,9 +140,12 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
                     ),
                     tabPanel("Subject Fits",  icon = icon("user"),
                              column(3,
-                                    helpText("Plot shows observed data and fitted values for the subject selected below. Blue curves are
-                                             subject-specific fitted values and red curves are subject-visit specific fitted values."), 
-                                    selectInput("subject", label = ("Select Subject"), choices = ids, selected =ids[1]),
+                                    helpText("Plot shows observed data and fitted values for the subject selected below. Dotted blue curve is
+                                             subject-specific mean and red curves are subject-visit specific fitted values."), hr(),
+                                    selectInput("subject", label = ("Select Subject"), choices = ids, selected =ids[1]), hr(),
+                                    checkboxInput("colVisit", label="Color by Visit", value =FALSE), 
+                                    helpText("If 'Color by Visit' is selected, observed values and subject-visit specific fitted values
+                                             are colored by visit number."),
                                     br(), br(), downloadButton('downloadPlotSubject', 'Download Plot')
                                     ),
                              column(9, h4("Fitted and Observed Values for Selected Subject"),
@@ -279,11 +282,7 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
       #################################
 
       ### change axes so they are the same as fpca.sc
-      ### do not show black curves- only show Yhat.subject and mean
-      #### add labels for Yhat.subject and mean
-      
-      ### add clickbox option so people can see Yhat values for each visit colored by visit
-      ### see if you can do this with a different color
+
       plotInputSubject <- reactive({
         id.cur = as.numeric(input$subject)
         
@@ -292,10 +291,15 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
         df.Yhat = mutate(melt(as.matrix(subset(Yhat, Y.df$id == id.cur))), grid=rep(1:ncol(Y.df$Y), each = length(which(Y.df$id == id.cur))))
         names(df.obs) = names(df.Yhat.subj) =  names(df.Yhat) = c("visit", "Ynames", "value", "time")
         
-        p4 <- ggplot(df.obs, aes(x = time, y = value, group = visit)) + geom_point(col = "blue") +theme_bw() + 
+        p4 <- ggplot(df.obs, aes(x = time, y = value, group = visit)) + geom_point(col = "indianred") +theme_bw() + 
+          scale_x_continuous(breaks = seq(0, length(mfpca.obj$mu)-1, length=6), labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1)))+
+          xlab(xlab) + ylab(ylab) + ylim(c(range(mfpca.obj$Yhat)[1], range(mfpca.obj$Yhat)[2])) +
           geom_line(data = mu, aes(x=V1, y=V2, group=NULL), col="gray")+
-          geom_path(data = df.Yhat.subj, col="blue")+
-          geom_path(data=df.Yhat, col = "indianred")
+          geom_path(data=df.Yhat, col = "indianred") + geom_path(data = df.Yhat.subj, col="cornflowerblue", lty = 6, lwd = 1.25) 
+        
+        if(input$colVisit) {p4 = p4 + geom_point(aes(col = factor(visit))) + geom_path(data=df.Yhat, aes(col = factor(visit)))+ theme(legend.position="none")
+                                                                                       
+        } else{p4 = p4   }
         
        })
       
