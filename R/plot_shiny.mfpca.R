@@ -29,6 +29,10 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
   ################################
   levels = names(mfpca.obj$npc)
   
+  ### Tab 3: mean +/- FPC plot
+  muPCtext = "Solid black line indicates population mean. For the FPC selected below, blue and red lines 
+                                             indicate the population mean +/- the FPC times 2 SDs of the associated score distribution."
+  
   ## Tab 2: scree plot
   
   scree <- lapply(levels, function(level) {
@@ -45,18 +49,19 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
   #varpercent.all = lapply(evalues.all, function(i){100*round(k/sum(evalues.all), 3)})
   
   
-  calls <- lapply(mfpca.obj$npc, function(x) as.list(rep(NA, 3)))
-  PCs <- lapply(mfpca.obj$npc, function(x) rep(NA, 3))
-  #names(calls) <- names(PCs) <- c("level1", "level2")
+  numSliders = 3 ## number of sliders per level for Linear Combinations plot
+  calls <- lapply(mfpca.obj$npc, function(x) as.list(rep(NA, numSliders)))
+  PCs <- lapply(mfpca.obj$npc, function(x) rep(NA, numSliders))
   
-  for(i in 1:3){
+  
+  for(i in 1:numSliders){
     PCnum = paste("PC", " 1.", i, sep="")    
     calls$level1[[i]] =  eval(call("sliderInput", inputId= PCnum, label = paste(PCnum, ": ", varpercent1[[i]],  "% of Level 1 Variance", sep=""),
                                    min = -2, max = 2, step = .1, value = 0, post = " SD", animate = animationOptions(interval=400, loop=T)))
     PCs$level1[i] = PCnum
   }  
   
-  for(i in 1:3){
+  for(i in 1:numSliders){
     PCnum = paste("PC", " 2.", i, sep="")    
     calls$level2[[i]] =  eval(call("sliderInput", inputId= PCnum, label = paste(PCnum, ": ", varpercent2[[i]],  "% of Level 2 Variance", sep=""),
                                    min = -2, max = 2, step = .1, value = 0, post = " SD", animate = animationOptions(interval=400, loop=T)))
@@ -87,49 +92,37 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
                     collapsible = FALSE, id = "nav",
                     inverse = TRUE, header = NULL,
                     tabPanel("Mean +/- FPCs", icon = icon("stats", lib = "glyphicon"),
-                             fluidRow(
-                               column(3,
-                                      helpText("Solid black line indicates population mean. For the FPC selected below, blue and red lines 
-                                             indicate the population mean +/- the FPC times 2 SDs of the associated score distribution."), hr(),
-                                      selectInput("PCchoice1", label = ("Select Level 1 FPC"), choices = 1:mfpca.obj$npc$level1, selected = 1),
-                                      br(), br(), downloadButton('downloadPlotMuPC1', 'Download Level 1 Plot')
-                               ),
-                               column(9, h4("Mean and FPCs for Level 1"),
-                                      plotOutput('muPCplot1')
-                               )
+                        tabsetPanel(
+                             tabPanel("Level 1",
+                                      column(3, helpText(muPCtext), hr(),
+                                             selectInput("PCchoice1", label = ("Select Level 1 FPC"), choices = 1:mfpca.obj$npc$level1, selected = 1),
+                                             br(), br(), downloadButton('downloadPlotMuPC1', 'Download Level 1 Plot')
+                                      ),
+                                      column(9, h4("Mean and FPCs for Level 1"), plotOutput('muPCplot1') )
                              ),
-                             fluidRow(
-                               column(3,
-                                      selectInput("PCchoice2", label = ("Select Level 2 FPC"), choices = 1:mfpca.obj$npc$level2, selected = 1),
-                                      br(), br(), downloadButton('downloadPlotMuPC2', 'Download Level 2 Plot')
-                               ),
-                               column(9, h4("Mean and FPCs for Level 2"),
-                                      plotOutput('muPCplot2')
-                               )
-                             ) ## end fluidRow
-                             
+                             tabPanel("Level 2", 
+                                      column(3, helpText(muPCtext), hr(),
+                                             selectInput("PCchoice2", label = ("Select Level 2 FPC"), choices = 1:mfpca.obj$npc$level2, selected = 1),
+                                             br(), br(), downloadButton('downloadPlotMuPC2', 'Download Level 2 Plot')       
+                                      ),
+                                      column(9,h4("Mean and FPCs for Level 2"),plotOutput('muPCplot2') )
+                             )
+                        )
                     ),
                     tabPanel("Scree Plot", icon = icon("medkit"),
-                             fluidRow(
-                               column(3, 
-                                      helpText("Scree plots for level1 and level2; the left panel shows the plot of eigenvalues and 
-                                             the right panel shows the cumulative percent variance explained."), 
+                             column(3,
+                               fluidRow( helpText("Scree plots for level 1 and level 2; the left panel shows the plot of eigenvalues and 
+                                             the right panel shows the cumulative percent variance explained."), hr(),
                                       br(), br(), downloadButton('downloadPlotScree1', 'Download Level 1 Plot')
                                ),
-                               column(9, h4("Scree Plots: Level 1"), 
-                                      plotOutput('Scree1')
-                               )
+                               fluidRow( br(),br(), br(), downloadButton('downloadPlotScree2', 'Download Level 2 Plot') )
                              ),
-                             fluidRow(
-                               column(3, 
-                                      
-                                      br(), br(), downloadButton('downloadPlotScree2', 'Download Level 2 Plot')
-                               ),
-                               column(9, h4("Scree Plots: Level 2"), 
-                                      plotOutput('Scree2')
-                               )
-                             ) ## end fluidRow
-                             
+                             column(9, h4("Scree Plots"),
+                                tabsetPanel(
+                                  tabPanel("Level 1", plotOutput('Scree1') ),
+                                  tabPanel("Level 2", plotOutput('Scree2') )
+                                )
+                             )       
                     ),
                     tabPanel("Linear Combinations", icon = icon("line-chart"),
                              withMathJax(),
@@ -173,7 +166,7 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
                              column(9,  h4("Score Scatterplot for Selected FPCs"),
                                tabsetPanel(
                                  tabPanel("Level 1",
-                                          fluidRow(
+                                          fluidRow( 
                                             plotOutput("ScorePlot",
                                                        brush=brushOpts(
                                                          id = "ScorePlot_brush",
@@ -204,6 +197,10 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
       scaled_efunctions = lapply(1:2, function(x) efunctions[[x]] %*% sqrt.evalues[[x]])
       names(scaled_efunctions) <- names(sqrt.evalues) <- names(efunctions) <- c("level1", "level2")
       
+      plotDefaults = list(theme_bw(), xlab(xlab), ylab(ylab), ylim(c(range(Yhat)[1], range(Yhat)[2])),
+                          scale_x_continuous(breaks = seq(0, length(mfpca.obj$mu)-1, length=6), labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1))) )
+        
+      
       #################################
       ## Code for mu PC plot
       #################################
@@ -214,11 +211,9 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
         scaled_efuncs = lapply(1:2, function(x) scaled_efunctions[[x]][,PCchoice[[x]]])
         
         p1 <- lapply(1:2, function(x){
-          ggplot(mu, aes(x = V1, y = V2)) + geom_line(lwd=1) + theme_bw() +
+          ggplot(mu, aes(x = V1, y = V2)) + geom_line(lwd=1) + plotDefaults +
             geom_point(data = as.data.frame(cbind(1:length(mfpca.obj$mu), mfpca.obj$mu + 2*scaled_efuncs[[x]])), color = "blue", size = 4, shape = '+')+
             geom_point(data = as.data.frame(cbind(1:length(mfpca.obj$mu), mfpca.obj$mu - 2*scaled_efuncs[[x]])), color = "red", size = 4, shape = "-")+
-            scale_x_continuous(breaks = seq(0, length(mfpca.obj$mu)-1, length=6), labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1)))+
-            xlab(xlab) + ylab(ylab) + ylim(c(range(mfpca.obj$Yhat)[1], range(mfpca.obj$Yhat)[2])) +
             ggtitle(bquote(psi[.(PCchoice[[x]])]~(t) ~ "," ~.(100*round(mfpca.obj$evalues[[x]][PCchoice[[x]]]/sum(mfpca.obj$evalues[[x]]),3)) ~ "% Variance"))   
         })   
       })
@@ -283,29 +278,25 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
       #################################
       
       plotInputLinCom <- reactive({
-        PCweights = lapply(1:2, function(x) rep(NA, 3)) ; 
+        PCweights = lapply(1:2, function(x) rep(NA, numSliders)) ; 
         names(PCweights) <- c("level1", "level2")
-        for(i in 1:3){PCweights$level1[i] = input[[PCs$level1[i]]]}
-        for(i in 1:3){PCweights$level2[i] = input[[PCs$level2[i]]]}
+        for(i in 1:numSliders){PCweights$level1[i] = input[[PCs$level1[i]]]}
+        for(i in 1:numSliders){PCweights$level2[i] = input[[PCs$level2[i]]]}
         
         df = as.data.frame(cbind(1:length(mfpca.obj$mu), 
-                                 as.matrix(mfpca.obj$mu)+efunctions$level1[,1:3] %*% sqrt.evalues$level1[1:3,1:3] %*% PCweights$level1
-                                 + efunctions$level2[,1:3] %*% sqrt.evalues$level2[1:3,1:3] %*% PCweights$level2,
-                                 as.matrix(mfpca.obj$mu) +efunctions$level1[,1:3] %*% sqrt.evalues$level1[1:3,1:3] %*% PCweights$level1 ))
+                                 as.matrix(mfpca.obj$mu)+efunctions$level1[,1:numSliders] %*% sqrt.evalues$level1[1:numSliders, 1:numSliders] %*% PCweights$level1
+                                 + efunctions$level2[,1:numSliders] %*% sqrt.evalues$level2[1:numSliders, 1:numSliders] %*% PCweights$level2,
+                                 as.matrix(mfpca.obj$mu) +efunctions$level1[,1:numSliders] %*% sqrt.evalues$level1[1:numSliders, 1:numSliders] %*% PCweights$level1 ))
         
         names(df) = c("grid", "mu_visit", "mu_subj")
-        p3 <- ggplot(mu, aes(x=V1, y=V2))+geom_line(lwd=1, aes(color= "mu"))+theme_bw()+
-          scale_x_continuous(breaks = seq(0, length(mfpca.obj$mu)-1, length=6), labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1)))+
+        p3 <- ggplot(mu, aes(x=V1, y=V2))+geom_line(lwd=1, aes(color= "mu"))+ plotDefaults + theme(legend.key = element_blank())+
           geom_line(data = df, lwd = 1.5, aes(x=grid, y = mu_visit, color = "visit")) + 
           geom_line(data = df, lwd = 1.5, aes(x=grid, y = mu_subj, color = "subject")) + 
-          xlab(xlab) + ylab(ylab) + ggtitle(title)+
-          scale_color_manual("Line Legend", values = c(mu = "black", visit = "indianred",  subject = "cornflowerblue"), guide = FALSE)+ 
-          theme(legend.key = element_blank()) + ylim(c(range(mfpca.obj$Yhat)[1], range(mfpca.obj$Yhat)[2]))
+          scale_color_manual("Line Legend", values = c(mu = "black", visit = "indianred",  subject = "cornflowerblue"), guide = FALSE)
       })
       
       output$LinCom <- renderPlot(  
-        print(plotInputLinCom())
-        
+        print(plotInputLinCom())   
       )
       
       output$downloadPlotLinCom <- downloadHandler(
@@ -319,24 +310,17 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
       ## Code for subject plots
       #################################
 
-      ### change axes so they are the same as fpca.sc
-
       plotInputSubject <- reactive({
         id.cur = as.numeric(input$subject)
         
-        df.obs = mutate(melt(as.matrix(subset(Y.df, id == id.cur, select = Y))), grid=rep(1:ncol(Y.df$Y), each = length(which(Y.df$id == id.cur))))
-        df.Yhat.subj = mutate(melt(as.matrix(subset(Yhat.subj, Y.df$id == id.cur))), grid=rep(1:ncol(Y.df$Y), each = length(which(Y.df$id == id.cur))))
-        df.Yhat = mutate(melt(as.matrix(subset(Yhat, Y.df$id == id.cur))), grid=rep(1:ncol(Y.df$Y), each = length(which(Y.df$id == id.cur))))
-        names(df.obs) = names(df.Yhat.subj) =  names(df.Yhat) = c("visit", "Ynames", "value", "time")
+        df.obs = makeDF(id.cur, Y.df, id, select = Y) 
+        df.Yhat.subj = makeDF(id.cur, Yhat.subj, Y.df$id); df.Yhat = makeDF(id.cur, Yhat, Y.df$id)
         
-        p4 <- ggplot(df.obs, aes(x = time, y = value, group = visit)) + geom_point(col = "indianred") +theme_bw() + 
-          scale_x_continuous(breaks = seq(0, length(mfpca.obj$mu)-1, length=6), labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1)))+
-          xlab(xlab) + ylab(ylab) + ylim(c(range(mfpca.obj$Yhat)[1], range(mfpca.obj$Yhat)[2])) +
+        p4 <- ggplot(df.obs, aes(x = time, y = value, group = visit)) + geom_point(col = "indianred", alpha = 1/5) + plotDefaults + 
           geom_line(data = mu, aes(x=V1, y=V2, group=NULL), col="gray")+
           geom_path(data=df.Yhat, col = "indianred") + geom_path(data = df.Yhat.subj, col="cornflowerblue", lty = 6, lwd = 1.25) 
         
-        if(input$colVisit) {p4 = p4 + geom_point(aes(col = factor(visit))) + geom_path(data=df.Yhat, aes(col = factor(visit)))+ 
-                              theme(legend.position="none")                                                         
+        if(input$colVisit) {p4 = p4 + geom_point(aes(col = factor(visit))) + geom_path(data=df.Yhat, aes(col = factor(visit)))+  theme(legend.position="none")                                                         
         } else{p4 = p4   }
         
        })

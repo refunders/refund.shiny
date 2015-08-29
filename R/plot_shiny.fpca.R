@@ -137,6 +137,9 @@ plot_shiny.fpca = function(x, xlab = "", ylab="", title = "", ...) {
       efunctions = fpca.obj$efunctions; sqrt.evalues = diag(sqrt(fpca.obj$evalues))      
       scaled_efunctions = efunctions %*% sqrt.evalues
       
+      plotDefaults = list(theme_bw(), xlab(xlab), ylab(ylab), ylim(c(range(fpca.obj$Yhat)[1], range(fpca.obj$Yhat)[2])),
+                          scale_x_continuous(breaks = seq(0, length(fpca.obj$mu)-1, length=6), labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1))) )
+      
       #################################
       ## Code for mu PC plot
       #################################
@@ -145,11 +148,9 @@ plot_shiny.fpca = function(x, xlab = "", ylab="", title = "", ...) {
         PCchoice = as.numeric(input$PCchoice)
         scaled_efuncs = scaled_efunctions[,PCchoice]
         
-        p1 <- ggplot(mu, aes(x = V1, y = V2)) + geom_line(lwd=1) + theme_bw() +
+        p1 <- ggplot(mu, aes(x = V1, y = V2)) + geom_line(lwd=1) + plotDefaults +
           geom_point(data = as.data.frame(cbind(1:length(fpca.obj$mu), fpca.obj$mu + 2*scaled_efuncs)), color = "blue", size = 4, shape = '+')+
           geom_point(data = as.data.frame(cbind(1:length(fpca.obj$mu), fpca.obj$mu - 2*scaled_efuncs)), color = "red", size = 4, shape = "-")+
-          scale_x_continuous(breaks = seq(0, length(fpca.obj$mu)-1, length=6), labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1)))+
-          xlab(xlab) + ylab(ylab) + ylim(c(range(fpca.obj$Yhat)[1], range(fpca.obj$Yhat)[2]))+
           ggtitle(bquote(psi[.(input$PCchoice)]~(t) ~ "," ~.(100*round(fpca.obj$evalues[as.numeric(input$PCchoice)]/sum(fpca.obj$evalues),3)) ~ "% Variance"))   
       })
       
@@ -193,11 +194,9 @@ plot_shiny.fpca = function(x, xlab = "", ylab="", title = "", ...) {
         PCweights = rep(NA, length(PCs)); for(i in 1:length(PCs)){PCweights[i] = input[[PCs[i]]]}
         df = as.data.frame(cbind(1:length(fpca.obj$mu), as.matrix(fpca.obj$mu)+efunctions %*% sqrt.evalues %*% PCweights ))
         
-        p3 <- ggplot(mu, aes(x=V1, y=V2))+geom_line(lwd=1, aes(color= "mu"))+theme_bw()+
-          scale_x_continuous(breaks = seq(0, length(fpca.obj$mu)-1, length=6), labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1)))+
+        p3 <- ggplot(mu, aes(x=V1, y=V2))+geom_line(lwd=1, aes(color= "mu"))+  plotDefaults + theme(legend.key = element_blank()) +
           geom_line(data = df, lwd = 1.5, aes(color = "subject")) + xlab(xlab) + ylab(ylab) + ggtitle(title)+
-          scale_color_manual("Line Legend", values = c(mu = "black", subject = "cornflowerblue"), guide = FALSE)+ 
-          theme(legend.key = element_blank()) + ylim(c(range(fpca.obj$Yhat)[1], range(fpca.obj$Yhat)[2]))
+          scale_color_manual("Line Legend", values = c(mu = "black", subject = "cornflowerblue"), guide = FALSE)  
       })
       
       output$LinCom <- renderPlot(  
@@ -220,11 +219,9 @@ plot_shiny.fpca = function(x, xlab = "", ylab="", title = "", ...) {
         subjectnum = as.numeric(input$subject)
         df = as.data.frame(cbind(1:length(fpca.obj$mu), fpca.obj$mu, fpca.obj$Yhat[subjectnum,], fpca.obj$Y[subjectnum,]))
         
-        p4 <- ggplot(data = df, aes(x=V1,y=V2)) + geom_line(lwd=0.5, color = "gray") + theme_bw() +
-          scale_x_continuous(breaks = seq(0, length(fpca.obj$mu)-1, length=6), labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1)))+
+        p4 <- ggplot(data = df, aes(x=V1,y=V2)) + geom_line(lwd=0.5, color = "gray") + plotDefaults +
           geom_line(data = df, aes(y=V3), size=1, color = "blue") +
-          geom_point(data = df, aes(y=V4), color = "blue") +
-          xlab(xlab) + ylab(ylab) + ylim(c(range(fpca.obj$Yhat)[1], range(fpca.obj$Yhat)[2])) 
+          geom_point(data = df, aes(y=V4), color = "blue") 
       })
       
       output$Subject <- renderPlot( 
@@ -258,8 +255,7 @@ plot_shiny.fpca = function(x, xlab = "", ylab="", title = "", ...) {
       ### second score plot
       Yhat.all.m = melt(fpca.obj$Yhat)
       colnames(Yhat.all.m) = c("subj", "time", "value")   
-      baseplot = ggplot(Yhat.all.m, aes(x=time, y=value, group = subj)) + geom_line(alpha = 1/5, color="black") + 
-        xlab(xlab) + ylab(ylab) + theme_bw()
+      baseplot = ggplot(Yhat.all.m, aes(x=time, y=value, group = subj)) + geom_line(alpha = 1/5, color="black") + plotDefaults
       
       output$ScorePlot2 <- renderPlot({
    
