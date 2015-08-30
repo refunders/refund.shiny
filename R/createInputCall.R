@@ -24,3 +24,32 @@ createInputCall = function(name, variable){
   
 }
 
+
+#' Create input calls for plot_shiny.mfpca()
+#'
+#' Internal method that constructs the input calls for plot_shiny.mfpca(). The
+#' number of sliders to construct for each level is passed as an argument, and 
+#' corresponding sliders for each FPC are constructed.
+#' 
+#' @param numSliders numeric, number of PCs per level to create sliders for. Defaults to 3.
+#' @param plotObj the mfpca object plotted in the plot_shiny.mfpca() function. 
+#' @param percents the percent variance calculated for each eigen values for levels 1 and 2.
+#' 
+#' @return a list of numbers that indicate percent variance for selected level.
+#' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu}
+#' 
+mfpcaCalls = function(numSliders = 3, plotObj = mfpca.obj, percents = varpercents){
+  calls <- lapply(plotObj$npc, function(x) as.list(rep(NA, numSliders)))
+  PCs <- lapply(plotObj$npc, function(x) rep(NA, numSliders))
+  
+  for(j in 1:2){
+    for(i in 1:numSliders){
+      PCnum = paste("PC ", j, ".",  i, sep="")    
+      calls[[j]][[i]] =  eval(call("sliderInput", inputId= PCnum, label = paste0(PCnum, ": ", percents[[j]][[i]], "% of Level ", j,  " Variance"),
+                                   min = -2, max = 2, step = .1, value = 0, post = " SD", animate = animationOptions(interval=400, loop=T)))
+      PCs[[j]][i] = PCnum
+    }  
+  }
+  ret <- list(calls, PCs); names(ret) <- c("calls", "PCs")  
+  return(ret)
+}

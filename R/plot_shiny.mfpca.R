@@ -27,57 +27,65 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
   ################################
   ## code for processing tabs
   ################################
-  levels = names(mfpca.obj$npc)
+  npc = mfpca.obj$npc
   
-  ### Tab 3: mean +/- FPC plot
+  #################################
+  ## Tab 3: mean +/- FPC plot
+  #################################
   muPCtext = "Solid black line indicates population mean. For the FPC selected below, blue and red lines 
                                              indicate the population mean +/- the FPC times 2 SDs of the associated score distribution."
   
+  #################################
   ## Tab 2: scree plot
-  
-  scree <- lapply(levels, function(level) {
-    data.frame(k = rep(1:mfpca.obj$npc[[level]], 2), 
+  #################################
+  scree <- lapply(names(npc), function(level) {
+    data.frame(k = rep(1:npc[[level]], 2), 
                lambda = c(mfpca.obj$evalues[[level]], cumsum(mfpca.obj$evalues[[level]])/ sum(mfpca.obj$evalues[[level]])),
-               type = rep(c("Eigenvalue", "Percent Variance Explained"), each = mfpca.obj$npc[[level]]))
+               type = rep(c("Eigenvalue", "Percent Variance Explained"), each = npc[[level]]))
   })
   names(scree) <- c("level1", "level2")  
   
-  ## Tab 3: linear combination of PCs
-  evalues.all = c(mfpca.obj$evalues$level1, mfpca.obj$evalues$level2)
-  varpercent1 = lapply(evalues.all[1:mfpca.obj$npc$level1], function(i){100*round(i/sum(mfpca.obj$evalues$level1), 3)}) 
-  varpercent2 = lapply(evalues.all[(mfpca.obj$npc$level1+1):length(evalues.all)], function(i){100*round(i/sum(mfpca.obj$evalues$level2) ,3)}) 
-  #varpercent.all = lapply(evalues.all, function(i){100*round(k/sum(evalues.all), 3)})
+  #################################
+  ## Tab 3:Linear combination of PCs
+  #################################
+  varpercents = lapply(c(1, 2, 12), function(x) varPercent(x, mfpca.obj)) 
   
+  numSliders = 3
+  calls <- mfpcaCalls(numSliders, mfpca.obj, varpercents)$calls
+  PCs <- mfpcaCalls(numSliders, mfpca.obj, varpercents)$PCs
   
-  numSliders = 3 ## number of sliders per level for Linear Combinations plot
-  calls <- lapply(mfpca.obj$npc, function(x) as.list(rep(NA, numSliders)))
-  PCs <- lapply(mfpca.obj$npc, function(x) rep(NA, numSliders))
-  
-  
-  for(i in 1:numSliders){
-    PCnum = paste("PC", " 1.", i, sep="")    
-    calls$level1[[i]] =  eval(call("sliderInput", inputId= PCnum, label = paste(PCnum, ": ", varpercent1[[i]],  "% of Level 1 Variance", sep=""),
-                                   min = -2, max = 2, step = .1, value = 0, post = " SD", animate = animationOptions(interval=400, loop=T)))
-    PCs$level1[i] = PCnum
-  }  
-  
-  for(i in 1:numSliders){
-    PCnum = paste("PC", " 2.", i, sep="")    
-    calls$level2[[i]] =  eval(call("sliderInput", inputId= PCnum, label = paste(PCnum, ": ", varpercent2[[i]],  "% of Level 2 Variance", sep=""),
-                                   min = -2, max = 2, step = .1, value = 0, post = " SD", animate = animationOptions(interval=400, loop=T)))
-    PCs$level2[i] = PCnum
-  }  
-  
-  ### Tab 4: subject fits
+  #################################
+  ## Tab 4: subject fits
+  #################################
   ids = unique(mfpca.obj$Y.df$id)
   Y.df = mfpca.obj$Y.df; Yhat.subj = mfpca.obj$Yhat.subject; Yhat = mfpca.obj$Yhat
   rownames(Yhat) = rownames(Yhat.subj) = rownames(Y.df)  ## set consistent rownames for grouping by visit in ggplot
   
-  ### Tab 5: score plots
+  #################################
+  ## Tab 5: score plots
+  #################################
   
-  ## changing Yhat.subject so we only have one curve for subject, by ignoring ETA differences. Update this
-      # if you decide to do something else. Make sure mfpca.sc reflects these changes.
-    
+  ## from score plots
+  scoreTextA = "Use the drop down menus to select FPCs for the X and Y axis. Plot shows observed 
+    score scatterplot for selected FPCs; click and drag on the scatterplot to select subjects."
+  scoreTextB = "Black curves are fitted values for all subjects. Blue curves correspond to subjects selected in the graph above. 
+    If no points are selected, the mean curve is shown."
+  scoredata = lapply(1:2, function(i) data.frame(mfpca.obj$scores[[i]]))       
+  for(i in 1:2){colnames(scoredata[[i]]) = c(paste0("PC", 1:npc[[i]]))}
+  
+  ####### code from server
+  mu = as.data.frame(cbind(1:length(mfpca.obj$mu), mfpca.obj$mu))
+  efunctions = mfpca.obj$efunctions; 
+  sqrt.evalues = lapply(mfpca.obj$evalues, function(i) diag(sqrt(i)))      
+  scaled_efunctions = lapply(1:2, function(i) efunctions[[i]] %*% sqrt.evalues[[i]])
+  names(scaled_efunctions) <- names(sqrt.evalues) <- names(efunctions) <- c("level1", "level2")
+  
+  plotDefaults = list(theme_bw(), xlab(xlab), ylab(ylab), ylim(c(range(Yhat)[1], range(Yhat)[2])),
+                      scale_x_continuous(breaks = seq(0, length(mfpca.obj$mu)-1, length=6),
+                                         labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1))) )
+  
+ 
+  
   #################################
   ## App
   #################################
@@ -95,7 +103,7 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
                         tabsetPanel(
                              tabPanel("Level 1",
                                       column(3, helpText(muPCtext), hr(),
-                                             selectInput("PCchoice1", label = ("Select Level 1 FPC"), choices = 1:mfpca.obj$npc$level1, selected = 1),
+                                             selectInput("PCchoice1", label = ("Select Level 1 FPC"), choices = 1:npc$level1, selected = 1),
                                              br(), br(), downloadButton('downloadPlotMuPC1', 'Download Level 1 Plot')
                                       ),
                                       column(9, h4("Mean and FPCs for Level 1"), plotOutput('muPCplot1') )
@@ -152,9 +160,7 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
                     ),
                     tabPanel("Score Scatterplot",icon = icon("binoculars"),
                              column(3,
-                                    fluidRow( helpText("Use the drop down menus to select FPCs for the X and Y axis. Plot shows observed 
-                                                       score scatterplot for selected FPCs; click and drag on the scatterplot to 
-                                                       select subjects."), hr(),
+                                    fluidRow( helpText(scoreTextA), hr(),
                                               selectInput("PCX", label = ("Select X-axis FPC"), choices = 1:4, selected = 1),
                                               selectInput("PCY", label = ("Select Y-axis FPC"), choices = 1:4, selected = 2), hr()
                                     ),
@@ -167,17 +173,23 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
                                tabsetPanel(
                                  tabPanel("Level 1",
                                           fluidRow( 
-                                            plotOutput("ScorePlot",
+                                            plotOutput("ScorePlot1L1",
                                                        brush=brushOpts(
                                                          id = "ScorePlot_brush",
                                                          resetOnNew = TRUE)
                                             )
                                           ),
-                                          fluidRow( plotOutput("ScorePlot2")
-                                          )
+                                          fluidRow( plotOutput("ScorePlot2L1") )
 
                                  ),
-                                 tabPanel("Level 2"
+                                 tabPanel("Level 2",
+                                          fluidRow(
+                                            plotOutput("ScorePlot1L2",
+                                                       brush=brushOpts(
+                                                         id = "ScorePlot_brush",)
+                                            )
+                                          ),
+                                          fluidRow( plotOutput("ScorePlot2L2") )
                                  )
                                )
                                
@@ -191,15 +203,6 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
 
     server = function(input, output){
       
-      mu = as.data.frame(cbind(1:length(mfpca.obj$mu), mfpca.obj$mu))
-      efunctions = mfpca.obj$efunctions; 
-      sqrt.evalues = lapply(mfpca.obj$evalues, function(x) diag(sqrt(x)))      
-      scaled_efunctions = lapply(1:2, function(x) efunctions[[x]] %*% sqrt.evalues[[x]])
-      names(scaled_efunctions) <- names(sqrt.evalues) <- names(efunctions) <- c("level1", "level2")
-      
-      plotDefaults = list(theme_bw(), xlab(xlab), ylab(ylab), ylim(c(range(Yhat)[1], range(Yhat)[2])),
-                          scale_x_continuous(breaks = seq(0, length(mfpca.obj$mu)-1, length=6), labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1))) )
-        
       
       #################################
       ## Code for mu PC plot
@@ -208,13 +211,13 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
       plotInputMuPC <- reactive({
         PCchoice = list(as.numeric(input$PCchoice1), as.numeric(input$PCchoice2))
         names(PCchoice) <- c("level1", "level2")
-        scaled_efuncs = lapply(1:2, function(x) scaled_efunctions[[x]][,PCchoice[[x]]])
+        scaled_efuncs = lapply(1:2, function(i) scaled_efunctions[[i]][,PCchoice[[i]]])
         
-        p1 <- lapply(1:2, function(x){
+        p1 <- lapply(1:2, function(i){
           ggplot(mu, aes(x = V1, y = V2)) + geom_line(lwd=1) + plotDefaults +
-            geom_point(data = as.data.frame(cbind(1:length(mfpca.obj$mu), mfpca.obj$mu + 2*scaled_efuncs[[x]])), color = "blue", size = 4, shape = '+')+
-            geom_point(data = as.data.frame(cbind(1:length(mfpca.obj$mu), mfpca.obj$mu - 2*scaled_efuncs[[x]])), color = "red", size = 4, shape = "-")+
-            ggtitle(bquote(psi[.(PCchoice[[x]])]~(t) ~ "," ~.(100*round(mfpca.obj$evalues[[x]][PCchoice[[x]]]/sum(mfpca.obj$evalues[[x]]),3)) ~ "% Variance"))   
+            geom_point(data = as.data.frame(cbind(1:length(mfpca.obj$mu), mfpca.obj$mu + 2*scaled_efuncs[[i]])), color = "blue", size = 4, shape = '+')+
+            geom_point(data = as.data.frame(cbind(1:length(mfpca.obj$mu), mfpca.obj$mu - 2*scaled_efuncs[[i]])), color = "red", size = 4, shape = "-")+
+            ggtitle(bquote(psi[.(PCchoice[[i]])]~(t) ~ "," ~.(100*round(mfpca.obj$evalues[[i]][PCchoice[[i]]]/sum(mfpca.obj$evalues[[i]]),3)) ~ "% Variance"))   
         })   
       })
       
@@ -245,8 +248,8 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
       #################################
       
       plotInputScree <- reactive({
-        p2 <-screeplots <- lapply(scree, function(x){
-          ggplot(x, aes(x=k, y=lambda))+geom_line(linetype=1, lwd=1.5, color="black")+
+        p2 <-screeplots <- lapply(scree, function(i){
+          ggplot(i, aes(x=k, y=lambda))+geom_line(linetype=1, lwd=1.5, color="black")+
             geom_point(size = 4, color = "black")+ theme_bw() + xlab("Principal Component") + ylab("") +
             facet_wrap(~type, scales = "free_y") + ylim(0, NA) 
         })      
@@ -278,7 +281,7 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
       #################################
       
       plotInputLinCom <- reactive({
-        PCweights = lapply(1:2, function(x) rep(NA, numSliders)) ; 
+        PCweights = lapply(1:2, function(i) rep(NA, numSliders)) ; 
         names(PCweights) <- c("level1", "level2")
         for(i in 1:numSliders){PCweights$level1[i] = input[[PCs$level1[i]]]}
         for(i in 1:numSliders){PCweights$level2[i] = input[[PCs$level2[i]]]}
@@ -340,7 +343,8 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
       ## Code for score plots
       #################################
             
-      scoredata = data.frame(mfpca.obj$scores$level1); colnames(scoredata) = c(paste0("PC", 1:mfpca.obj$npc[[1]]))
+                
+      
       ###
       #
       # right now only plot 1 is shown... need to update so we see plot 2... maybe use code from the other plot where you
@@ -355,11 +359,18 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
       PCY <- reactive({ paste0("PC", input$PCY) })
       
       
-      ## Tab 5 Plot
-      output$ScorePlot <- renderPlot({
-        ggplot(scoredata, aes_string(x = PCX(), y = PCY()))+geom_point(color = "blue", alpha = 1/5, size = 3)+theme_bw()+
-          xlab(paste("Scores for FPC", input$PCX))+ylab(paste("Scores for FPC", input$PCY))  
+      ## Tab 5: Score Scatter Plots
+      ScorePlots <- reactive({
+        p5 = lapply(1:2, function(i){
+          ggplot(scoredata[[i]], aes_string(x = PCX(), y = PCY()))+geom_point(color = "blue", alpha = 1/5, size = 3)+theme_bw()+
+            xlab(paste("Scores for FPC", input$PCX))+ylab(paste("Scores for FPC", input$PCY))   
+        })
       })
+        
+      output$ScorePlot1L1 <- renderPlot({ print(ScorePlots()[[1]])})
+      
+      output$ScorePlot1L2 <- renderPlot({ print(ScorePlots()[[2]])})
+      
       
       ### 
       ## 
@@ -369,26 +380,25 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
       
       ##df.Yhat.subj = mutate(melt(as.matrix(subset(Yhat.subj, Y.df$id == id.cur))), grid=rep(1:ncol(Y.df$Y), each = length(which(Y.df$id == id.cur))))
       
-      #Yhat.all.m = melt(mfpca.obj$Yhat)
-      #colnames(Yhat.all.m) = c("subj", "time", "value")   
-      #baseplot = ggplot(Yhat.all.m, aes(x=time, y=value, group = subj)) + geom_line(alpha = 1/5, color="black") + 
-       # xlab(xlab) + ylab(ylab) + theme_bw()
       
-      #output$ScorePlot2 <- renderPlot({
+      Yhat.all.m = melt(mfpca.obj$Yhat); colnames(Yhat.all.m) = c("subj", "time", "value")   
+      baseplot = ggplot(Yhat.all.m, aes(x=time, y=value, group = subj)) + geom_line(alpha = 1/5, color="black") + plotDefaults
+      
+      output$ScorePlot2L1 <- renderPlot({
         
-       # brush <- input$ScorePlot_brush
-        #if(!is.null(brush)){           
-        #  points = brushedPoints(scoredata, input$ScorePlot_brush, xvar=PCX(), yvar = PCY())
-        #  Yhat.m = melt(as.matrix(points[,-c(1:mfpca.obj$npc[[1]])]))
-        ##  
-        #}else{
-        #  Yhat.m = as.data.frame(cbind(1, 1:length(mfpca.obj$mu), mfpca.obj$mu))
-        #}
+        brush <- input$ScorePlot_brush
+        if(!is.null(brush)){           
+          points = brushedPoints(scoredata[[1]], input$ScorePlot_brush, xvar=PCX(), yvar = PCY())
+          Yhat.m = melt(as.matrix(points[,-c(1:mfpca.obj$npc[[1]])]))
+          
+        }else{
+          Yhat.m = as.data.frame(cbind(1, 1:length(mfpca.obj$mu), mfpca.obj$mu))
+        }
         
-      #  colnames(Yhat.m) <- c("subj", "time", "value")  
-       # baseplot+geom_line(data= Yhat.m, aes(x=as.numeric(time), y=value, group = subj), color="blue")
+        colnames(Yhat.m) <- c("subj", "time", "value")  
+        baseplot+geom_line(data= Yhat.m, aes(x=as.numeric(time), y=value, group = subj), color="blue")
         
-    #  })
+      })
       
     } ## end server
   )

@@ -1,6 +1,6 @@
-#' Compute quadrature weights
+#' make melted dataframes for mfpca
 #'
-#' Utility function for numerical integration.
+#' Function to create dataframes of observed and fitted values for plotting with mfpca.
 #' @param IDvalue id on which to create dataframe.
 #' @param data name of data to be manipulated.
 #' @param subsetOn name of dataframe with 'id' column on which to subset data.
@@ -12,3 +12,4 @@ makeDF <- function(IDvalue, data, subsetON, ...){
   names(df) = c("visit", "Ynames", "value", "time")
   return(df)
 }
+
