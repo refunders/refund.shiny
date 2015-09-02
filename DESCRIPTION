@@ -16,6 +16,7 @@ Imports:
     gamm4,
     refund,
     dplyr,
-    lme4
+    lme4,
+    gridExtra
 License: GPL (>= 2)
 LazyData: true

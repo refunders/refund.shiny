@@ -15,6 +15,7 @@
 #' @seealso \code{\link{plot_shiny}}
 #' @import shiny
 #' @import ggplot2
+#' @importFrom gridExtra grid.arrange
 #' @importFrom dplyr mutate
 #' @importFrom reshape2 melt
 #' 
@@ -50,7 +51,9 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
                type = rep(c("Eigenvalue", "Percent Variance Explained"), each = npc[[level]]))
   })
   names(scree) <- c("level1", "level2")  
-  
+ 
+  levelVariance = lapply(1:2, function(i) round(sum(mfpca.obj$evalues[[i]])/(sum(mfpca.obj$evalues[[1]])+sum(mfpca.obj$evalues[[2]])), 3)*100)
+
   #################################
   ## Tab 3:Linear combination of PCs
   #################################
@@ -76,24 +79,31 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
   ## from score plots
   scoreTextA = "Use the drop down menus to select FPCs for the X and Y axis. Plot shows observed 
     score scatterplot for selected FPCs; click and drag on the scatterplot to select subjects."
-  scoredata = lapply(1:2, function(i) data.frame(mfpca.obj$scores[[i]]))       
-  for(i in 1:2){colnames(scoredata[[i]]) = c(paste0("PC", 1:npc[[i]]))}
+ 
   
+  ## repeat level 1 scores so they are the same dimension as input dataset  
+  scores = list(mfpca.obj$scores$level1[rep(seq(nrow(mfpca.obj$scores$level1)), data.frame(table(Y.df$id))$Freq),], mfpca.obj$scores$level2)  
+  Yhat.level = lapply(1:2, function(i) scores[[i]] %*% t(efunctions[[i]]))
   
-  
-  Yhat.visit = mfpca.obj$scores[[2]] %*% t(efunctions[[2]])
-  scoredata2 = as.data.frame(cbind(mfpca.obj$scores[[2]], Yhat.visit)) 
-  colnames(scoredata2) = c(paste0("PC", 1:npc[[2]]), paste0("subj", 1:dim(mfpca.obj$Yhat)[2]))
-  
-  
+  scoredata = as.list(rep(NA,2))
+  for(i in 1:2){
+    scoredata[[i]] = data.frame(scores[[i]])
+    colnames(scoredata[[i]]) = c(paste0("PC", 1:npc[[i]]))
+   
+    scoredata[[i]]$Yhat.level = Yhat.level[[i]]
+    scoredata[[i]]$Yhat = Yhat
+  }
+ 
+  Yhat.all.m = melt(mfpca.obj$Yhat)
+  Yhat.level.all.m = lapply(1:2, function(i) melt(scoredata[[i]]$Yhat.level) )
+  colnames(Yhat.level.all.m[[1]]) = colnames(Yhat.level.all.m[[2]]) = colnames(Yhat.all.m) = c("subj", "time", "value")
+ 
   
   ####### set some defaults for ggplot
   
   plotDefaults = list(theme_bw(), xlab(xlab), ylab(ylab), ylim(c(range(Yhat)[1], range(Yhat)[2])),
                       scale_x_continuous(breaks = seq(0, length(mfpca.obj$mu)-1, length=6),
                                          labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1))) )
-  
- 
   
   #################################
   ## App
@@ -127,19 +137,24 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
                         )
                     ),
                     tabPanel("Scree Plot", icon = icon("medkit"),
-                             column(3,
-                               fluidRow( helpText("Scree plots for level 1 and level 2; the left panel shows the plot of eigenvalues and 
-                                             the right panel shows the cumulative percent variance explained."), hr(),
-                                      br(), br(), downloadButton('downloadPlotScree1', 'Download Level 1 Plot')
+                             tabsetPanel(
+                               tabPanel("Level 1",
+                                        column(3,helpText(paste0("Scree plots for level 1; the left panel shows the plot of eigenvalues and 
+                                                          the right panel shows the cumulative percent variance explained. Level 1 accounts for ",
+                                                                 levelVariance[[1]], "% of total variance." )), hr(),
+                                               br(), br(), downloadButton('downloadPlotScree1', 'Download Level 1 Plot')
+                                        ),
+                                        column(9, h4("Scree Plots"), tabPanel("Level 1", plotOutput('Scree1') ) )                                        
                                ),
-                               fluidRow( br(),br(), br(), downloadButton('downloadPlotScree2', 'Download Level 2 Plot') )
-                             ),
-                             column(9, h4("Scree Plots"),
-                                tabsetPanel(
-                                  tabPanel("Level 1", plotOutput('Scree1') ),
-                                  tabPanel("Level 2", plotOutput('Scree2') )
-                                )
-                             )       
+                               tabPanel("Level 2",
+                                        column(3,helpText(paste0("Scree plots for level 2; the left panel shows the plot of eigenvalues and 
+                                                          the right panel shows the cumulative percent variance explained. Level 2 accounts for ",
+                                                                 levelVariance[[2]], "% of total variance." )), hr(),
+                                               br(), br(), downloadButton('downloadPlotScree2', 'Download Level 2 Plot')
+                                        ),
+                                        column(9, h4("Scree Plots"),tabPanel("Level 2", plotOutput('Scree2') ) )
+                               )
+                              )  ## end tabsetPanel     
                     ),
                     tabPanel("Linear Combinations", icon = icon("line-chart"),
                              withMathJax(),
@@ -170,55 +185,52 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
                     tabPanel("Score Scatterplot",icon = icon("binoculars"),
                              tabsetPanel(
                                tabPanel("Level 1",
-                                        column(3,
-                                               fluidRow( 
+                                        fluidRow(                                          
+                                          column(3,
                                                  helpText(scoreTextA), hr(),
                                                  selectInput("PCX1", label = ("Select X-axis FPC"), choices = 1:npc[[1]], selected = 1),
                                                  selectInput("PCY1", label = ("Select Y-axis FPC"), choices = 1:npc[[1]], selected = 2), hr()
-                                               ),
-                                               fluidRow( helpText("Black curves are fitted values for all subjects. Blue curves correspond 
-                                                                  to subjects selected in the graph above.   If no points are selected, the mean 
-                                                                  curve is shown.") )
+                                          ), ## end column3
+                                          column(9, h4("Score Scatterplot for Selected FPCs"),
+                                                          plotOutput("ScorePlot1",
+                                                                     brush=brushOpts(
+                                                                       id = "ScorePlotL1_brush",
+                                                                       resetOnNew = TRUE)
+                                                          )            
+                                          ) ## end column9          
                                         ),
-                                        column(9,
-                                               fluidRow(h4("Score Scatterplot for Selected FPCs"),
-                                                        plotOutput("ScorePlot1_L1",
-                                                                   brush=brushOpts(
-                                                                     id = "ScorePlotL1_brush",
-                                                                     resetOnNew = TRUE)
-                                                        )            
-                                               ),
-                                               fluidRow( plotOutput("ScorePlot2_L1")
-                                               )
+                                        fluidRow(
+                                          column(3, helpText("Black curves are fitted values for all subjects. Blue curves correspond 
+                                                                  to subjects selected in the graph above.   If no points are selected, the mean 
+                                                                  curve is shown.") 
+                                          ),
+                                          column(9, plotOutput("YhatPlot1"))
                                         )
                                ), ## end tabPanel
                                tabPanel("Level 2",
-                                        column(3,
-                                               fluidRow(
+                                        fluidRow(                                          
+                                          column(3,
                                                  helpText(scoreTextA), hr(),
                                                  selectInput("PCX2", label = ("Select X-axis FPC"), choices = 1:npc[[2]], selected = 1),
                                                  selectInput("PCY2", label = ("Select Y-axis FPC"), choices = 1:npc[[2]], selected = 2), hr()
-     
-                                               ),
-                                               fluidRow( helpText("Black curves are Level 2 eigenvalues times Level 2 scores for subjects at
-                                                                  all visits. Blue curves correspond to observations selected in the graph above.") )
+                                          ), ## end column3
+                                          column(9, h4("Score Scatterplot for Selected FPCs"),
+                                                 plotOutput("ScorePlot2",
+                                                            brush=brushOpts(
+                                                              id = "ScorePlotL2_brush",
+                                                              resetOnNew = TRUE)
+                                                 )
+                                          ) ## end column9          
                                         ),
-                                        column(9,
-                                               fluidRow( h4("Score Scatterplot for Selected FPCs"),
-                                                         plotOutput("ScorePlot1_L2",
-                                                                    brush=brushOpts(
-                                                                      id = "ScorePlotL2_brush",
-                                                                      resetOnNew = TRUE)
-                                                         )
-                                               ),
-                                               fluidRow( plotOutput("ScorePlot2_L2") )
+                                        fluidRow(
+                                          column(3, helpText("Black curves are Level 2 eigenvalues times Level 2 scores for subjects at
+                                                        all visits. Blue curves correspond to observations selected in the graph above.") 
+                                          ),
+                                          column(9, plotOutput("YhatPlot2"))
                                         )
-                               )
-                               
+                               ) ## end tabPanel                               
                              ) ## end tabsetPanel
-                    ) ## end tabPanel
-                    
-                    
+                    ) # end big tabPanel
                     
             ), ## end UI
     
@@ -365,88 +377,64 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
       #################################
       ## Code for score plots
       #################################              
-      
-      ###
-      #
-      # right now only plot 1 is shown... need to update so we see plot 2... maybe use code from the other plot where you
-          ## melt Yhat values instead, and take Yhat.subject out of the scoredata matrix so you don't have dimension problem
-          ## and don't have ot reduce the data in  weird way, which will naturally deal with the eta problem.
-      #
-      #scoredata = as.data.frame(cbind(mfpca.obj$scores[[1]], mfpca.obj$Yhat.subject)) 
-      #colnames(scoredata) = c(paste0("PC", 1:mfpca.obj$npc[[1]]), paste0("subj", 1:dim(mfpca.obj$Yhat.subject)[2]))
-      
- 
-
+                 
+      PCX <- reactive({ list(level1 = paste0("PC", input$PCX1), level2 = paste0("PC", input$PCX2) ) }) 
+      PCY <- reactive({ list(level1 = paste0("PC", input$PCY1), level2 = paste0("PC", input$PCY2) ) }) 
       
       
-      #################################################################################
-      #
-      # new score plot stuff
-       
-      ##### Level 1 Tab
-      PCX1 <- reactive({ paste0("PC", input$PCX1) }); PCY1 <- reactive({ paste0("PC", input$PCY1) })
-      
-      ## Level 1 Plot 1
-      output$ScorePlot1_L1 <- renderPlot({ 
-        ggplot(scoredata[[1]], aes_string(x = PCX1(), y = PCY1()))+geom_point(color = "blue", alpha = 1/5, size = 3)+
+      ## Level 1 scatter plot of scores 
+      output$ScorePlot1 <- renderPlot({ 
+        ggplot(scoredata[[1]], aes_string(x = PCX()[[1]], y = PCY()[[1]]))+geom_point(color = "blue", alpha = 1/5, size = 3)+
           theme_bw()+xlab(paste("Scores for FPC", input$PCX1))+ylab(paste("Scores for FPC", input$PCY1))   
-      })
-      
-      
-      ## Level 1 Plot 2
-      Yhat.all.m = melt(mfpca.obj$Yhat); colnames(Yhat.all.m) = c("subj", "time", "value")   
-      baseplot = ggplot(Yhat.all.m, aes(x=time, y=value, group = subj)) + geom_line(alpha = 1/5, color="black") + 
-        plotDefaults
-      
-      output$ScorePlot2_L1 <- renderPlot({
+      })      
+            
+      #########################################
+      # Store brush values as a data frame
+      #######################################
+
+      YhatPlots <- reactive({
+        brushes <- list(input$ScorePlotL1_brush, input$ScorePlotL2_brush)
+        plots = list()
         
-        brush <- input$ScorePlotL1_brush
-        if(!is.null(brush)){           
-          points = brushedPoints(scoredata[[1]], input$ScorePlotL1_brush, xvar=PCX1(), yvar = PCY1())
-          Yhat.m = melt(as.matrix(points[,-c(1:mfpca.obj$npc[[1]])]))
+        for (i in 1:2){
+           if(!is.null(brushes[[i]])){           
+            points = brushedPoints(scoredata[[i]], brushes[[i]], xvar=PCX()[[i]], yvar = PCY()[[i]])
+            Yhat.m = melt(as.matrix(points$Yhat))
+            Yhat.level.m = melt(as.matrix(points$Yhat.level))
+            
+            colnames(Yhat.level.m) <- c("subj", "time", "value")        
+          }else{ Yhat.m = as.data.frame(cbind(1, 1:length(mfpca.obj$mu), mfpca.obj$mu)) }  
+          colnames(Yhat.m) <- c("subj", "time", "value") 
           
-        }else{
-          Yhat.m = as.data.frame(cbind(1, 1:length(mfpca.obj$mu), mfpca.obj$mu))
+          plots[[i]] <- ggplot(Yhat.all.m, aes(x=time, y=value, group = subj)) + geom_line(alpha = 1/5, color="black") +  plotDefaults+
+            geom_line(data = Yhat.m, aes(x=as.numeric(time), y=value, group = subj), color="cornflowerblue")    
+           
+          plots[[i+2]] <- ggplot(Yhat.level.all.m[[1]], aes(x=time, y=value, group = subj)) + geom_line(alpha = 1/5, color="black") +
+            plotDefaults[-c(4)] + ylim(c(range(scoredata[[1]]$Yhat.level)[1], range(scoredata[[1]]$Yhat.level)[2]))
+          
+          if(!is.null(brushes[[i]])){
+            plots[[i+2]] = plots[[i+2]] + geom_line(data = Yhat.level.m, aes(x=as.numeric(time), y=value, group = subj), color="cornflowerblue")
+          } else{ plots[[i+2]] = plots[[i+2]] }                              
         }
-        
-        colnames(Yhat.m) <- c("subj", "time", "value")  
-        baseplot+geom_line(data= Yhat.m, aes(x=as.numeric(time), y=value, group = subj), color="blue")
-        
+                
+        return(plots)   
+      })
+ 
+      output$YhatPlot1 <- renderPlot({
+        grid.arrange(YhatPlots()[[1]],YhatPlots()[[3]], ncol = 2)
       })
       
       ####### Level 2 Tab
-      PCX2 <- reactive({ paste0("PC", input$PCX2) }); PCY2 <- reactive({ paste0("PC", input$PCY2) })
       
       ## Level 2 Plot 1
-      output$ScorePlot1_L2 <- renderPlot({ 
-        ggplot(scoredata2, aes_string(x = PCX2(), y = PCY2()))+geom_point(color = "blue", alpha = 1/5, size = 3)+theme_bw()+
+      output$ScorePlot2 <- renderPlot({ 
+        ggplot(scoredata[[2]], aes_string(x = PCX()[[2]], y = PCY()[[2]]))+geom_point(color = "blue", alpha = 1/5, size = 3)+theme_bw()+
           xlab(paste("Scores for FPC", input$PCX2))+ylab(paste("Scores for FPC", input$PCY2))   
       })
       
-      ## Level 2 Plot 2
-      Yhat.visit.all.m = melt(Yhat.visit); colnames(Yhat.visit.all.m) = c("subj", "time", "value")   
-      baseplot = ggplot(Yhat.visit.all.m, aes(x=time, y=value, group = subj)) + geom_line(alpha = 1/5, color="black") 
-      
-      output$ScorePlot2_L2 <- renderPlot({
-        
-        brush <- input$ScorePlotL2_brush
-        if(!is.null(brush)){           
-          points = brushedPoints(scoredata2, input$ScorePlotL2_brush, xvar=PCX2(), yvar = PCY2())
-          Yhat.m = melt(as.matrix(points[,-c(1:npc[[2]])]))
-          
-          colnames(Yhat.m) <- c("subj", "time", "value")  
-          
-          baseplot+geom_line(data= Yhat.m, aes(x=as.numeric(time), y=value, group = subj), color="blue")
-          
-        }else{
-          #Yhat.m = as.data.frame(cbind(1, 1:length(mfpca.obj$mu), mfpca.obj$mu))
-          baseplot
-        }
-        
-         
+      output$YhatPlot2 <- renderPlot({
+        grid.arrange(YhatPlots()[[2]],YhatPlots()[[4]], ncol = 2)
       })
-      
-      
       
     } ## end server
   )
