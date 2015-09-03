@@ -70,7 +70,7 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
   Y.df = mfpca.obj$Y.df
   Yhat.subj = mfpca.obj$Yhat.subject 
   Yhat = mfpca.obj$Yhat
-  rownames(Yhat) = rownames(Yhat.subj) = rownames(Y.df)  ## set consistent rownames for grouping by visit in ggplot
+  rownames(Y.df) = rownames(Yhat) = rownames(Yhat.subj)   ## set consistent rownames for grouping by visit in ggplot
   
   #################################
   ## Tab 5: score plots
@@ -176,16 +176,16 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
                                     helpText("Plot shows observed data and fitted values for the subject selected below. Dotted blue curve is
                                              subject-specific mean and red curves are subject-visit specific fitted values."), hr(),
                                     selectInput("subject", label = ("Select Subject"), choices = ids, selected =ids[1]), hr(),
-                                    checkboxInput("colVisit", label="Color by Visit", value =FALSE), 
+                                    #selectInput("visit","Select Visit", c(Choose='', 1:dataInputSubject()[[4]]), selectize = TRUE, multiple = TRUE), 
+                                    uiOutput("visitnum"),
+                                    hr(),
+                                    checkboxInput("colorVisit", label="Color by Visit", value =FALSE), 
                                     helpText("If 'Color by Visit' is selected, observed values and subject-visit specific fitted values
                                              are colored by visit number."), hr(),
                                     downloadButton("downloadPDFSubject", "Download Plot as PDF"), br(), br(),                                                                                   
                                     downloadButton("downloadPlotSubject", "Download Plot as Object", class = "plot-download") 
-                                    
                                     ),
-                             column(9, h4("Fitted and Observed Values for Selected Subject"),
-                                      plotOutput("Subject")
-                                    )
+                             column(9, h4("Fitted and Observed Values for Selected Subject"), plotOutput("Subject"))
                     ),
                     tabPanel("Score Scatterplot",icon = icon("binoculars"),
                              tabsetPanel(
@@ -323,24 +323,46 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
       ## Code for subject plots
       #################################
 
-      plotInputSubject <- reactive({
+      dataInputSubject <- reactive({
         id.cur = as.numeric(input$subject)
         
         df.obs = mutate(melt(as.matrix(subset(Y.df, id == id.cur, select = Y))), grid=rep(1:ncol(Y.df$Y), each = length(which(Y.df$id == id.cur))))
         df.Yhat.subj = mutate(melt(as.matrix(subset(Yhat.subj, Y.df$id == id.cur))), grid=rep(1:ncol(Y.df$Y), each = length(which(Y.df$id == id.cur))))
         df.Yhat = mutate(melt(as.matrix(subset(Yhat, Y.df$id == id.cur))), grid=rep(1:ncol(Y.df$Y), each = length(which(Y.df$id == id.cur))))
-                
-        names(df.obs) = names(df.Yhat.subj) = names(df.Yhat) = c("visit", "Ynames", "value", "time")
+        
+        names(df.obs) = names(df.Yhat.subj) = names(df.Yhat) = c("visit", "Ynames", "value", "time"); df.obs$visit <- df.Yhat$visit
+        numVisits = length(unique(df.Yhat$visit))
+      
+        return(list(df.obs, df.Yhat, df.Yhat.subj, numVisits))  
+      })
+      
+      output$visitnum <- renderUI({ selectInput("visit","Select Visit", c(Choose='', 1:dataInputSubject()[[4]]), selectize = TRUE, multiple = TRUE)})
+      
+      plotInputSubject <- reactive({
+        p4 <- ggplot(dataInputSubject()[[1]], aes(x = time, y = value, group = visit)) + plotDefaults + 
+          geom_line(data = mu, aes(x = grid, y = values, group=NULL), col="gray")
+        
+        visits <- input[["visit"]]
+        df.Yhat.visits <- subset(dataInputSubject()[[2]], visit %in% visits)
+        df.obs.visits <- subset(dataInputSubject()[[1]], visit %in% visits)
+             
+        if(length(visits)>=1){p4 = p4 + geom_point(data = df.obs.visits, col = "indianred") +
+                                geom_path(data = df.Yhat.visits, col="indianred") 
+        }
+        
+        else if(input$colorVisit) {p4 = p4 + geom_point(aes(col = factor(visit))) + geom_path(data=dataInputSubject()[[2]], aes(col = factor(visit)))+  
+                                theme(legend.position="none") + geom_path(data = dataInputSubject()[[3]], col="cornflowerblue", lwd = 1.25)                                                          
+        }
+        
+        else{p4 = p4 + geom_path(data=dataInputSubject()[[2]], col = "indianred") + geom_point(col = "indianred", alpha = 1/5) + 
+                 geom_path(data = dataInputSubject()[[3]], col="cornflowerblue", lwd = 1.25) 
+              }        
+      })
+      
+      
         
         
-        p4 <- ggplot(df.obs, aes(x = time, y = value, group = visit)) + geom_point(col = "indianred", alpha = 1/5) + plotDefaults + 
-          geom_line(data = mu, aes(x = grid, y = values, group=NULL), col="gray")+
-          geom_path(data=df.Yhat, col = "indianred") + geom_path(data = df.Yhat.subj, col="cornflowerblue", lwd = 1.25) 
-        
-        if(input$colVisit) {p4 = p4 + geom_point(aes(col = factor(visit))) + geom_path(data=df.Yhat, aes(col = factor(visit)))+  theme(legend.position="none")                                                         
-        } else{p4 = p4   }
-        
-       })
+       
       
       output$Subject <- renderPlot( print(plotInputSubject()) )
       
