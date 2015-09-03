@@ -57,7 +57,7 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
   #################################
   ## Tab 3:Linear combination of PCs
   #################################
-  varpercents = lapply(c(1, 2, 12), function(x) varPercent(x, mfpca.obj)) 
+  varpercents = lapply(c(1, 2, 12), function(i) varPercent(i, mfpca.obj)) 
   
   numSliders = 3
   calls <- mfpcaCalls(numSliders, mfpca.obj, varpercents)$calls
@@ -82,12 +82,12 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
  
   
   ## repeat level 1 scores so they are the same dimension as input dataset  
-  scores = list(mfpca.obj$scores$level1[rep(seq(nrow(mfpca.obj$scores$level1)), data.frame(table(Y.df$id))$Freq),], mfpca.obj$scores$level2)  
-  Yhat.level = lapply(1:2, function(i) scores[[i]] %*% t(efunctions[[i]]))
+  scores_new = list(mfpca.obj$scores$level1[rep(seq(nrow(mfpca.obj$scores$level1)), data.frame(table(Y.df$id))$Freq),], mfpca.obj$scores$level2)  
+  Yhat.level = lapply(1:2, function(i) scores_new[[i]] %*% t(efunctions[[i]]))
   
   scoredata = as.list(rep(NA,2))
   for(i in 1:2){
-    scoredata[[i]] = data.frame(scores[[i]])
+    scoredata[[i]] = data.frame(scores_new[[i]])
     colnames(scoredata[[i]]) = c(paste0("PC", 1:npc[[i]]))
    
     scoredata[[i]]$Yhat.level = Yhat.level[[i]]
@@ -161,7 +161,11 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
                              column(3, h4("Sliders for Levels 1 and 2"),
                                     helpText("Plot shows the linear combination of mean and FPCs with the scores 
                                              specified using the sliders below."), hr(),
-                                    eval(calls),
+                                    tabsetPanel(
+                                      tabPanel("Level 1", eval(calls[[1]]) ),
+                                      tabPanel("Level 2", eval(calls[[2]]) )
+                                    ),
+                                    
                                     br(), br(), downloadButton('downloadPlotLinCom', 'Download Plot')
                              ),
                              column(9, h4("Linear Combination of Mean and FPCs"), 
@@ -312,6 +316,7 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
       #################################
       
       plotInputLinCom <- reactive({
+               
         PCweights = lapply(1:2, function(i) rep(NA, numSliders)) ; 
         names(PCweights) <- c("level1", "level2")
         for(i in 1:numSliders){PCweights$level1[i] = input[[PCs$level1[i]]]}
@@ -323,10 +328,11 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
                                  as.matrix(mfpca.obj$mu) +efunctions$level1[,1:numSliders] %*% sqrt.evalues$level1[1:numSliders, 1:numSliders] %*% PCweights$level1 ))
         
         names(df) = c("grid", "mu_visit", "mu_subj")
-        p3 <- ggplot(mu, aes(x=V1, y=V2))+geom_line(lwd=1, aes(color= "mu"))+ plotDefaults + theme(legend.key = element_blank())+
+        p3 <- ggplot(mu, aes(x=V1, y=V2))+geom_line(lwd=0.75, aes(color= "mu"))+ plotDefaults + theme(legend.key = element_blank())+
           geom_line(data = df, lwd = 1.5, aes(x=grid, y = mu_visit, color = "visit")) + 
           geom_line(data = df, lwd = 1.5, aes(x=grid, y = mu_subj, color = "subject")) + 
-          scale_color_manual("Line Legend", values = c(mu = "black", visit = "indianred",  subject = "cornflowerblue"), guide = FALSE)
+          scale_color_manual("Line Legend", values = c(mu = "gray", visit = "indianred",  subject = "cornflowerblue"), guide = FALSE)
+   
       })
       
       output$LinCom <- renderPlot(  
@@ -356,7 +362,7 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
         
         p4 <- ggplot(df.obs, aes(x = time, y = value, group = visit)) + geom_point(col = "indianred", alpha = 1/5) + plotDefaults + 
           geom_line(data = mu, aes(x=V1, y=V2, group=NULL), col="gray")+
-          geom_path(data=df.Yhat, col = "indianred") + geom_path(data = df.Yhat.subj, col="cornflowerblue", lty = 6, lwd = 1.25) 
+          geom_path(data=df.Yhat, col = "indianred") + geom_path(data = df.Yhat.subj, col="cornflowerblue", lwd = 1.25) 
         
         if(input$colVisit) {p4 = p4 + geom_point(aes(col = factor(visit))) + geom_path(data=df.Yhat, aes(col = factor(visit)))+  theme(legend.position="none")                                                         
         } else{p4 = p4   }
