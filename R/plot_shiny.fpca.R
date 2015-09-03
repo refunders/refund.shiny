@@ -65,8 +65,8 @@ plot_shiny.fpca = function(x, xlab = "", ylab="", title = "", ...) {
                                     helpText("Solid black line indicates population mean. For the FPC selected below, blue and red lines 
                                              indicate the population mean +/- the FPC times 2 SDs of the associated score distribution."), hr(),
                                     selectInput("PCchoice", label = ("Select FPC"), choices = 1:fpca.obj$npc, selected = 1), hr(),
-                                    downloadButton('downloadPDFMuPC', "Download PDF"), br(), br(),
-                                    downloadButton("downloadPlotMuPC", "Download Plot", class = "plot-download") 
+                                    downloadButton('downloadPDFMuPC', "Download Plot as PDF"), br(), br(),
+                                    downloadButton("downloadPlotMuPC", "Download Plot as Object", class = "plot-download") 
                                     ),
                              column(9, h4("Mean and FPCs"), plotOutput('muPCplot') )
                             ),
@@ -74,8 +74,8 @@ plot_shiny.fpca = function(x, xlab = "", ylab="", title = "", ...) {
                              column(3, 
                                     helpText("Scree plots; the left panel shows the plot of eigenvalues and 
                                              the right panel shows the cumulative percent variance explained."), hr(),
-                                   downloadButton("downloadPDFScree", "Download PDF"), br(), br(), 
-                                   downloadButton("downloadPlotScree", "Download Plot", class = "plot-download") 
+                                   downloadButton("downloadPDFScree", "Download Plot as PDF"), br(), br(), 
+                                   downloadButton("downloadPlotScree", "Download Plot as Object", class = "plot-download") 
                                     ),
                              column(9, h4("Scree Plots"),  plotOutput('Scree') )     
                             ),
@@ -84,8 +84,8 @@ plot_shiny.fpca = function(x, xlab = "", ylab="", title = "", ...) {
                              column(3,
                                     helpText("Plot shows the linear combination of mean and FPCs with the scores specified using the sliders below."), hr(),
                                     eval(calls), hr(),
-                                    downloadButton("downloadPDFLinCom", "Download PDF"), br(), br(),   
-                                    downloadButton("downloadPlotLinCom", "Download Plot", class = "plot-download")                                     
+                                    downloadButton("downloadPDFLinCom", "Download Plot as PDF"), br(), br(),   
+                                    downloadButton("downloadPlotLinCom", "Download Plot as Object", class = "plot-download")                                     
                                     ),
                              column(9, h4("Linear Combination of Mean and FPCs"), 
                                       plotOutput('LinCom')
@@ -95,8 +95,8 @@ plot_shiny.fpca = function(x, xlab = "", ylab="", title = "", ...) {
                              column(3,
                                     helpText("Plot shows observed data and fitted values for the subject selected below"), 
                                     selectInput("subject", label = ("Select Subject"), choices = 1:dim(fpca.obj$Yhat)[1], selected =1), hr(),
-                                    downloadButton("downloadPDFSubject", "Download PDF"), br(), br(), 
-                                    downloadButton("downloadPlotSubject", "Download Plot", class = "plot-download")                                                                        
+                                    downloadButton("downloadPDFSubject", "Download Plot as PDF"), br(), br(), 
+                                    downloadButton("downloadPlotSubject", "Download Plot as Object", class = "plot-download")                                                                        
                                     ),
                              column(9, h4("Fitted and Observed Values for Selected Subject"),
                                       plotOutput("Subject")

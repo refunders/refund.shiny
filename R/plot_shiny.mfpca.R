@@ -120,16 +120,16 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
                              tabPanel("Level 1",
                                       column(3, helpText(muPCtext), hr(),
                                              selectInput("PCchoice1", label = ("Select Level 1 FPC"), choices = 1:npc$level1, selected = 1),hr(),
-                                              downloadButton("downloadPDFMuPC1", "Download PDF"), br(), br(),
-                                              downloadButton("downloadPlotMuPC1", "Download Plot", class = "plot-download")
+                                              downloadButton("downloadPDFMuPC1", "Download Plot as PDF"), br(), br(),
+                                              downloadButton("downloadPlotMuPC1", "Download Plot as Object", class = "plot-download")
                                       ),
                                       column(9, h4("Mean and FPCs for Level 1"), plotOutput('muPCplot1') )
                              ),
                              tabPanel("Level 2", 
                                       column(3, helpText(muPCtext), hr(),
                                              selectInput("PCchoice2", label = ("Select Level 2 FPC"), choices = 1:mfpca.obj$npc$level2, selected = 1),
-                                             hr(), downloadButton("downloadPDFMuPC2", "Download PDF"), br(), br(),
-                                             downloadButton("downloadPlotMuPC2", "Download Plot",  class = "plot-download")
+                                             hr(), downloadButton("downloadPDFMuPC2", "Download Plot as PDF"), br(), br(),
+                                             downloadButton("downloadPlotMuPC2", "Download Plot as Object",  class = "plot-download")
                                       ),
                                       column(9,h4("Mean and FPCs for Level 2"),plotOutput('muPCplot2') )
                              )
@@ -141,8 +141,8 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
                                         column(3,helpText(paste0("Scree plots for level 1; the left panel shows the plot of eigenvalues and 
                                                           the right panel shows the cumulative percent variance explained. Level 1 accounts for ",
                                                                  levelVariance[[1]], "% of total variance." )), hr(),
-                                               downloadButton("downloadPDFScree1", "Download PDF"), br(), br(), 
-                                               downloadButton("downloadPlotScree1", "Download Plot", class = "plot-download")                                               
+                                               downloadButton("downloadPDFScree1", "Download Plot as PDF"), br(), br(), 
+                                               downloadButton("downloadPlotScree1", "Download Plot as Object", class = "plot-download")                                               
                                         ),
                                         column(9, h4("Scree Plots"), tabPanel("Level 1", plotOutput('Scree1') ) )                                        
                                ),
@@ -150,8 +150,8 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
                                         column(3,helpText(paste0("Scree plots for level 2; the left panel shows the plot of eigenvalues and 
                                                           the right panel shows the cumulative percent variance explained. Level 2 accounts for ",
                                                                  levelVariance[[2]], "% of total variance." )), hr(),
-                                               downloadButton("downloadPDFScree2", "Download PDF"), br(), br(),                                               
-                                               downloadButton("downloadPlotScree2", "Download Plot", class = "plot-download")                                               
+                                               downloadButton("downloadPDFScree2", "Download Plot as PDF"), br(), br(),                                               
+                                               downloadButton("downloadPlotScree2", "Download Plot as Object", class = "plot-download")                                               
                                         ),
                                         column(9, h4("Scree Plots"),tabPanel("Level 2", plotOutput("Scree2") ) )
                                )
@@ -166,8 +166,8 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
                                       tabPanel("Level 1", eval(calls[[1]]) ),
                                       tabPanel("Level 2", eval(calls[[2]]) )
                                     ), hr(),
-                                    downloadButton("downloadPDFLinCom", "Download PDF"), br(), br(),
-                                    downloadButton("downloadPlotLinCom", "Download Plot", class = "plot-download")                                                                                   
+                                    downloadButton("downloadPDFLinCom", "Download Plot as PDF"), br(), br(),
+                                    downloadButton("downloadPlotLinCom", "Download Plot as Object", class = "plot-download")                                                                                   
                              ),
                              column(9, h4("Linear Combination of Mean and FPCs"),  plotOutput('LinCom') )
                     ),
@@ -179,8 +179,8 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
                                     checkboxInput("colVisit", label="Color by Visit", value =FALSE), 
                                     helpText("If 'Color by Visit' is selected, observed values and subject-visit specific fitted values
                                              are colored by visit number."), hr(),
-                                    downloadButton("downloadPDFSubject", "Download PDF"), br(), br(),                                                                                   
-                                    downloadButton("downloadPlotSubject", "Download Plot", class = "plot-download") 
+                                    downloadButton("downloadPDFSubject", "Download Plot as PDF"), br(), br(),                                                                                   
+                                    downloadButton("downloadPlotSubject", "Download Plot as Object", class = "plot-download") 
                                     
                                     ),
                              column(9, h4("Fitted and Observed Values for Selected Subject"),
@@ -308,7 +308,7 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
         
         names(df) = c("grid", "mu_visit", "mu_subj")
         p3 <- ggplot(mu, aes(x=grid, y=values))+geom_line(lwd=0.75, aes(color= "mu"))+ plotDefaults + theme(legend.key = element_blank())+
-          geom_line(data = df, lwd = 1.5, aes(x=grid, y = mu_visit, color = "visit")) + 
+          geom_line(data = df, lwd = 1, aes(x=grid, y = mu_visit, color = "visit")) + 
           geom_line(data = df, lwd = 1.5, aes(x=grid, y = mu_subj, color = "subject")) + 
           scale_color_manual("Line Legend", values = c(mu = "gray", visit = "indianred",  subject = "cornflowerblue"), guide = FALSE)
    

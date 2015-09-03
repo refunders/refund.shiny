@@ -65,7 +65,9 @@ plot_shiny.fosr = function(x, xlab = "", ylab="", title = "", ...) {
                     tabPanel("Observed Data", icon = icon("stats", lib = "glyphicon"),
                              column(3, 
                                     helpText("Observed response data, colored according to the covariate selected below."), hr(),
-                                    selectInput("CovarChoice", label = ("Select Covariate"), choices = covarInputValues, selected = 1)
+                                    selectInput("CovarChoice", label = ("Select Covariate"), choices = covarInputValues, selected = 1),hr(),
+                                    downloadButton('downloadPDFObs', "Download Plot as PDF"), br(), br(),
+                                    downloadButton("downloadPlotObs", "Download Plot as Object", class = "plot-download") 
                                     ),
                              column(9, h4("Observed Data"), 
                                     plotOutput('ObsDataPlot')
@@ -74,7 +76,9 @@ plot_shiny.fosr = function(x, xlab = "", ylab="", title = "", ...) {
                     tabPanel("Fitted Values", icon = icon("line-chart"),
                              column(3,
                                     helpText("Fitted response curve for a subject with covariate values specified below."), hr(),
-                                    eval(calls)
+                                    eval(calls), hr(),
+                                    downloadButton('downloadPDFFittedVal', "Download Plot as PDF"), br(), br(),
+                                    downloadButton("downloadPlotFittedVal", "Download Plot as Object", class = "plot-download") 
                                    ),
                              column(9, h4("Fitted Response Curve"), 
                                    plotOutput('FittedValPlot')
@@ -83,7 +87,9 @@ plot_shiny.fosr = function(x, xlab = "", ylab="", title = "", ...) {
                     tabPanel("Coefficient Functions", icon = icon("area-chart"),
                              column(3, 
                                     helpText("Coefficient function and confidence bounds for the predictor selected below"), hr(),
-                                    selectInput("CoefChoice", label = ("Select Predictor"), choices = coefInputValues, selected = 1)
+                                    selectInput("CoefChoice", label = ("Select Predictor"), choices = coefInputValues, selected = 1), hr(),
+                                    downloadButton('downloadPDFCoefFunc', "Download Plot as PDF"), br(), br(),
+                                    downloadButton("downloadPlotCoefFunc", "Download Plot as Object", class = "plot-download") 
                                     ),
                              column(9, h4("Coefficient Function"), 
                                     plotOutput('CoefFunc')
@@ -98,7 +104,9 @@ plot_shiny.fosr = function(x, xlab = "", ylab="", title = "", ...) {
                                                  selected=1),
                                     helpText("If 'Show Outliers' is selected, the median and outlying curves are shown 
                                              in blue and red respectively. If 'Rainbowize' is selected, curves are ordered by band depth
-                                             with most outlying curves shown in red and curves closest to the median shown in violet")
+                                             with most outlying curves shown in red and curves closest to the median shown in violet"), hr(),
+                                    downloadButton('downloadPDFresid', "Download Plot as PDF"), br(), br(),
+                                    downloadButton("downloadPlotresid", "Download Plot as Object", class = "plot-download") 
                                     ),
                              column(9, h4("Residuals"), 
                                     plotOutput('resid')
@@ -116,7 +124,7 @@ plot_shiny.fosr = function(x, xlab = "", ylab="", title = "", ...) {
       ## Code for observed data tab
       #################################
       
-      dataInputObsData <- reactive({
+      plotInputObsData <- reactive({
         y.obs = fosr.obj$data[,names(attributes(terms(fosr.obj$terms))$dataClasses)[1]]
         colnames(y.obs) = grid
         y.obs.m = melt(y.obs)
@@ -129,24 +137,27 @@ plot_shiny.fosr = function(x, xlab = "", ylab="", title = "", ...) {
         } else {
           y.obs.m$covariate = rep(fosr.obj$data[,selected], length(grid))
         }
-        y.obs.m
-      })
-      
-      output$ObsDataPlot <- renderPlot(
-        if(is.null(dataInputObsData()$covariate)){
-          ggplot(dataInputObsData(), aes(x=grid, y=value, group = subj)) + geom_line(alpha = .3, color="black") +
+        #y.obs.m
+        
+        if(is.null(y.obs.m$covariate)){
+          p1 <- ggplot(y.obs.m, aes(x=grid, y=value, group = subj)) + geom_line(alpha = .3, color="black") +
             theme_bw() + xlab("") + ylab("") 
         } else {
-          ggplot(dataInputObsData(), aes(x=grid, y=value, group = subj, color = covariate)) + geom_line(alpha = .3) +
+          p1 <- ggplot(y.obs.m, aes(x=grid, y=value, group = subj, color = covariate)) + geom_line(alpha = .3) +
             theme_bw() + xlab("") + ylab("") + theme(legend.position="bottom", legend.title=element_blank())
-        }
-      )
+        }        
+      })
+      
+      output$ObsDataPlot <- renderPlot(print(plotInputObsData()) )
+      
+      output$downloadPDFObs <- savePDF("ObsData.pdf", plotInputObsData())
+      output$downloadPlotObs <- savePlot("ObsData.RData", plotInputObsData())
       
       #################################
       ## Code for FittedValues Tab
       #################################
       
-      dataInputFittedVal <- reactive({
+      plotInputFittedVal <- reactive({
         
         variables = sapply(pred.list, function(u) {input[[u]]})
         
@@ -167,36 +178,41 @@ plot_shiny.fosr = function(x, xlab = "", ylab="", title = "", ...) {
         
         X.design = t(matrix(model.matrix(fosr.obj$terms, input.data)))
         fit.vals = as.vector(X.design %*% fosr.obj$beta.hat)
-        data.frame(grid = grid,
+        df <- data.frame(grid = grid,
                    fit.vals = fit.vals)
+        
+        p2 <- ggplot(df, aes(x = grid, y = fit.vals)) + geom_line(lwd=1) + theme_bw() +
+          xlab(xlab) + ylab(ylab) + ylim(c(.9, 1.1) * range(fosr.obj$Yhat))
+        
       })
       
-      output$FittedValPlot <- renderPlot(
-        ggplot(dataInputFittedVal(), aes(x = grid, y = fit.vals)) + geom_line(lwd=1) + theme_bw() +
-          xlab(xlab) + ylab(ylab) + ylim(c(.9, 1.1) * range(fosr.obj$Yhat))
-      )
+      output$FittedValPlot <- renderPlot(print(plotInputFittedVal()) )
+      
+      output$downloadPDFFittedVal <- savePDF("FittedVal.pdf", plotInputFittedVal())
+      output$downloadPlotFittedVal <- savePlot("FittedVal.RData", plotInputFittedVal())
       
       #################################
       ## Code for CoefFunc Tab
       #################################
       
-      dataInputCoefFunc <- reactive({
+      plotInputCoefFunc <- reactive({
         CoefChoice = as.numeric(input$CoefChoice)
-        data.frame(grid = grid,
+        df <- data.frame(grid = grid,
                    coef = fosr.obj$beta.hat[CoefChoice,],
                    UB =  fosr.obj$beta.UB[CoefChoice,],
                    LB = fosr.obj$beta.LB[CoefChoice,])
-      })      
-      
-      output$CoefFunc <- renderPlot(
-        ggplot(dataInputCoefFunc(), aes(x=grid, y=coef))+geom_line(linetype=1, lwd=1.5, color="black")+
-          geom_line(data = dataInputCoefFunc(), aes(y=UB), color = "blue") +
-          geom_line(data = dataInputCoefFunc(), aes(y=LB), color = "blue")+
+        
+        p3 <- ggplot(df, aes(x=grid, y=coef))+geom_line(linetype=1, lwd=1.5, color="black")+
+          geom_line(data = df, aes(y=UB), color = "blue") +
+          geom_line(data = df, aes(y=LB), color = "blue")+
           theme_bw() + xlab("") + ylab("") 
-      )
+        
+      })      
+            
+      output$CoefFunc <- renderPlot(print(plotInputCoefFunc()) )
       
-      
-      
+      output$downloadPDFCoefFunc <- savePDF("CoefFunc.pdf", plotInputCoefFunc())
+      output$downloadPlotCoefFunc <- savePlot("CoefFunc.RData", plotInputCoefFunc())  
       
       #################################
       ## Code for Residual plot
@@ -229,7 +245,7 @@ plot_shiny.fosr = function(x, xlab = "", ylab="", title = "", ...) {
         if(input$residOptions==2 & dim(outs$outcurves)[1]!= 0){residPlot=residPlot+
                                    geom_line(data=resid.outs.m, aes(x=grid, y=residual, group=subj, color="outliers"))+
                                    geom_line(data=resid.med.m, aes(x=grid, y=residual, group=subj, color = "median"))+
-                                   scale_colour_manual("", values = c("outliers"="red", "median"="blue"), guide = FALSE)
+                                   scale_colour_manual("", values = c("outliers"="indianred", "median"="blue"), guide = FALSE)
                                    #theme(legend.position="bottom")
                                    
         } 
@@ -244,14 +260,12 @@ plot_shiny.fosr = function(x, xlab = "", ylab="", title = "", ...) {
         residPlot  + xlab("") + ylab("")
       })   
       
+           
+      output$resid <- renderPlot(plotInputResid() )
       
+      output$downloadPDFresid <- savePDF("resid.pdf", plotInputResid())
+      output$downloadPlotresid <- savePlot("resid.RData", plotInputResid())  
       
-      output$resid <- renderPlot(
-        plotInputResid() 
-
-      )
-      
-       
       
       ## add subject number
       
