@@ -64,29 +64,28 @@ plot_shiny.fpca = function(x, xlab = "", ylab="", title = "", ...) {
                              column(3,
                                     helpText("Solid black line indicates population mean. For the FPC selected below, blue and red lines 
                                              indicate the population mean +/- the FPC times 2 SDs of the associated score distribution."), hr(),
-                                    selectInput("PCchoice", label = ("Select FPC"), choices = 1:fpca.obj$npc, selected = 1),
-                                    br(), br(), downloadButton('downloadPlotMuPC', 'Download Plot')
+                                    selectInput("PCchoice", label = ("Select FPC"), choices = 1:fpca.obj$npc, selected = 1), hr(),
+                                    downloadButton('downloadPDFMuPC', "Download PDF"), br(), br(),
+                                    downloadButton("downloadPlotMuPC", "Download Plot", class = "plot-download") 
                                     ),
-                             column(9, h4("Mean and FPCs"),
-                                    plotOutput('muPCplot')
-                                    )
+                             column(9, h4("Mean and FPCs"), plotOutput('muPCplot') )
                             ),
                     tabPanel("Scree Plot", icon = icon("medkit"),
                              column(3, 
                                     helpText("Scree plots; the left panel shows the plot of eigenvalues and 
-                                             the right panel shows the cumulative percent variance explained."), 
-                                    br(), br(), downloadButton('downloadPlotScree', 'Download Plot')
+                                             the right panel shows the cumulative percent variance explained."), hr(),
+                                   downloadButton("downloadPDFScree", "Download PDF"), br(), br(), 
+                                   downloadButton("downloadPlotScree", "Download Plot", class = "plot-download") 
                                     ),
-                             column(9, h4("Scree Plots"), 
-                                    plotOutput('Scree')
-                                    )     
+                             column(9, h4("Scree Plots"),  plotOutput('Scree') )     
                             ),
                     tabPanel("Linear Combinations", icon = icon("line-chart"),
                              withMathJax(),
                              column(3,
                                     helpText("Plot shows the linear combination of mean and FPCs with the scores specified using the sliders below."), hr(),
-                                    eval(calls),
-                                    br(), br(), downloadButton('downloadPlotLinCom', 'Download Plot')
+                                    eval(calls), hr(),
+                                    downloadButton("downloadPDFLinCom", "Download PDF"), br(), br(),   
+                                    downloadButton("downloadPlotLinCom", "Download Plot", class = "plot-download")                                     
                                     ),
                              column(9, h4("Linear Combination of Mean and FPCs"), 
                                       plotOutput('LinCom')
@@ -95,8 +94,9 @@ plot_shiny.fpca = function(x, xlab = "", ylab="", title = "", ...) {
                     tabPanel("Subject Fits",  icon = icon("user"),
                              column(3,
                                     helpText("Plot shows observed data and fitted values for the subject selected below"), 
-                                    selectInput("subject", label = ("Select Subject"), choices = 1:dim(fpca.obj$Yhat)[1], selected =1),
-                                    br(), br(), downloadButton('downloadPlotSubject', 'Download Plot')
+                                    selectInput("subject", label = ("Select Subject"), choices = 1:dim(fpca.obj$Yhat)[1], selected =1), hr(),
+                                    downloadButton("downloadPDFSubject", "Download PDF"), br(), br(), 
+                                    downloadButton("downloadPlotSubject", "Download Plot", class = "plot-download")                                                                        
                                     ),
                              column(9, h4("Fitted and Observed Values for Selected Subject"),
                                       plotOutput("Subject")
@@ -158,12 +158,8 @@ plot_shiny.fpca = function(x, xlab = "", ylab="", title = "", ...) {
         print(plotInputMuPC())
       )   
       
-      output$downloadPlotMuPC <- downloadHandler(
-        filename = function(){ 'mean_FPC.png' },
-        content = function(file) {
-          ggsave(file,plotInputMuPC())
-        }
-      )
+      output$downloadPDFMuPC <- savePDF("muPC.pdf", plotInputMuPC())
+      output$downloadPlotMuPC <- savePlot("muPC.RData", plotInputMuPC())
 
       #################################
       ## Code for scree plot
@@ -179,12 +175,9 @@ plot_shiny.fpca = function(x, xlab = "", ylab="", title = "", ...) {
         print(plotInputScree())
       )
       
-      output$downloadPlotScree <- downloadHandler(
-        filename = function(){'screeplots.png' },
-        content = function(file) {
-          ggsave(file,plotInputScree())
-        }
-      ) 
+      output$downloadPDFScree <- savePDF("scree.pdf", plotInputScree())
+      output$downloadPlotScree <- savePlot("scree.RData", plotInputScree())
+      
       
       #################################
       ## Code for linear combinations
@@ -199,18 +192,11 @@ plot_shiny.fpca = function(x, xlab = "", ylab="", title = "", ...) {
           scale_color_manual("Line Legend", values = c(mu = "gray", subject = "cornflowerblue"), guide = FALSE)  
       })
       
-      output$LinCom <- renderPlot(  
-        print(plotInputLinCom())
-        
-      )
+      output$LinCom <- renderPlot( print(plotInputLinCom()) )
       
-      output$downloadPlotLinCom <- downloadHandler(
-        filename = function(){'FPC_LinearCombo.png' },
-        content = function(file) {
-          ggsave(file,plotInputLinCom())
-        }
-      )
-      
+      output$downloadPDFLinCom <- savePDF("LinCom.pdf", plotInputLinCom())
+      output$downloadPlotLinCom <- savePlot("LinCom.RData", plotInputLinCom())
+
       #################################
       ## Code for subject plots
       #################################
@@ -224,16 +210,10 @@ plot_shiny.fpca = function(x, xlab = "", ylab="", title = "", ...) {
           geom_point(data = df, aes(y=V4), color = "blue", alpha = 1/3) 
       })
       
-      output$Subject <- renderPlot( 
-        print(plotInputSubject())        
-      )
+      output$Subject <- renderPlot( print(plotInputSubject()) )
       
-      output$downloadPlotSubject <- downloadHandler(
-        filename = function(){'subjectPlot.png' },
-        content = function(file) {
-          ggsave(file,plotInputSubject())
-        }
-      )
+      output$downloadPDFSubject <- savePDF("subject.pdf", plotInputSubject())
+      output$downloadPlotSubject <- savePlot("subject.RData", plotInputSubject())
       
       #################################
       ## Code for score plots
