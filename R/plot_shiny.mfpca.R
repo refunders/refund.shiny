@@ -29,7 +29,7 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
   ## code for processing tabs
   ################################
   npc = mfpca.obj$npc
-  mu = as.data.frame(cbind(1:length(mfpca.obj$mu), mfpca.obj$mu))
+  mu = data.frame(grid = 1:length(mfpca.obj$mu), values = mfpca.obj$mu)
   efunctions = mfpca.obj$efunctions; 
   sqrt.evalues = lapply(mfpca.obj$evalues, function(i) diag(sqrt(i)))      
   scaled_efunctions = lapply(1:2, function(i) efunctions[[i]] %*% sqrt.evalues[[i]])
@@ -80,7 +80,6 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
   scoreTextA = "Use the drop down menus to select FPCs for the X and Y axis. Plot shows observed 
     score scatterplot for selected FPCs; click and drag on the scatterplot to select subjects."
  
-  
   ## repeat level 1 scores so they are the same dimension as input dataset  
   scores_new = list(mfpca.obj$scores$level1[rep(seq(nrow(mfpca.obj$scores$level1)), data.frame(table(Y.df$id))$Freq),], mfpca.obj$scores$level2)  
   Yhat.level = lapply(1:2, function(i) scores_new[[i]] %*% t(efunctions[[i]]))
@@ -97,10 +96,8 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
   Yhat.all.m = melt(mfpca.obj$Yhat)
   Yhat.level.all.m = lapply(1:2, function(i) melt(scoredata[[i]]$Yhat.level) )
   colnames(Yhat.level.all.m[[1]]) = colnames(Yhat.level.all.m[[2]]) = colnames(Yhat.all.m) = c("subj", "time", "value")
- 
   
   ####### set some defaults for ggplot
-  
   plotDefaults = list(theme_bw(), xlab(xlab), ylab(ylab), ylim(c(range(Yhat)[1], range(Yhat)[2])),
                       scale_x_continuous(breaks = seq(0, length(mfpca.obj$mu)-1, length=6),
                                          labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1))) )
@@ -254,9 +251,9 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
         scaled_efuncs = lapply(1:2, function(i) scaled_efunctions[[i]][,PCchoice[[i]]])
         
         p1 <- lapply(1:2, function(i){
-          ggplot(mu, aes(x = V1, y = V2)) + geom_line(lwd=1) + plotDefaults +
-            geom_point(data = as.data.frame(cbind(1:length(mfpca.obj$mu), mfpca.obj$mu + 2*scaled_efuncs[[i]])), color = "blue", size = 4, shape = '+')+
-            geom_point(data = as.data.frame(cbind(1:length(mfpca.obj$mu), mfpca.obj$mu - 2*scaled_efuncs[[i]])), color = "red", size = 4, shape = "-")+
+          ggplot(mu, aes(x = grid, y = values)) + geom_line(lwd=1) + plotDefaults +
+            geom_point(data = data.frame(grid =1:length(mfpca.obj$mu),values =  mfpca.obj$mu + 2*scaled_efuncs[[i]]), color = "blue", size = 4, shape = '+') +
+            geom_point(data = data.frame(grid =1:length(mfpca.obj$mu), values = mfpca.obj$mu - 2*scaled_efuncs[[i]]), color = "indianred", size = 4, shape = "-") +
             ggtitle(bquote(psi[.(PCchoice[[i]])]~(t) ~ "," ~.(100*round(mfpca.obj$evalues[[i]][PCchoice[[i]]]/sum(mfpca.obj$evalues[[i]]),3)) ~ "% Variance"))   
         })   
       })
@@ -322,13 +319,13 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
         for(i in 1:numSliders){PCweights$level1[i] = input[[PCs$level1[i]]]}
         for(i in 1:numSliders){PCweights$level2[i] = input[[PCs$level2[i]]]}
         
-        df = as.data.frame(cbind(1:length(mfpca.obj$mu), 
+        df = data.frame(1:length(mfpca.obj$mu), 
                                  as.matrix(mfpca.obj$mu)+efunctions$level1[,1:numSliders] %*% sqrt.evalues$level1[1:numSliders, 1:numSliders] %*% PCweights$level1
                                  + efunctions$level2[,1:numSliders] %*% sqrt.evalues$level2[1:numSliders, 1:numSliders] %*% PCweights$level2,
-                                 as.matrix(mfpca.obj$mu) +efunctions$level1[,1:numSliders] %*% sqrt.evalues$level1[1:numSliders, 1:numSliders] %*% PCweights$level1 ))
+                                 as.matrix(mfpca.obj$mu) +efunctions$level1[,1:numSliders] %*% sqrt.evalues$level1[1:numSliders, 1:numSliders] %*% PCweights$level1 )
         
         names(df) = c("grid", "mu_visit", "mu_subj")
-        p3 <- ggplot(mu, aes(x=V1, y=V2))+geom_line(lwd=0.75, aes(color= "mu"))+ plotDefaults + theme(legend.key = element_blank())+
+        p3 <- ggplot(mu, aes(x=grid, y=values))+geom_line(lwd=0.75, aes(color= "mu"))+ plotDefaults + theme(legend.key = element_blank())+
           geom_line(data = df, lwd = 1.5, aes(x=grid, y = mu_visit, color = "visit")) + 
           geom_line(data = df, lwd = 1.5, aes(x=grid, y = mu_subj, color = "subject")) + 
           scale_color_manual("Line Legend", values = c(mu = "gray", visit = "indianred",  subject = "cornflowerblue"), guide = FALSE)
@@ -361,7 +358,7 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
         
         
         p4 <- ggplot(df.obs, aes(x = time, y = value, group = visit)) + geom_point(col = "indianred", alpha = 1/5) + plotDefaults + 
-          geom_line(data = mu, aes(x=V1, y=V2, group=NULL), col="gray")+
+          geom_line(data = mu, aes(x = grid, y = values, group=NULL), col="gray")+
           geom_path(data=df.Yhat, col = "indianred") + geom_path(data = df.Yhat.subj, col="cornflowerblue", lwd = 1.25) 
         
         if(input$colVisit) {p4 = p4 + geom_point(aes(col = factor(visit))) + geom_path(data=df.Yhat, aes(col = factor(visit)))+  theme(legend.position="none")                                                         
@@ -409,14 +406,14 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
             Yhat.level.m = melt(as.matrix(points$Yhat.level))
             
             colnames(Yhat.level.m) <- c("subj", "time", "value")        
-          }else{ Yhat.m = as.data.frame(cbind(1, 1:length(mfpca.obj$mu), mfpca.obj$mu)) }  
+          }else{ Yhat.m = data.frame(1, 1:length(mfpca.obj$mu), mfpca.obj$mu) }  
           colnames(Yhat.m) <- c("subj", "time", "value") 
           
           plots[[i]] <- ggplot(Yhat.all.m, aes(x=time, y=value, group = subj)) + geom_line(alpha = 1/5, color="black") +  plotDefaults+
             geom_line(data = Yhat.m, aes(x=as.numeric(time), y=value, group = subj), color="cornflowerblue")    
            
-          plots[[i+2]] <- ggplot(Yhat.level.all.m[[1]], aes(x=time, y=value, group = subj)) + geom_line(alpha = 1/5, color="black") +
-            plotDefaults[-c(4)] + ylim(c(range(scoredata[[1]]$Yhat.level)[1], range(scoredata[[1]]$Yhat.level)[2]))
+          plots[[i+2]] <- ggplot(Yhat.level.all.m[[i]], aes(x=time, y=value, group = subj)) + geom_line(alpha = 1/5, color="black") +
+            plotDefaults[-c(4)] + ylim(c(range(scoredata[[i]]$Yhat.level)[1], range(scoredata[[1]]$Yhat.level)[2]))
           
           if(!is.null(brushes[[i]])){
             plots[[i+2]] = plots[[i+2]] + geom_line(data = Yhat.level.m, aes(x=as.numeric(time), y=value, group = subj), color="cornflowerblue")
