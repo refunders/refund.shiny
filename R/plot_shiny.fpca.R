@@ -42,7 +42,7 @@ plot_shiny.fpca = function(x, xlab = "", ylab="", title = "", ...) {
     PCnum = paste("PC", i, sep="")
     
     calls[[i]] =  eval(call("sliderInput", inputId= PCnum, label = paste(PCnum, ": ", varpercent[[i]],  "% Variance", sep=""),
-                            min = -2, max = 2, step = .1, value = 0, post = " SD", animate = animationOptions(interval=500, loop=T)))
+                            min = -2, max = 2, step = .1, value = 0, post = " SD", animate = animationOptions(interval=400, loop=T)))
     
     PCs[i] = PCnum
   }  
@@ -150,7 +150,7 @@ plot_shiny.fpca = function(x, xlab = "", ylab="", title = "", ...) {
         
         p1 <- ggplot(mu, aes(x = V1, y = V2)) + geom_line(lwd=1) + plotDefaults +
           geom_point(data = as.data.frame(cbind(1:length(fpca.obj$mu), fpca.obj$mu + 2*scaled_efuncs)), color = "blue", size = 4, shape = '+')+
-          geom_point(data = as.data.frame(cbind(1:length(fpca.obj$mu), fpca.obj$mu - 2*scaled_efuncs)), color = "red", size = 4, shape = "-")+
+          geom_point(data = as.data.frame(cbind(1:length(fpca.obj$mu), fpca.obj$mu - 2*scaled_efuncs)), color = "indianred", size = 4, shape = "-")+
           ggtitle(bquote(psi[.(input$PCchoice)]~(t) ~ "," ~.(100*round(fpca.obj$evalues[as.numeric(input$PCchoice)]/sum(fpca.obj$evalues),3)) ~ "% Variance"))   
       })
       
@@ -194,9 +194,9 @@ plot_shiny.fpca = function(x, xlab = "", ylab="", title = "", ...) {
         PCweights = rep(NA, length(PCs)); for(i in 1:length(PCs)){PCweights[i] = input[[PCs[i]]]}
         df = as.data.frame(cbind(1:length(fpca.obj$mu), as.matrix(fpca.obj$mu)+efunctions %*% sqrt.evalues %*% PCweights ))
         
-        p3 <- ggplot(mu, aes(x=V1, y=V2))+geom_line(lwd=1, aes(color= "mu"))+  plotDefaults + theme(legend.key = element_blank()) +
+        p3 <- ggplot(mu, aes(x=V1, y=V2))+geom_line(lwd=0.75, aes(color= "mu"))+  plotDefaults + theme(legend.key = element_blank()) +
           geom_line(data = df, lwd = 1.5, aes(color = "subject")) + xlab(xlab) + ylab(ylab) + ggtitle(title)+
-          scale_color_manual("Line Legend", values = c(mu = "black", subject = "cornflowerblue"), guide = FALSE)  
+          scale_color_manual("Line Legend", values = c(mu = "gray", subject = "cornflowerblue"), guide = FALSE)  
       })
       
       output$LinCom <- renderPlot(  
@@ -220,8 +220,8 @@ plot_shiny.fpca = function(x, xlab = "", ylab="", title = "", ...) {
         df = as.data.frame(cbind(1:length(fpca.obj$mu), fpca.obj$mu, fpca.obj$Yhat[subjectnum,], fpca.obj$Y[subjectnum,]))
         
         p4 <- ggplot(data = df, aes(x=V1,y=V2)) + geom_line(lwd=0.5, color = "gray") + plotDefaults +
-          geom_line(data = df, aes(y=V3), size=1, color = "blue") +
-          geom_point(data = df, aes(y=V4), color = "blue") 
+          geom_line(data = df, aes(y=V3), size=1, color = "cornflowerblue") +
+          geom_point(data = df, aes(y=V4), color = "blue", alpha = 1/3) 
       })
       
       output$Subject <- renderPlot( 
