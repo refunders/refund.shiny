@@ -26,7 +26,7 @@ of those analyses. There are three major categories of analyses that can be view
 linear combinations of score values and FPCs; reconstructions for each subject; and score scatterplots.}
 \item{Function-on-scalar regression analyses implemented by \code{\link{bayes_fosr}}. Plots show the raw data
 colored by covariate values; fitted values depending on covariates; coefficient functions; and residuals.}
-\item{Multilevel functional principal components analyses implemented by \code{\link{fpca.sc}}.  Plots show the mean +/- 2SD times each FPC;
+\item{Multilevel functional principal components analyses implemented by \code{\link{mfpca.sc}}.  Plots show the mean +/- 2SD times each FPC;
 scree plots; linear combinations of score values and FPCs; reconstructions for each subject; and score scatterplots for levels 1 and 2.}
 }
 }
