@@ -4,7 +4,7 @@
 \alias{varPercent}
 \title{Calculate percent variance of eigenvalues for plot_shiny.mfpca()}
 \usage{
-varPercent(level, plotObj = mfpca.obj)
+varPercent(level, plotObj)
 }
 \arguments{
 \item{level}{numeric, 1 or 2 for levels 1 or 2, respectively, 12 to calculate total variance.}

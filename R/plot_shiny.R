@@ -22,6 +22,7 @@
 #' @author Jeff Goldsmith \email{jeff.goldsmith@@columbia.edu}, 
 #' Julia Wrobel \email{jw3134@@cumc.columbia.edu}
 #' @seealso \code{\link{plot_shiny.fpca}}, \code{\link{plot_shiny.mfpca}},  \code{\link{plot_shiny.fosr}}
+#' @import refund
 #' @export plot_shiny
 #' 
 #' @examples
@@ -73,10 +74,10 @@
 #' DTI$gender = factor(sample(c("male","female"), dim(DTI)[1], replace = TRUE))
 #' DTI$status = factor(sample(c("RRMS", "SPMS", "PPMS"), dim(DTI)[1], replace = TRUE))
 #' 
-#' fosr.dti1 = fosr_gls(cca ~ pasat, data = DTI)
+#' fosr.dti1 = bayes_fosr(cca ~ pasat, data = DTI)
 #' plot_shiny(fosr.dti1)
 #' 
-#' fosr.dti2 = fosr_gls(cca ~ pasat * gender + status, data = DTI)
+#' fosr.dti2 = bayes_fosr(cca ~ pasat * gender + status, data = DTI)
 #' plot_shiny(fosr.dti2)
 #' 
 #' 
@@ -85,7 +86,7 @@
 #' DTI$cca[1,] = DTI$cca[1,] + .4
 #' DTI$cca[2,] = DTI$cca[2,] + .4
 #' 
-#' fosr.dti3 = fosr_gls(cca ~ pasat * gender + status, data = DTI)
+#' fosr.dti3 = bayes_fosr(cca ~ pasat * gender + status, data = DTI)
 #' plot_shiny(fosr.dti3)
 #' 
 #' ##### MFPCA Example #####

@@ -1,21 +1,22 @@
 Package: refund.shiny
 Title: Interactive plotting for functional data analyses
 Version: 0.1
-Authors@R: c(person("Jeff", "Goldsmith", role = "aut", email = "jeff.goldsmith@columbia.edu"), person("Julia", "Wrobel", role = c("aut", "cre"), email =
-    "jw3134@cumc.columbia.edu"))
-Description: Interactive plotting for functional data analyses
-Depends: R (>= 3.0.1)
+Authors@R: c(
+    person("Jeff", "Goldsmith", role = "aut", email = "jeff.goldsmith@columbia.edu"), 
+    person("Julia", "Wrobel", role = c("aut", "cre"), email = "jw3134@cumc.columbia.edu")
+    )
+Description: Interactive plotting for functional data analyses.
+Depends: 
+    R (>= 3.0.1)
 Imports:
     ggplot2,
     Matrix,
     mgcv,
-    pbs,
     shiny (>= 0.11),
-    splines,
     reshape2,
-    gamm4,
     dplyr,
-    lme4,
-    gridExtra
+    gridExtra,
+    refund,
+    MASS
 License: GPL (>= 2)
 LazyData: true

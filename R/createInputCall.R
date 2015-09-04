@@ -38,7 +38,7 @@ createInputCall = function(name, variable){
 #' @return a list of numbers that indicate percent variance for selected level.
 #' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu}
 #' 
-mfpcaCalls = function(numSliders = NULL, plotObj = mfpca.obj, percents = varpercents){
+mfpcaCalls = function(numSliders = NULL, plotObj, percents){
 
   calls <- PCs <- list(NA, NA)
   

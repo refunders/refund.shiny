@@ -22,6 +22,10 @@
 plot_shiny.fpca = function(x, xlab = "", ylab="", title = "", ...) {
     
   fpca.obj <- x
+  
+  ### NULLify global values called in ggplot
+  V1 = V2 = V3 = V4 = k = lambda = value = subj = NULL
+  
   ################################
   ## code for processing tabs
   ################################

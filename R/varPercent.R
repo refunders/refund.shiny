@@ -9,7 +9,7 @@
 #' @return a list of numbers that indicate percent variance for selected level.
 #' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu}
 #' 
-varPercent <- function(level, plotObj = mfpca.obj){
+varPercent <- function(level, plotObj){
   if (level == 12){
     eigenvalues = c(plotObj$evalues$level1, plotObj$evalues$level2)
   }else{eigenvalues = plotObj$evalues[[level]]}

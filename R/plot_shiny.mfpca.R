@@ -25,11 +25,14 @@
 plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
     
   mfpca.obj <- x
+  ### NULLify global values called in ggplot
+  Y = id = k = lambda = value = mu_visit = mu_subj = visit = subj = NULL
+  
   ################################
   ## code for processing tabs
   ################################
   npc = mfpca.obj$npc
-  mu = data.frame(grid = 1:length(mfpca.obj$mu), values = mfpca.obj$mu)
+  mu = data.frame(grid = 1:length(mfpca.obj$mu), value = mfpca.obj$mu)
   efunctions = mfpca.obj$efunctions; 
   sqrt.evalues = lapply(mfpca.obj$evalues, function(i) diag(sqrt(i)))      
   scaled_efunctions = lapply(1:2, function(i) efunctions[[i]] %*% sqrt.evalues[[i]])
@@ -255,9 +258,9 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
         scaled_efuncs = lapply(1:2, function(i) scaled_efunctions[[i]][,PCchoice[[i]]])
         
         p1 <- lapply(1:2, function(i){
-          ggplot(mu, aes(x = grid, y = values)) + geom_line(lwd=1) + plotDefaults +
-            geom_point(data = data.frame(grid =1:length(mfpca.obj$mu),values =  mfpca.obj$mu + 2*scaled_efuncs[[i]]), color = "blue", size = 4, shape = '+') +
-            geom_point(data = data.frame(grid =1:length(mfpca.obj$mu), values = mfpca.obj$mu - 2*scaled_efuncs[[i]]), color = "indianred", size = 4, shape = "-") +
+          ggplot(mu, aes(x = grid, y = value)) + geom_line(lwd=1) + plotDefaults +
+            geom_point(data = data.frame(grid =1:length(mfpca.obj$mu),value =  mfpca.obj$mu + 2*scaled_efuncs[[i]]), color = "blue", size = 4, shape = '+') +
+            geom_point(data = data.frame(grid =1:length(mfpca.obj$mu), value = mfpca.obj$mu - 2*scaled_efuncs[[i]]), color = "indianred", size = 4, shape = "-") +
             ggtitle(bquote(psi[.(PCchoice[[i]])]~(t) ~ "," ~.(100*round(mfpca.obj$evalues[[i]][PCchoice[[i]]]/sum(mfpca.obj$evalues[[i]]),3)) ~ "% Variance"))   
         })   
       })
@@ -307,7 +310,7 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
                                  as.matrix(mfpca.obj$mu) +efunctions$level1[,1:numSliders] %*% sqrt.evalues$level1[1:numSliders, 1:numSliders] %*% PCweights$level1 )
         
         names(df) = c("grid", "mu_visit", "mu_subj")
-        p3 <- ggplot(mu, aes(x=grid, y=values))+geom_line(lwd=0.75, aes(color= "mu"))+ plotDefaults + theme(legend.key = element_blank())+
+        p3 <- ggplot(mu, aes(x=grid, y=value))+geom_line(lwd=0.75, aes(color= "mu"))+ plotDefaults + theme(legend.key = element_blank())+
           geom_line(data = df, lwd = 1, aes(x=grid, y = mu_visit, color = "visit")) + 
           geom_line(data = df, lwd = 1.5, aes(x=grid, y = mu_subj, color = "subject")) + 
           scale_color_manual("Line Legend", values = c(mu = "gray", visit = "indianred",  subject = "cornflowerblue"), guide = FALSE)
@@ -340,7 +343,7 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
       
       plotInputSubject <- reactive({
         p4 <- ggplot(dataInputSubject()[[1]], aes(x = time, y = value, group = visit)) + plotDefaults + 
-          geom_line(data = mu, aes(x = grid, y = values, group=NULL), col="gray")
+          geom_line(data = mu, aes(x = grid, y = value, group=NULL), col="gray")
         
         visits <- input[["visit"]]
         df.Yhat.visits <- subset(dataInputSubject()[[2]], visit %in% visits)

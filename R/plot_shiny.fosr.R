@@ -18,10 +18,16 @@
 #' @importFrom reshape2 melt
 #' 
 #' @export
-#' 
+
+#utils::globalVariables(c("value", "subj", "covariate"))
+
+
 plot_shiny.fosr = function(x, xlab = "", ylab="", title = "", ...) {
-    
+
   fosr.obj <- x
+  
+  ### NULLify global values called in ggplot
+  value = subj = covariate = UB = LB = residual = depth.rank = NULL
   
   ################################
   ## code for processing tabs
