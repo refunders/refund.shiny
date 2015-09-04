@@ -14,9 +14,10 @@ Imports:
     splines,
     reshape2,
     gamm4,
-    refund,
     dplyr,
     lme4,
     gridExtra
+r_github_packages:
+    - refunders/refund/jg-devel
 License: GPL (>= 2)
 LazyData: true
