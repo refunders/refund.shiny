@@ -253,7 +253,7 @@ plot_shiny.fpca = function(x, xlab = "", ylab="", title = "", ...) {
         }
         
         colnames(Yhat.m) <- c("subj", "time", "value")  
-        baseplot+geom_line(data= Yhat.m, aes(x=as.numeric(time), y=value, group = subj), color="blue")
+        baseplot+geom_line(data= Yhat.m, aes(x=as.numeric(time), y=value, group = subj), color="cornflowerblue")
         
       })
             

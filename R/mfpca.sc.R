@@ -88,8 +88,8 @@ quadWeights<- function(argvals, method = "trapezoidal")
 ##' bands for functional data using principal components. \emph{Biometrics},
 ##' 69(1), 41--51.
 ##'
+##' @import mgcv
 ##' @importFrom Matrix nearPD Matrix t as.matrix
-##' @importFrom mgcv gam predict.gam
 ##' @importFrom MASS ginv
 ##' @export
 ##' 
