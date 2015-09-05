@@ -73,13 +73,12 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
   Y.df = mfpca.obj$Y.df
   Yhat.subj = mfpca.obj$Yhat.subject 
   Yhat = mfpca.obj$Yhat
-  rownames(Y.df) = rownames(Yhat) = rownames(Yhat.subj)   ## set consistent rownames for grouping by visit in ggplot
+  rownames(Y.df) = rownames(Yhat) = rownames(Yhat.subj)   
   
   #################################
   ## Tab 5: score plots
   #################################
   
-  ## from score plots
   scoreTextA = "Use the drop down menus to select FPCs for the X and Y axis. Plot shows observed 
     score scatterplot for selected FPCs; click and drag on the scatterplot to select subjects."
  
@@ -362,11 +361,6 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
               }        
       })
       
-      
-        
-        
-       
-      
       output$Subject <- renderPlot( print(plotInputSubject()) )
       
       output$downloadPDFSubject <- savePDF("subject.pdf", plotInputSubject())
@@ -377,8 +371,7 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
       #################################              
                  
       PCX <- reactive({ list(level1 = paste0("PC", input$PCX1), level2 = paste0("PC", input$PCX2) ) }) 
-      PCY <- reactive({ list(level1 = paste0("PC", input$PCY1), level2 = paste0("PC", input$PCY2) ) }) 
-      
+      PCY <- reactive({ list(level1 = paste0("PC", input$PCY1), level2 = paste0("PC", input$PCY2) ) })      
       
       ## Level 1 scatter plot of scores 
       output$ScorePlot1 <- renderPlot({ 
@@ -387,7 +380,7 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
       })      
             
       #########################################
-      # Store brush values as a data frame
+      # Store Plots that use Brush Values
       #######################################
 
       YhatPlots <- reactive({
@@ -422,7 +415,6 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
         grid.arrange(YhatPlots()[[1]],YhatPlots()[[3]], ncol = 2)
       })
       
-      ####### Level 2 Tab
       
       ## Level 2 Plot 1
       output$ScorePlot2 <- renderPlot({ 
