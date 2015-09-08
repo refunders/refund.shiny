@@ -4,10 +4,10 @@
 \alias{mfpcaCalls}
 \title{Create input calls for plot_shiny.mfpca()}
 \usage{
-mfpcaCalls(numSliders = NULL, plotObj, percents)
+mfpcaCalls(plot.npc, plotObj, percents)
 }
 \arguments{
-\item{numSliders}{numeric, number of PCs per level to create sliders for. By default it uses number of PCs.}
+\item{plot.npc}{list of 2 numeric entries giving number of sliders at each level}
 
 \item{plotObj}{the mfpca object plotted in the plot_shiny.mfpca() function.}
 

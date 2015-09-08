@@ -31,14 +31,14 @@ createInputCall = function(name, variable){
 #' number of sliders to construct for each level is passed as an argument, and 
 #' corresponding sliders for each FPC are constructed.
 #' 
-#' @param numSliders numeric, number of PCs per level to create sliders for. By default it uses number of PCs.
+#' @param plot.npc list of 2 numeric entries giving number of sliders at each level
 #' @param plotObj the mfpca object plotted in the plot_shiny.mfpca() function. 
 #' @param percents the percent variance calculated for each eigen values for levels 1 and 2.
 #' 
 #' @return a list of numbers that indicate percent variance for selected level.
 #' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu}
 #' 
-mfpcaCalls = function(numSliders = NULL, plotObj, percents){
+mfpcaCalls = function(plot.npc, plotObj, percents){
 
   calls <- PCs <- list(NA, NA)
   
@@ -48,10 +48,10 @@ mfpcaCalls = function(numSliders = NULL, plotObj, percents){
     
     #numSliders = plotObj$npc[[j]]
     
-    calls[[j]] = as.list(rep(NA, numSliders))
-    PCs[[j]] = rep(NA, numSliders)
+    calls[[j]] = as.list(rep(NA, plot.npc[[j]]))
+    PCs[[j]] = rep(NA, plot.npc[[j]])
     
-     for(i in 1:numSliders){
+     for(i in 1:plot.npc[[j]]){
       PCnum = paste("PC ", j, ".",  i, sep="")    
       calls[[j]][[i]] =  eval(call("sliderInput", inputId= PCnum, label = paste0(PCnum, ": ", percents[[j]][[i]], "% of Level ", j,  " Variance"),
                                    min = -2, max = 2, step = .1, value = 0, post = " SD", animate = animationOptions(interval=400, loop=T)))

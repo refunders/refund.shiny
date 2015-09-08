@@ -62,9 +62,11 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
   #################################
   varpercents = lapply(c(1, 2, 12), function(i) varPercent(i, mfpca.obj)) 
   
-  numSliders = 3
-  calls <- mfpcaCalls(numSliders, mfpca.obj, varpercents)$calls
-  PCs <- mfpcaCalls(numSliders, mfpca.obj, varpercents)$PCs
+  plot.npc = list(min(3, mfpca.obj$npc[[1]]), min(3, mfpca.obj$npc[[2]]))
+  
+  mfpca.calls = mfpcaCalls(plot.npc = plot.npc, mfpca.obj, varpercents)
+  calls <- mfpca.calls$calls
+  PCs <- mfpca.calls$PCs
   
   #################################
   ## Tab 4: subject fits
@@ -163,7 +165,8 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
                              withMathJax(),
                              column(3, h4("Sliders for Levels 1 and 2"),
                                     helpText("Plot shows the linear combination of mean and FPCs with the scores 
-                                             specified using the sliders below."), hr(),
+                                             specified using the sliders below. Black curve is population mean; blue curve
+                                             is subject-specific mean; red curve is subject-visit specific mean."), hr(),
                                     tabsetPanel(
                                       tabPanel("Level 1", eval(calls[[1]]) ),
                                       tabPanel("Level 2", eval(calls[[2]]) )
@@ -175,12 +178,12 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
                     ),
                     tabPanel("Subject Fits",  icon = icon("user"),
                              column(3,
-                                    helpText("Plot shows observed data and fitted values for the subject selected below. Dotted blue curve is
-                                             subject-specific mean and red curves are subject-visit specific fitted values."), hr(),
-                                    selectInput("subject", label = ("Select Subject"), choices = ids, selected =ids[1]), hr(),
+                                    helpText("Plot shows observed data and fitted values for the subject selected below. Blue curve is
+                                             subject-specific mean, red curves are subject-visit specific fitted values, and red
+                                             points are observed data."), hr(),
+                                    selectInput("subject", label = ("Select Subject"), choices = ids, selected =ids[1]),
                                     #selectInput("visit","Select Visit", c(Choose='', 1:dataInputSubject()[[4]]), selectize = TRUE, multiple = TRUE), 
                                     uiOutput("visitnum"),
-                                    hr(),
                                     checkboxInput("colorVisit", label="Color by Visit", value =FALSE), 
                                     helpText("If 'Color by Visit' is selected, observed values and subject-visit specific fitted values
                                              are colored by visit number."), hr(),
@@ -207,9 +210,10 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
                                           ) ## end column9          
                                         ),
                                         fluidRow(
-                                          column(3, helpText("Black curves are fitted values for all subjects. Blue curves correspond 
-                                                                  to subjects selected in the graph above.   If no points are selected, the mean 
-                                                                  curve is shown.") 
+                                          column(3, helpText("The left panel shows all fitted curves, for all subjects and visits; the 
+                                                              right panel shows fitted curves using only Level 1 FPCs -- the mean and 
+                                                             Level 2 effects are omitted. Blue curves correspond to subjects selected 
+                                                             in the graph above.") 
                                           ),
                                           column(9, plotOutput("YhatPlot1"))
                                         )
@@ -230,8 +234,10 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
                                           ) ## end column9          
                                         ),
                                         fluidRow(
-                                          column(3, helpText("Black curves are Level 2 eigenvalues times Level 2 scores for subjects at
-                                                        all visits. Blue curves correspond to observations selected in the graph above.") 
+                                          column(3, helpText("The left panel shows all fitted curves, for all subjects and visits; the 
+                                                              right panel shows fitted curves using only Level 2 FPCs -- the mean and 
+                                                             Level 1 effects are omitted. Blue curves correspond to subjects selected 
+                                                             in the graph above.") 
                                           ),
                                           column(9, plotOutput("YhatPlot2"))
                                         )
@@ -298,15 +304,15 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
       
       plotInputLinCom <- reactive({
                
-        PCweights = lapply(1:2, function(i) rep(NA, numSliders)) ; 
+        PCweights = lapply(1:2, function(i) rep(NA, plot.npc[[i]])) ; 
         names(PCweights) <- c("level1", "level2")
-        for(i in 1:numSliders){PCweights$level1[i] = input[[PCs$level1[i]]]}
-        for(i in 1:numSliders){PCweights$level2[i] = input[[PCs$level2[i]]]}
+        for(i in 1:plot.npc[[1]]){PCweights$level1[i] = input[[PCs$level1[i]]]}
+        for(i in 1:plot.npc[[2]]){PCweights$level2[i] = input[[PCs$level2[i]]]}
         
         df = data.frame(1:length(mfpca.obj$mu), 
-                                 as.matrix(mfpca.obj$mu)+efunctions$level1[,1:numSliders] %*% sqrt.evalues$level1[1:numSliders, 1:numSliders] %*% PCweights$level1
-                                 + efunctions$level2[,1:numSliders] %*% sqrt.evalues$level2[1:numSliders, 1:numSliders] %*% PCweights$level2,
-                                 as.matrix(mfpca.obj$mu) +efunctions$level1[,1:numSliders] %*% sqrt.evalues$level1[1:numSliders, 1:numSliders] %*% PCweights$level1 )
+                                 as.matrix(mfpca.obj$mu)+efunctions$level1[,1:plot.npc[[1]]] %*% sqrt.evalues$level1[1:plot.npc[[1]], 1:plot.npc[[1]]] %*% PCweights$level1 +
+                                                         efunctions$level2[,1:plot.npc[[2]]] %*% sqrt.evalues$level2[1:plot.npc[[2]], 1:plot.npc[[2]]] %*% PCweights$level2,
+                                 as.matrix(mfpca.obj$mu)+efunctions$level1[,1:plot.npc[[1]]] %*% sqrt.evalues$level1[1:plot.npc[[1]], 1:plot.npc[[1]]] %*% PCweights$level1 )
         
         names(df) = c("grid", "mu_visit", "mu_subj")
         p3 <- ggplot(mu, aes(x=grid, y=value))+geom_line(lwd=0.75, aes(color= "mu"))+ plotDefaults + theme(legend.key = element_blank())+
