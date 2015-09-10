@@ -46,7 +46,11 @@ fMBD=function(data){
 #' @param factor a constant that determines the fences for outliers. Defaults to 1.5, as in classical definition for Tukey outliers. 
 #' 
 #' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu}
-#'
+#' @references Sun, Ying, Marc G. Genton, and Douglas W. Nychka. (2012).
+#' Exact fast computation of band depth for large functional datasets: How quickly can one million curves be ranked? \emph{Stat}, 1, 68-74.
+#' 
+#' Sun, Ying, and Marc G. Genton. (2011). Functional boxplots. \emph{Journal of Computational and Graphical Statistics}, 20, 313-334.
+#' 
 
 outliers = function(data, factor=1.5){
   # tranpose data so that each column is a curve rather than each row

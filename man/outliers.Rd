@@ -19,4 +19,10 @@ A dataframe of residuals is passed as an argument, and depths and outlying curve
 \author{
 Julia Wrobel \email{jw3134@cumc.columbia.edu}
 }
+\references{
+Sun, Ying, Marc G. Genton, and Douglas W. Nychka. (2012).
+Exact fast computation of band depth for large functional datasets: How quickly can one million curves be ranked? \emph{Stat}, 1, 68-74.
+
+Sun, Ying, and Marc G. Genton. (2011). Functional boxplots. \emph{Journal of Computational and Graphical Statistics}, 20, 313-334.
+}
 

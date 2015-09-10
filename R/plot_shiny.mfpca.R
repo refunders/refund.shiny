@@ -354,7 +354,8 @@ plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
         df.Yhat.visits <- subset(dataInputSubject()[[2]], visit %in% visits)
         df.obs.visits <- subset(dataInputSubject()[[1]], visit %in% visits)
              
-        if(length(visits)>=1){p4 = p4 + geom_point(data = df.obs.visits, col = "indianred") +
+        if(length(visits)>=1){p4 = p4 + geom_path(data = dataInputSubject()[[3]], col="cornflowerblue") +
+                                geom_point(data = df.obs.visits, col = "indianred") +
                                 geom_path(data = df.Yhat.visits, col="indianred") 
         }
         
