@@ -1,5 +1,5 @@
 Package: refund.shiny
-Title: Interactive plotting for functional data analyses
+Title: Interactive Plotting for Functional Data Analyses
 Version: 0.1
 Authors@R: c(
     person("Julia", "Wrobel", role = c("aut", "cre"), email = "jw3134@cumc.columbia.edu"),
@@ -14,6 +14,6 @@ Imports:
     reshape2,
     dplyr,
     gridExtra,
-    refund
+    refund (>= 0.13)
 License: GPL (>= 2)
 LazyData: true
