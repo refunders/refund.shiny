@@ -10,12 +10,10 @@
 #'
 
 savePDF = function(title, plotName){
-  pdf = NULL
-
   PDF <-   downloadHandler(
     filename = title,
     content = function(file) {
-      ggsave(file, plot = plotName, device = pdf)
+      ggsave(file, plot = plotName)
     })
 
   return(PDF)
