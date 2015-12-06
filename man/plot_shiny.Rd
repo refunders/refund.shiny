@@ -91,6 +91,17 @@ DTI$cca[2,] = DTI$cca[2,] + .4
 fosr.dti3 = fosr_gls(cca ~ pasat * gender + status, data = DTI)
 plot_shiny(fosr.dti3)
 
+##### Longitudinal FoSR Examples #####
+
+data(DTI2)
+class(DTI2$cca) = class(DTI2$cca)[-1]
+DTI2 = subset(DTI2, select = c(cca, id, pasat))
+DTI2 = DTI2[complete.cases(DTI2),]
+
+fosr.dti4 = bayes_fosr(cca ~ pasat + re(id), data = DTI2, Kt = 10, Kp = 4, cov.method = "FPCA")
+plot_shiny(fosr.dti4)
+plot_shiny(fosr.dti4$fpca.obj)
+
 }
 }
 \author{
