@@ -16,7 +16,7 @@
 #' }
 #' 
 #' @title plot_shiny: The generic function for interactive plots of functional data analyses
-#' @param x object to be plotted. Currently, allowed data types are \code{fpca} \code{mfpca} and \code{fosr}.
+#' @param obj object to be plotted. Currently, allowed data types are \code{fpca} \code{mfpca} and \code{fosr}.
 #' @param ... additional arguments passed to plotting functions
 #' 
 #' @author Jeff Goldsmith \email{jeff.goldsmith@@columbia.edu}, 
@@ -100,6 +100,6 @@
 #' 
 #' }
 #' 
-plot_shiny <- function(x, ...){
+plot_shiny <- function(obj, ...){
   UseMethod("plot_shiny")
 }

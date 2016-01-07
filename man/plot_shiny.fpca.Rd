@@ -4,10 +4,10 @@
 \alias{plot_shiny.fpca}
 \title{Interactive Plotting for Functional Principal Component Analysis}
 \usage{
-\method{plot_shiny}{fpca}(x, xlab = "", ylab = "", title = "", ...)
+\method{plot_shiny}{fpca}(obj, xlab = "", ylab = "", title = "", ...)
 }
 \arguments{
-\item{x}{fpca object to be plotted.}
+\item{obj}{fpca object to be plotted.}
 
 \item{xlab}{x axis label}
 

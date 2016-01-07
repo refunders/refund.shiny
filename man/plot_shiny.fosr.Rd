@@ -4,10 +4,10 @@
 \alias{plot_shiny.fosr}
 \title{Interactive Plotting for Functional-on-Scalar Regressions}
 \usage{
-\method{plot_shiny}{fosr}(x, xlab = "", ylab = "", title = "", ...)
+\method{plot_shiny}{fosr}(obj, xlab = "", ylab = "", title = "", ...)
 }
 \arguments{
-\item{x}{fosr object to be plotted.}
+\item{obj}{fosr object to be plotted.}
 
 \item{xlab}{x axis label}
 

@@ -3,7 +3,7 @@
 #' Produces an interactive plot illustrating a multilevel functional principal component
 #' analysis.
 #'
-#' @param x mfpca object to be plotted.
+#' @param obj mfpca object to be plotted.
 #' @param xlab x axis label
 #' @param ylab y axis label
 #' @param title plot title
@@ -22,9 +22,9 @@
 #' @export
 #'
 #'
-plot_shiny.mfpca = function(x, xlab = "", ylab="", title = "", ...) {
+plot_shiny.mfpca = function(obj, xlab = "", ylab="", title = "", ...) {
 
-  mfpca.obj <- x
+  mfpca.obj <- obj
   ### NULLify global values called in ggplot
   Y = id = k = lambda = value = mu_visit = mu_subj = visit = subj = time = grid = NULL
 

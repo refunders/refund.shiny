@@ -3,7 +3,7 @@
 #' Produces an interactive plot illustrating a function-on-scalar
 #' regression analysis.
 #'
-#' @param x fosr object to be plotted.
+#' @param obj fosr object to be plotted.
 #' @param xlab x axis label
 #' @param ylab y axis label
 #' @param title plot title
@@ -23,9 +23,9 @@
 #utils::globalVariables(c("value", "subj", "covariate"))
 
 
-plot_shiny.fosr = function(x, xlab = "", ylab="", title = "", ...) {
+plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
 
-  fosr.obj <- x
+  fosr.obj <- obj
 
   ### NULLify global values called in ggplot
   value = subj = covariate = UB = LB = residual = depth.rank = coef = grid = NULL

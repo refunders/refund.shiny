@@ -4,10 +4,10 @@
 \alias{plot_shiny.mfpca}
 \title{Interactive Plotting for Multilevel Functional Principal Component Analysis}
 \usage{
-\method{plot_shiny}{mfpca}(x, xlab = "", ylab = "", title = "", ...)
+\method{plot_shiny}{mfpca}(obj, xlab = "", ylab = "", title = "", ...)
 }
 \arguments{
-\item{x}{mfpca object to be plotted.}
+\item{obj}{mfpca object to be plotted.}
 
 \item{xlab}{x axis label}
 

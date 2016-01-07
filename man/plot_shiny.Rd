@@ -4,10 +4,10 @@
 \alias{plot_shiny}
 \title{plot_shiny: The generic function for interactive plots of functional data analyses}
 \usage{
-plot_shiny(x, ...)
+plot_shiny(obj, ...)
 }
 \arguments{
-\item{x}{object to be plotted. Currently, allowed data types are \code{fpca} \code{mfpca} and \code{fosr}.}
+\item{obj}{object to be plotted. Currently, allowed data types are \code{fpca} \code{mfpca} and \code{fosr}.}
 
 \item{...}{additional arguments passed to plotting functions}
 }

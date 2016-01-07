@@ -3,7 +3,7 @@
 #' Produces an interactive plot illustrating a functional principal component
 #' analysis.
 #'
-#' @param x fpca object to be plotted.
+#' @param obj fpca object to be plotted.
 #' @param xlab x axis label
 #' @param ylab y axis label
 #' @param title plot title
@@ -19,9 +19,9 @@
 #'
 #' @export
 #'
-plot_shiny.fpca = function(x, xlab = "", ylab="", title = "", ...) {
+plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
 
-  fpca.obj <- x
+  fpca.obj <- obj
 
   ### NULLify global values called in ggplot
   V1 = V2 = V3 = V4 = k = lambda = value = subj = time = NULL
