@@ -17,7 +17,7 @@
 #' @param visit.index index for visits (repeated measures); vector of length N with each element corresponding a row of Y
 #' @param obsT actual time of visits at which a function is observed; vector of length N with each element corresponding a row of Y
 #' @param funcArg numeric; function argument
-#' @param numTEvalPoint total number of evaluation time points for visits; used for pre-binning in sFPCA step; defaults to 41
+#' @param numTEvalPoints total number of evaluation time points for visits; used for pre-binning in sFPCA step; defaults to 41
 #' @param newdata an optional data frame providing predictors (i for subject id / Ltime for visit time) with which prediction is desired; defaults to NULL
 #' 
 #' @param fbps.knots list of two vectors of knots or number of equidistanct knots for all dimensions
@@ -29,6 +29,7 @@
 #' @param mFPCA.knots number of knots to use or the vectors of knots in a mFPCA step; used for obtain a smooth estimate of a covarance function; defaults to 35; see \command{fpca.face} 
 #' @param mFPCA.p integer; the degree of B-spline functions to use in a mFPCA step; defaults to 3; see \command{fpca.face} 
 #' @param mFPCA.m integer;order of differencing penalty to use in a mFPCA step; defaults to 2; see \command{fpca.face} 
+#' @param mFPCA.npc pre-specified value for the number of principal components; if given, it overrides \code{pve}; defaults to NULL; see \command{fpca.face}
 #' 
 #' @param LongiModel.method model and estimation method for estimating covariance of estimated scores from a mFPCA step; 
 #'                          either KL expansion model or random effects model; defaults to fpca.sc
@@ -39,7 +40,8 @@
 #' @param gam.method smoothing parameter estimation method when \command{gam} is used for predicting score functions at unobserved visit time, T; defaults to \code{REML}; see \command{gam} 
 #' @param gam.kT dimension of basis functions to use; see \command{gam} 
 #' 
-#' @return A list with components \item{i }{subject id} \item{funcArg }{function argument} \item{visitTime }{visit times}
+#' @return A list with components \item{obsData }{observed data (input)}
+#' \item{i }{subject id} \item{funcArg }{function argument} \item{visitTime }{visit times}
 #' \item{fitted.values }{fitted values (in-sample); of the same dimension as Y} \item{fitted.values.all }{a list of which each component consists of a subject's fitted values at all pairs of evaluation points (s and T)} 
 #' \item{predicted.values }{predicted values for variables provided in newdata}
 #' \item{bivariateSmoothMeanFunc }{estimated bivariate smooth mean function}
@@ -58,13 +60,13 @@
 #' @importFrom mgcv gam s 
 #' @importFrom splines spline.des
 #' @importFrom Matrix kronecker as.matrix
+#' @import rgl
 #'  
 #' @examples 
 #'
 #'   ###########################################################################################
 #'   # data generation
 #'   ###########################################################################################
-#'   library(rgl)
 #'   set.seed(1)
 #'   n <- 100 # number of subjects
 #'   ss <- seq(0,1,length.out=101) 
@@ -100,31 +102,31 @@
 #'   mu <- matrix(meanFn(s = rep(ss, each=length(Tij)), t=rep(Tij, length(ss)) ) , nrow=nrow(X))
 #'
 #'   Y <- mu +  X + 
-#'      matrix(rnorm(nrow(X)*ncol(phi), 0, sigma), nrow=nrow(X)) %*% t(phi) + # correlated error process
+#'      matrix(rnorm(nrow(X)*ncol(phi), 0, sigma), nrow=nrow(X)) %*% t(phi) + #correlated error
 #'      matrix(rnorm(length(X), 0, sigma_wn), nrow=nrow(X)) # white noise
 #'
-#'   matplot(ss, t(Y[which(i==2),]), type='l', ylab="", xlab="functional argument", main="observations from subject i = 2")
+#'   matplot(ss, t(Y[which(i==2),]), type='l', ylab="", xlab="functional argument", 
+#'          main="observations from subject i = 2")
 #'   # END: data generation
 #'   
 #'   ###########################################################################################
 #'   # Illustration I : when covariance of scores from a mFPCA step is estimated using fpca.sc
 #'   ###########################################################################################
 #'   est <- fpca.lfda(Y = Y, 
-#'                    subject.index = i,
-#'                    visit.index = j,
-#'                    obsT = Tij,
-#'                    funcArg = ss,
-#'                    numTEvalPoints = length(TT), newdata = data.frame(i = c(1:3), Ltime = c(Tij[1], 0.2, 0.5)), 
+#'                    subject.index = i, visit.index = j, obsT = Tij, 
+#'                    funcArg = ss, numTEvalPoints = length(TT), 
+#'                    newdata = data.frame(i = c(1:3), Ltime = c(Tij[1], 0.2, 0.5)), 
 #'                    fbps.knots = 35, fbps.p = 3, fbps.m = 2,
 #'                    LongiModel.method='fpca.sc',
-#'                    mFPCA.pve = 0.95, mFPCA.knots = 35, mFPCA.p = 3, mFPCA.m = 2, mFPCA.npc = NULL,
+#'                    mFPCA.pve = 0.95, mFPCA.knots = 35, mFPCA.p = 3, mFPCA.m = 2, 
 #'                    sFPCA.pve = 0.95, sFPCA.nbasis = 10, sFPCA.npc = NULL,
 #'                    gam.method = 'REML', gam.kT = 10)
 #'   
 #'   
 #'   # mean function (true vs. estimated)
-#'   persp3d(x=TT, y = ss, z= t(sapply(TT, function(a) meanFn(s=ss, t = a))),xlab="visit times", ylab="s", zlab="estimated mean fn")
-#'   persp3d(x = TT, y = ss, est$bivariateSmoothMeanFunc, add = TRUE, col='light blue')
+#'   rgl::persp3d(x=TT, y = ss, z= t(sapply(TT, function(a) meanFn(s=ss, t = a))),
+#'           xlab="visit times", ylab="s", zlab="estimated mean fn")
+#'   rgl::persp3d(x = TT, y = ss, est$bivariateSmoothMeanFunc, add = TRUE, col='light blue')
 #'   
 #'   ################   mFPCA step   ################
 #'   par(mfrow=c(1,2))
@@ -135,10 +137,11 @@
 #'   
 #'   # eigenfunctions (true vs. estimated)
 #'   matplot(ss, phi, type='l') 
-#'   matlines(ss, cbind(est$mFPCA.efunctions[,1], est$mFPCA.efunctions[,2])  , type='l', lwd=2)
+#'   matlines(ss, cbind(est$mFPCA.efunctions[,1], est$mFPCA.efunctions[,2]), type='l', lwd=2)
 #'   
 #'   # scree plot
-#'   plot(cumsum(est$mFPCA.scree.eval)/sum(est$mFPCA.scree.eval), type='l', ylab = "Percentage of variance explained")
+#'   plot(cumsum(est$mFPCA.scree.eval)/sum(est$mFPCA.scree.eval), type='l', 
+#'        ylab = "Percentage of variance explained")
 #'   points(cumsum(est$mFPCA.scree.eval)/sum(est$mFPCA.scree.eval), pch=16)
 #'   
 #'   ################   sFPCA step   ################
@@ -154,8 +157,12 @@
 #'   image(est$sFPCA.longDynCov.k[[2]])
 #'   
 #'   # estimated scores functions
-#'   matplot(TT, do.call(cbind,lapply(est$sFPCA.xiHat.bySubj, function(a) a[,1])), xlab="visit time", main="k=1", type='l', ylab="", col=rainbow(100, alpha = 1), lwd=1, lty=1)
-#'   matplot(TT, do.call(cbind,lapply(est$sFPCA.xiHat.bySubj, function(a) a[,2])), xlab="visit time", main="k=2",type='l', ylab="", col=rainbow(100, alpha = 1), lwd=1, lty=1)
+#'   matplot(TT, do.call(cbind,lapply(est$sFPCA.xiHat.bySubj, function(a) a[,1])), 
+#'           xlab="visit time", main="k=1", type='l', ylab="", col=rainbow(100, alpha = 1), 
+#'           lwd=1, lty=1)
+#'   matplot(TT, do.call(cbind,lapply(est$sFPCA.xiHat.bySubj, function(a) a[,2])), 
+#'           xlab="visit time", main="k=2",type='l', ylab="", col=rainbow(100, alpha = 1), 
+#'           lwd=1, lty=1)
 #'   
 #'   ################   In-sample and Out-of-sample Prediction   ################
 #'   par(mfrow=c(1,2))
@@ -163,7 +170,9 @@
 #'   matplot(ss, t(Y[which(i==1),]), type='l', ylab="", xlab="functional argument")
 #'   matlines(ss, t(est$fitted.values[which(i==1),]), type='l', lwd=2)
 #'   
-#'  # sanity check : expect fitted and predicted (obtained using info from newdata) values to be the same
+#'  # sanity check : expect fitted and predicted (obtained using info from newdata) 
+#'  #                values to be the same
+#'  
 #'   plot(ss, est$fitted.values[1,], type='p', xlab="", ylab="", pch = 1, cex=1)
 #'   lines(ss, est$predicted.values[1,], type='l', lwd=2, col='blue')
 #'   all.equal(est$predicted.values[1,], est$fitted.values[1,])
@@ -172,30 +181,37 @@
 #'   # Illustration II : when covariance of scores from a mFPCA step is estimated using lmer
 #'   ###########################################################################################
 #'   est.lme <- fpca.lfda(Y = Y, 
-#'                        subject.index = i,
-#'                        visit.index = j,
-#'                        obsT = Tij,
-#'                        funcArg = ss,
-#'                        numTEvalPoints = length(TT), newdata = data.frame(i = c(1:3), Ltime = c(Tij[1], 0.2, 0.5)), 
+#'                        subject.index = i, visit.index = j, obsT = Tij,
+#'                        funcArg = ss, numTEvalPoints = length(TT), 
+#'                        newdata = data.frame(i = c(1:3), Ltime = c(Tij[1], 0.2, 0.5)), 
 #'                        fbps.knots = 35, fbps.p = 3, fbps.m = 2,
 #'                        LongiModel.method='lme',
-#'                        mFPCA.pve = 0.95, mFPCA.knots = 35, mFPCA.p = 3, mFPCA.m = 2, mFPCA.npc = NULL,
+#'                        mFPCA.pve = 0.95, mFPCA.knots = 35, mFPCA.p = 3, mFPCA.m = 2, 
 #'                        gam.method = 'REML', gam.kT = 10)
 #'   
 #'   par(mfrow=c(2,2))
 #'   
 #'   # fpca.sc vs. lme (assumes linearity)
-#'   matplot(TT, do.call(cbind,lapply(est$sFPCA.xiHat.bySubj, function(a) a[,1])), xlab="visit time", main="k=1", type='l', ylab="", col=rainbow(100, alpha = 1), lwd=1, lty=1)
-#'   matplot(TT, do.call(cbind,lapply(est$sFPCA.xiHat.bySubj, function(a) a[,2])), xlab="visit time", main="k=2",type='l', ylab="", col=rainbow(100, alpha = 1), lwd=1, lty=1)
-#'   matplot(TT, do.call(cbind,lapply(est.lme$sFPCA.xiHat.bySubj, function(a) a[,1])), xlab="visit time", main="k=1", type='l', ylab="", col=rainbow(100, alpha = 1), lwd=1, lty=1)
-#'   matplot(TT, do.call(cbind,lapply(est.lme$sFPCA.xiHat.bySubj, function(a) a[,2])), xlab="visit time", main="k=2", type='l', ylab="", col=rainbow(100, alpha = 1), lwd=1, lty=1)
+#'   matplot(TT, do.call(cbind,lapply(est$sFPCA.xiHat.bySubj, function(a) a[,1])), 
+#'           xlab="visit time", main="k=1", type='l', ylab="", col=rainbow(100, alpha = 1), 
+#'           lwd=1, lty=1)
+#'   matplot(TT, do.call(cbind,lapply(est$sFPCA.xiHat.bySubj, function(a) a[,2])), 
+#'           xlab="visit time", main="k=2",type='l', ylab="", col=rainbow(100, alpha = 1), 
+#'           lwd=1, lty=1)
+#'           
+#'   matplot(TT, do.call(cbind,lapply(est.lme$sFPCA.xiHat.bySubj, function(a) a[,1])), 
+#'           xlab="visit time", main="k=1", type='l', ylab="", col=rainbow(100, alpha = 1), 
+#'           lwd=1, lty=1)
+#'   matplot(TT, do.call(cbind,lapply(est.lme$sFPCA.xiHat.bySubj, function(a) a[,2])), 
+#'           xlab="visit time", main="k=2", type='l', ylab="", col=rainbow(100, alpha = 1),
+#'           lwd=1, lty=1)
 
-#####################################################################################################################
-#####################################################################################################################
+################################################################################################
+################################################################################################
 
 fpca.lfda <- function(Y, subject.index, visit.index, obsT = NULL, funcArg = NULL, numTEvalPoints = 41, newdata = NULL, 
                       fbps.knots = c(5,10), fbps.p = 3, fbps.m = 2,
-                      mFPCA.pve = 0.95, mFPCA.knots = 35, mFPCA.p = 3, mFPCA.m = 2, mFPCA.npc = NULL,
+                      mFPCA.pve = 0.95, mFPCA.knots = 35, mFPCA.p = 3, mFPCA.m = 2, mFPCA.npc = NULL, 
                       LongiModel.method = c('fpca.sc', 'lme'),
                       sFPCA.pve = 0.95, sFPCA.nbasis = 10, sFPCA.npc = NULL,
                       gam.method = 'REML', gam.kT = 10){
@@ -237,7 +253,8 @@ fpca.lfda <- function(Y, subject.index, visit.index, obsT = NULL, funcArg = NULL
   #######################################  
   new.y <- y-mu.hat
   
-  fit1 <- fpca.face(Y=new.y, pve=mFPCA.pve, knots=mFPCA.knots, p = mFPCA.p, m = mFPCA.m, npc = mFPCA.npc)
+  fit1 <- fpca.face(Y=new.y, pve=mFPCA.pve, 
+                    knots=mFPCA.knots, p = mFPCA.p, m = mFPCA.m, npc = mFPCA.npc)
   phi.hat <- fit1$efunctions*sqrt(M)   # estimate eigenfunctions
   K.hat <- fit1$npc 
   
@@ -351,7 +368,9 @@ fpca.lfda <- function(Y, subject.index, visit.index, obsT = NULL, funcArg = NULL
   #######################################
   
   if(LongiModel.method == 'fpca.sc'){
-    return(list(i = subject.index, # index for subject
+    ret <- list(obsData = list(y = Y, i = subject.index, j = visit.index, Tij = obsT, funcArg = ss),
+                
+                i = subject.index, # index for subject
                 funcArg = ss,   # eval points in s direction
                 visitTime = TT, # eval points in T direction
                 
@@ -371,10 +390,12 @@ fpca.lfda <- function(Y, subject.index, visit.index, obsT = NULL, funcArg = NULL
                 
                 mFPCA.covar = marCovar.hat,   # estimated marginal covariance
                 sFPCA.longDynCov.k = longDynamicsCov.hat.k) # estimated covariance of longitudinal dynamics
-    )  
+     
   }else if(LongiModel.method == 'lme'){
     
-    return(list(i = subject.index, # index for subject
+    ret <- list(obsData = list(y = Y, i = subject.index, j = visit.index, Tij = obsT, funcArg = ss),
+               
+                i = subject.index, # index for subject
                 funcArg = ss,   # eval points in s direction
                 visitTime = TT, # eval points in T direction
                 
@@ -393,10 +414,12 @@ fpca.lfda <- function(Y, subject.index, visit.index, obsT = NULL, funcArg = NULL
                 
                 mFPCA.covar = marCovar.hat,   # estimated marginal covariance
                 sFPCA.longDynCov.k = longDynamicsCov.hat.k) # estimated covariance of longitudinal dynamics
-    )   
+       
     
   }
   
+  class(ret) <- "lfpca"
+  return(ret)
   
 }
 

@@ -23,6 +23,8 @@ fpca.lfda(Y, subject.index, visit.index, obsT = NULL, funcArg = NULL,
 
 \item{funcArg}{numeric; function argument}
 
+\item{numTEvalPoints}{total number of evaluation time points for visits; used for pre-binning in sFPCA step; defaults to 41}
+
 \item{newdata}{an optional data frame providing predictors (i for subject id / Ltime for visit time) with which prediction is desired; defaults to NULL}
 
 \item{fbps.knots}{list of two vectors of knots or number of equidistanct knots for all dimensions
@@ -40,6 +42,8 @@ for a fast bivariate \emph{P}-spline smoothing (fbps) method used to estimate a 
 
 \item{mFPCA.m}{integer;order of differencing penalty to use in a mFPCA step; defaults to 2; see \command{fpca.face}}
 
+\item{mFPCA.npc}{pre-specified value for the number of principal components; if given, it overrides \code{pve}; defaults to NULL; see \command{fpca.face}}
+
 \item{LongiModel.method}{model and estimation method for estimating covariance of estimated scores from a mFPCA step;
 either KL expansion model or random effects model; defaults to fpca.sc}
 
@@ -52,11 +56,10 @@ either KL expansion model or random effects model; defaults to fpca.sc}
 \item{gam.method}{smoothing parameter estimation method when \command{gam} is used for predicting score functions at unobserved visit time, T; defaults to \code{REML}; see \command{gam}}
 
 \item{gam.kT}{dimension of basis functions to use; see \command{gam}}
-
-\item{numTEvalPoint}{total number of evaluation time points for visits; used for pre-binning in sFPCA step; defaults to 41}
 }
 \value{
-A list with components \item{i }{subject id} \item{funcArg }{function argument} \item{visitTime }{visit times}
+A list with components \item{obsData }{observed data (input)}
+\item{i }{subject id} \item{funcArg }{function argument} \item{visitTime }{visit times}
 \item{fitted.values }{fitted values (in-sample); of the same dimension as Y} \item{fitted.values.all }{a list of which each component consists of a subject's fitted values at all pairs of evaluation points (s and T)}
 \item{predicted.values }{predicted values for variables provided in newdata}
 \item{bivariateSmoothMeanFunc }{estimated bivariate smooth mean function}
@@ -83,7 +86,6 @@ A random effects model is recommended when a set of visit times for all subjects
 ###########################################################################################
   # data generation
   ###########################################################################################
-  library(rgl)
   set.seed(1)
   n <- 100 # number of subjects
   ss <- seq(0,1,length.out=101)
@@ -119,31 +121,31 @@ A random effects model is recommended when a set of visit times for all subjects
   mu <- matrix(meanFn(s = rep(ss, each=length(Tij)), t=rep(Tij, length(ss)) ) , nrow=nrow(X))
 
   Y <- mu +  X +
-     matrix(rnorm(nrow(X)*ncol(phi), 0, sigma), nrow=nrow(X)) \%*\% t(phi) + # correlated error process
+     matrix(rnorm(nrow(X)*ncol(phi), 0, sigma), nrow=nrow(X)) \%*\% t(phi) + #correlated error
      matrix(rnorm(length(X), 0, sigma_wn), nrow=nrow(X)) # white noise
 
-  matplot(ss, t(Y[which(i==2),]), type='l', ylab="", xlab="functional argument", main="observations from subject i = 2")
+  matplot(ss, t(Y[which(i==2),]), type='l', ylab="", xlab="functional argument",
+         main="observations from subject i = 2")
   # END: data generation
 
   ###########################################################################################
   # Illustration I : when covariance of scores from a mFPCA step is estimated using fpca.sc
   ###########################################################################################
   est <- fpca.lfda(Y = Y,
-                   subject.index = i,
-                   visit.index = j,
-                   obsT = Tij,
-                   funcArg = ss,
-                   numTEvalPoints = length(TT), newdata = data.frame(i = c(1:3), Ltime = c(Tij[1], 0.2, 0.5)),
+                   subject.index = i, visit.index = j, obsT = Tij,
+                   funcArg = ss, numTEvalPoints = length(TT),
+                   newdata = data.frame(i = c(1:3), Ltime = c(Tij[1], 0.2, 0.5)),
                    fbps.knots = 35, fbps.p = 3, fbps.m = 2,
                    LongiModel.method='fpca.sc',
-                   mFPCA.pve = 0.95, mFPCA.knots = 35, mFPCA.p = 3, mFPCA.m = 2, mFPCA.npc = NULL,
+                   mFPCA.pve = 0.95, mFPCA.knots = 35, mFPCA.p = 3, mFPCA.m = 2,
                    sFPCA.pve = 0.95, sFPCA.nbasis = 10, sFPCA.npc = NULL,
                    gam.method = 'REML', gam.kT = 10)
 
 
   # mean function (true vs. estimated)
-  persp3d(x=TT, y = ss, z= t(sapply(TT, function(a) meanFn(s=ss, t = a))),xlab="visit times", ylab="s", zlab="estimated mean fn")
-  persp3d(x = TT, y = ss, est$bivariateSmoothMeanFunc, add = TRUE, col='light blue')
+  rgl::persp3d(x=TT, y = ss, z= t(sapply(TT, function(a) meanFn(s=ss, t = a))),
+          xlab="visit times", ylab="s", zlab="estimated mean fn")
+  rgl::persp3d(x = TT, y = ss, est$bivariateSmoothMeanFunc, add = TRUE, col='light blue')
 
   ################   mFPCA step   ################
   par(mfrow=c(1,2))
@@ -154,10 +156,11 @@ A random effects model is recommended when a set of visit times for all subjects
 
   # eigenfunctions (true vs. estimated)
   matplot(ss, phi, type='l')
-  matlines(ss, cbind(est$mFPCA.efunctions[,1], est$mFPCA.efunctions[,2])  , type='l', lwd=2)
+  matlines(ss, cbind(est$mFPCA.efunctions[,1], est$mFPCA.efunctions[,2]), type='l', lwd=2)
 
   # scree plot
-  plot(cumsum(est$mFPCA.scree.eval)/sum(est$mFPCA.scree.eval), type='l', ylab = "Percentage of variance explained")
+  plot(cumsum(est$mFPCA.scree.eval)/sum(est$mFPCA.scree.eval), type='l',
+       ylab = "Percentage of variance explained")
   points(cumsum(est$mFPCA.scree.eval)/sum(est$mFPCA.scree.eval), pch=16)
 
   ################   sFPCA step   ################
@@ -173,8 +176,12 @@ A random effects model is recommended when a set of visit times for all subjects
   image(est$sFPCA.longDynCov.k[[2]])
 
   # estimated scores functions
-  matplot(TT, do.call(cbind,lapply(est$sFPCA.xiHat.bySubj, function(a) a[,1])), xlab="visit time", main="k=1", type='l', ylab="", col=rainbow(100, alpha = 1), lwd=1, lty=1)
-  matplot(TT, do.call(cbind,lapply(est$sFPCA.xiHat.bySubj, function(a) a[,2])), xlab="visit time", main="k=2",type='l', ylab="", col=rainbow(100, alpha = 1), lwd=1, lty=1)
+  matplot(TT, do.call(cbind,lapply(est$sFPCA.xiHat.bySubj, function(a) a[,1])),
+          xlab="visit time", main="k=1", type='l', ylab="", col=rainbow(100, alpha = 1),
+          lwd=1, lty=1)
+  matplot(TT, do.call(cbind,lapply(est$sFPCA.xiHat.bySubj, function(a) a[,2])),
+          xlab="visit time", main="k=2",type='l', ylab="", col=rainbow(100, alpha = 1),
+          lwd=1, lty=1)
 
   ################   In-sample and Out-of-sample Prediction   ################
   par(mfrow=c(1,2))
@@ -182,7 +189,9 @@ A random effects model is recommended when a set of visit times for all subjects
   matplot(ss, t(Y[which(i==1),]), type='l', ylab="", xlab="functional argument")
   matlines(ss, t(est$fitted.values[which(i==1),]), type='l', lwd=2)
 
- # sanity check : expect fitted and predicted (obtained using info from newdata) values to be the same
+ # sanity check : expect fitted and predicted (obtained using info from newdata)
+ #                values to be the same
+
   plot(ss, est$fitted.values[1,], type='p', xlab="", ylab="", pch = 1, cex=1)
   lines(ss, est$predicted.values[1,], type='l', lwd=2, col='blue')
   all.equal(est$predicted.values[1,], est$fitted.values[1,])
@@ -191,23 +200,30 @@ A random effects model is recommended when a set of visit times for all subjects
   # Illustration II : when covariance of scores from a mFPCA step is estimated using lmer
   ###########################################################################################
   est.lme <- fpca.lfda(Y = Y,
-                       subject.index = i,
-                       visit.index = j,
-                       obsT = Tij,
-                       funcArg = ss,
-                       numTEvalPoints = length(TT), newdata = data.frame(i = c(1:3), Ltime = c(Tij[1], 0.2, 0.5)),
+                       subject.index = i, visit.index = j, obsT = Tij,
+                       funcArg = ss, numTEvalPoints = length(TT),
+                       newdata = data.frame(i = c(1:3), Ltime = c(Tij[1], 0.2, 0.5)),
                        fbps.knots = 35, fbps.p = 3, fbps.m = 2,
                        LongiModel.method='lme',
-                       mFPCA.pve = 0.95, mFPCA.knots = 35, mFPCA.p = 3, mFPCA.m = 2, mFPCA.npc = NULL,
+                       mFPCA.pve = 0.95, mFPCA.knots = 35, mFPCA.p = 3, mFPCA.m = 2,
                        gam.method = 'REML', gam.kT = 10)
 
   par(mfrow=c(2,2))
 
   # fpca.sc vs. lme (assumes linearity)
-  matplot(TT, do.call(cbind,lapply(est$sFPCA.xiHat.bySubj, function(a) a[,1])), xlab="visit time", main="k=1", type='l', ylab="", col=rainbow(100, alpha = 1), lwd=1, lty=1)
-  matplot(TT, do.call(cbind,lapply(est$sFPCA.xiHat.bySubj, function(a) a[,2])), xlab="visit time", main="k=2",type='l', ylab="", col=rainbow(100, alpha = 1), lwd=1, lty=1)
-  matplot(TT, do.call(cbind,lapply(est.lme$sFPCA.xiHat.bySubj, function(a) a[,1])), xlab="visit time", main="k=1", type='l', ylab="", col=rainbow(100, alpha = 1), lwd=1, lty=1)
-  matplot(TT, do.call(cbind,lapply(est.lme$sFPCA.xiHat.bySubj, function(a) a[,2])), xlab="visit time", main="k=2", type='l', ylab="", col=rainbow(100, alpha = 1), lwd=1, lty=1)
+  matplot(TT, do.call(cbind,lapply(est$sFPCA.xiHat.bySubj, function(a) a[,1])),
+          xlab="visit time", main="k=1", type='l', ylab="", col=rainbow(100, alpha = 1),
+          lwd=1, lty=1)
+  matplot(TT, do.call(cbind,lapply(est$sFPCA.xiHat.bySubj, function(a) a[,2])),
+          xlab="visit time", main="k=2",type='l', ylab="", col=rainbow(100, alpha = 1),
+          lwd=1, lty=1)
+
+  matplot(TT, do.call(cbind,lapply(est.lme$sFPCA.xiHat.bySubj, function(a) a[,1])),
+          xlab="visit time", main="k=1", type='l', ylab="", col=rainbow(100, alpha = 1),
+          lwd=1, lty=1)
+  matplot(TT, do.call(cbind,lapply(est.lme$sFPCA.xiHat.bySubj, function(a) a[,2])),
+          xlab="visit time", main="k=2", type='l', ylab="", col=rainbow(100, alpha = 1),
+          lwd=1, lty=1)
 }
 \author{
 So Young Park \email{spark13@ncsu.edu}, Ana-Maria Staicu
