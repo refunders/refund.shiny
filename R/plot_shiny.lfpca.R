@@ -20,7 +20,6 @@
 #'   ###########################################################################################
 #'   library(refund)
 #'   library(lme4)
-#'   library(rgl)
 #'   set.seed(1)
 #'   n <- 100 # number of subjects
 #'   ss <- seq(0,1,length.out=101) 
