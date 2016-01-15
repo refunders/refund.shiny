@@ -86,6 +86,8 @@ A random effects model is recommended when a set of visit times for all subjects
 ###########################################################################################
   # data generation
   ###########################################################################################
+  library(refund)
+  library(lme4)
   set.seed(1)
   n <- 100 # number of subjects
   ss <- seq(0,1,length.out=101)
@@ -143,9 +145,11 @@ A random effects model is recommended when a set of visit times for all subjects
 
 
   # mean function (true vs. estimated)
-  rgl::persp3d(x=TT, y = ss, z= t(sapply(TT, function(a) meanFn(s=ss, t = a))),
-          xlab="visit times", ylab="s", zlab="estimated mean fn")
-  rgl::persp3d(x = TT, y = ss, est$bivariateSmoothMeanFunc, add = TRUE, col='light blue')
+  par(mfrow=c(1,2))
+  persp(x=TT, y = ss, z= t(sapply(TT, function(a) meanFn(s=ss, t = a))),
+          xlab="visit times", ylab="s", zlab="true mean fn")
+  persp(x = TT, y = ss, est$bivariateSmoothMeanFunc,
+   xlab="visit times", ylab="s", zlab="estimated mean fn", col='light blue')
 
   ################   mFPCA step   ################
   par(mfrow=c(1,2))
