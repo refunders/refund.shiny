@@ -2,7 +2,7 @@
 #'
 #' Produces an interactive plot illustrating longitudinal functioanl data analysis (Park and Staicu, 2015).
 #' 
-#' @param x lfpca object to be plotted.
+#' @param obj lfpca object to be plotted.
 #' 
 #' @author So Young Park \email{spark13@@ncsu.edu}, Ana-Maria Staicu \email{astaicu@@ncsu.edu}
 #' @export

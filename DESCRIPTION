@@ -4,7 +4,8 @@ Version: 0.1
 Authors@R: c(person("Jeff", "Goldsmith", role = "aut", email = "jeff.goldsmith@columbia.edu"), person("Julia", "Wrobel", role = c("aut", "cre"), email =
     "jw3134@cumc.columbia.edu"))
 Description: Interactive plotting for functional data analyses
-Depends: R (>= 3.0.1)
+Depends:
+    R (>= 3.0.1)
 Imports:
     ggplot2,
     Matrix,
@@ -19,3 +20,4 @@ Imports:
     lme4
 License: GPL (>= 2)
 LazyData: true
+RoxygenNote: 5.0.1
