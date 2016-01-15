@@ -2,16 +2,12 @@
 % Please edit documentation in R/plot_shiny.R
 \name{plot_shiny}
 \alias{plot_shiny}
-\title{plot_shiny: The generic function for interactive plots of functional data analyses}
+\title{plot_shiny The generic function for interactive plots of functional data analyses}
 \usage{
 plot_shiny(obj, ...)
 }
 \arguments{
-<<<<<<< HEAD
-\item{obj}{object to be plotted. Currently, allowed data types are \code{fpca} \code{mfpca} and \code{fosr}.}
-=======
-\item{obj}{object to be plotted. Currently, allowed data types are \code{fpca} and \code{fosr}.}
->>>>>>> devel-soyoung
+\item{obj}{object to be plotted. Currently, allowed data types are \code{fpca} \code{mfpca} \code{lfpca} and \code{fosr}.}
 
 \item{...}{additional arguments passed to plotting functions}
 }
@@ -30,7 +26,7 @@ of those analyses. There are three major categories of analyses that can be view
 linear combinations of score values and FPCs; reconstructions for each subject; and score scatterplots.}
 \item{Function-on-scalar regression analyses implemented by \code{\link{bayes_fosr}}. Plots show the raw data
 colored by covariate values; fitted values depending on covariates; coefficient functions; and residuals.}
-\item{Multilevel functional principal components analyses implemented by \code{\link{mfpca.sc}}.  Plots show the mean +/- 2SD times each FPC;
+\item{Multilevel functional principal components analyses implemented by \code{\link{mfpca.sc}}.  Plots show the mean +/- 2SD times each FPC; 
 scree plots; linear combinations of score values and FPCs; reconstructions for each subject; and score scatterplots for levels 1 and 2.}
 }
 }
@@ -98,7 +94,6 @@ DTI$cca[2,] = DTI$cca[2,] + .4
 fosr.dti3 = bayes_fosr(cca ~ pasat * gender + status, data = DTI)
 plot_shiny(fosr.dti3)
 
-<<<<<<< HEAD
 ##### MFPCA Example #####
 
 data(DTI)
@@ -107,7 +102,6 @@ id = DTI$ID
 
 mfpca.dti = mfpca.sc(Y=Y, id = id, twoway = FALSE)
 plot_shiny(mfpca.dti)
-=======
 ##### Longitudinal FoSR Examples #####
 
 data(DTI2)
@@ -118,7 +112,6 @@ DTI2 = DTI2[complete.cases(DTI2),]
 fosr.dti4 = bayes_fosr(cca ~ pasat + re(id), data = DTI2, Kt = 10, Kp = 4, cov.method = "FPCA")
 plot_shiny(fosr.dti4)
 plot_shiny(fosr.dti4$fpca.obj)
->>>>>>> devel-soyoung
 
 }
 

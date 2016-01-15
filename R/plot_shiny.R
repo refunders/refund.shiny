@@ -15,12 +15,8 @@
 #' scree plots; linear combinations of score values and FPCs; reconstructions for each subject; and score scatterplots for levels 1 and 2.}
 #' }
 #' 
-#' @title plot_shiny: The generic function for interactive plots of functional data analyses
-<<<<<<< HEAD
-#' @param obj object to be plotted. Currently, allowed data types are \code{fpca} \code{mfpca} and \code{fosr}.
-=======
-#' @param obj object to be plotted. Currently, allowed data types are \code{fpca} and \code{fosr}.
->>>>>>> devel-soyoung
+#' @title plot_shiny The generic function for interactive plots of functional data analyses
+#' @param obj object to be plotted. Currently, allowed data types are \code{fpca} \code{mfpca} \code{lfpca} and \code{fosr}.
 #' @param ... additional arguments passed to plotting functions
 #' 
 #' @author Jeff Goldsmith \email{jeff.goldsmith@@columbia.edu}, 
@@ -93,7 +89,6 @@
 #' fosr.dti3 = bayes_fosr(cca ~ pasat * gender + status, data = DTI)
 #' plot_shiny(fosr.dti3)
 #' 
-<<<<<<< HEAD
 #' ##### MFPCA Example #####
 #' 
 #' data(DTI)
@@ -102,7 +97,6 @@
 #' 
 #' mfpca.dti = mfpca.sc(Y=Y, id = id, twoway = FALSE)
 #' plot_shiny(mfpca.dti)
-=======
 #' ##### Longitudinal FoSR Examples #####
 #' 
 #' data(DTI2)
@@ -113,7 +107,6 @@
 #' fosr.dti4 = bayes_fosr(cca ~ pasat + re(id), data = DTI2, Kt = 10, Kp = 4, cov.method = "FPCA")
 #' plot_shiny(fosr.dti4)
 #' plot_shiny(fosr.dti4$fpca.obj)
->>>>>>> devel-soyoung
 #' 
 #' }
 #' 
