@@ -3,7 +3,11 @@
 
 ## Interactive plots of functional data analyses.
 
+<<<<<<< HEAD
 The primary function is `plot.shiny`, which calls other functions depending on the class of the object. (So far, the supported classes are "fpca" for functional principal components analyses, "mfpca" for multilevel fpca, and "fosr" for function on scalar regression).
+=======
+The primary function is `plot.shiny()`, which calls other functions depending on the class of the object. So far, the supported classes are "fpca" for functional principal components analyses, "mfpca" for multilevel fpca, "lfpca" for longitudinal fpca, "lfda" for longitudinal functional data analysis, and "fosr" for function on scalar regression.
+>>>>>>> devel-soyoung
 
 ---------------
 
