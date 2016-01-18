@@ -4,7 +4,7 @@
 \alias{plot_shiny.lfpca}
 \title{Interactive Plotting for Longtiudinal Functional Data Analysis using FPCA}
 \usage{
-\method{plot_shiny}{lfpca}(obj)
+\method{plot_shiny}{lfpca}(obj, xlab = "", ylab = "", title = "", ...)
 }
 \arguments{
 \item{obj}{lfpca object to be plotted.}

@@ -30,7 +30,6 @@
 ##' \item{Theta}{matrix of estimated coefficients}
 ##' @author Luo Xiao \email{lxiao@@jhsph.edu}
 ##' @export
-##' @importFrom Matrix kronecker as.matrix
 ##' @references Xiao, L., Li, Y., and Ruppert, D. (2013). Fast bivariate
 ##' \emph{P}-splines: the sandwich smoother. \emph{Journal of the Royal
 ##' Statistical Society: Series B}, 75(3), 577--599.

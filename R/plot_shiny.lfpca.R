@@ -12,6 +12,7 @@
 #' @seealso \code{\link{plot_shiny}}; \code{fpca.lfda} in the Refund package for estimation method. 
 #' @import shiny
 #' @import ggplot2
+#' @import lme4
 #'  
 #' @examples 
 #'
@@ -97,7 +98,7 @@
 #####################################################################################################################
 #####################################################################################################################
 
-plot_shiny.lfpca <- function(obj){
+plot_shiny.lfpca <- function(obj, xlab = "", ylab="", title = "", ...){
   
   ##################################
   # for exploratory analysis
