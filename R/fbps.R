@@ -14,8 +14,6 @@
 ##' @param p degrees of B-splines; defaults to 3
 ##' @param m order of differencing penalty; defaults to 2
 ##' @param lambda user-specified smoothing parameters; defaults to NULL
-##' @param alpha the coefficient of the penalty for degrees of freedom in the
-##' GCV criterion; defaults to 1
 ##' @param search.grid logical; defaults to TRUE, if FALSE, uses
 ##' \command{optim}
 ##' @param search.length number of equidistant (log scale) smoothing parameter;
@@ -24,11 +22,16 @@
 ##' @param lower,upper bounds for log smoothing parameter, passed to
 ##' \command{optim}; defaults are -20 and 20.
 ##' @param control see \command{optim}
+##' @param subj defaults to NULL
+##' @param knots.option defaults to "equally-spaced"
+##' @param periodicity defaults to FALSE
+##' @param selecion defaults to "GCV"
 ##' @return A list with components \item{lambda}{vector of length 2 of selected
 ##' smoothing parameters} \item{Yhat}{fitted data} \item{trace}{trace of the
 ##' overall smoothing matrix} \item{gcv}{value of generalized cross validation}
 ##' \item{Theta}{matrix of estimated coefficients}
 ##' @author Luo Xiao \email{lxiao@@jhsph.edu}
+##' @import Matrix
 ##' @export
 ##' @references Xiao, L., Li, Y., and Ruppert, D. (2013). Fast bivariate
 ##' \emph{P}-splines: the sandwich smoother. \emph{Journal of the Royal

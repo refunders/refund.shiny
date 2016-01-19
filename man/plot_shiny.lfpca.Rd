@@ -74,7 +74,7 @@ Produces an interactive plot illustrating longitudinal functioanl data analysis 
                    sFPCA.pve = 0.95, sFPCA.nbasis = 10, sFPCA.npc = NULL,
                    gam.method = 'REML', gam.kT = 10)
 
-  plot_shiny(x = est)
+  plot_shiny(obj = est)
   
   ###########################################################################################
   # Illustration II : when covariance of scores from a mFPCA step is estimated using lmer
@@ -90,7 +90,7 @@ Produces an interactive plot illustrating longitudinal functioanl data analysis 
                        mFPCA.pve = 0.95, mFPCA.knots = 35, mFPCA.p = 3, mFPCA.m = 2, mFPCA.npc = NULL,
                        gam.method = 'REML', gam.kT = 10)
 
-  plot_shiny(x = est.lme)
+  plot_shiny(obj = est.lme)
 }
 \author{
 So Young Park \email{spark13@ncsu.edu}, Ana-Maria Staicu \email{astaicu@ncsu.edu}

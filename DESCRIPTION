@@ -16,6 +16,7 @@ Imports:
     gridExtra,
     lme4,
     mgcv,
+    Matrix,
     refund
 License: GPL (>= 2)
 LazyData: true

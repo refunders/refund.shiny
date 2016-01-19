@@ -57,7 +57,7 @@
 #'
 #' 
 #' @import lme4
-#' @importFrom mgcv gam s 
+#' @import mgcv
 #' @importFrom splines spline.des
 #'  
 #' @examples 

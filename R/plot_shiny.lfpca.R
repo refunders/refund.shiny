@@ -3,6 +3,10 @@
 #' Produces an interactive plot illustrating longitudinal functioanl data analysis (Park and Staicu, 2015).
 #' 
 #' @param obj lfpca object to be plotted.
+#' @param xlab x axis label
+#' @param ylab y axis label
+#' @param title plot title
+#' @param ... additional arguments passed to plotting functions
 #' 
 #' @author So Young Park \email{spark13@@ncsu.edu}, Ana-Maria Staicu \email{astaicu@@ncsu.edu}
 #' @export
@@ -56,7 +60,8 @@
 #'   mu <- matrix(meanFn(s = rep(ss, each=length(Tij)), t=rep(Tij, length(ss)) ) , nrow=nrow(X))
 #'
 #'   Y <- mu +  X + 
-#'      matrix(rnorm(nrow(X)*ncol(phi), 0, sigma), nrow=nrow(X)) %*% t(phi) + # correlated error process
+#'      matrix(rnorm(nrow(X)*ncol(phi), 0, sigma), 
+#'      nrow=nrow(X)) %*% t(phi) + # correlated error process
 #'      matrix(rnorm(length(X), 0, sigma_wn), nrow=nrow(X)) # white noise
 #'
 #'   # END: data generation
@@ -69,14 +74,17 @@
 #'                    visit.index = j,
 #'                    obsT = Tij,
 #'                    funcArg = ss,
-#'                    numTEvalPoints = length(TT), newdata = data.frame(i = c(1:3), Ltime = c(Tij[1], 0.2, 0.5)), 
+#'                    numTEvalPoints = length(TT), newdata = data.frame(i = c(1:3), 
+#'                    Ltime = c(Tij[1], 0.2, 0.5)), 
 #'                    fbps.knots = 35, fbps.p = 3, fbps.m = 2,
 #'                    LongiModel.method='fpca.sc',
-#'                    mFPCA.pve = 0.95, mFPCA.knots = 35, mFPCA.p = 3, mFPCA.m = 2, mFPCA.npc = NULL,
-#'                    sFPCA.pve = 0.95, sFPCA.nbasis = 10, sFPCA.npc = NULL,
+#'                    mFPCA.pve = 0.95, mFPCA.knots = 35, 
+#'                    mFPCA.p = 3, mFPCA.m = 2, mFPCA.npc = NULL,
+#'                    sFPCA.pve = 0.95, sFPCA.nbasis = 10,
+#'                    sFPCA.npc = NULL,
 #'                    gam.method = 'REML', gam.kT = 10)
 #'
-#'   plot_shiny(x = est)
+#'   plot_shiny(obj = est)
 #'   
 #'   ###########################################################################################
 #'   # Illustration II : when covariance of scores from a mFPCA step is estimated using lmer
@@ -86,13 +94,16 @@
 #'                        visit.index = j,
 #'                        obsT = Tij,
 #'                        funcArg = ss,
-#'                        numTEvalPoints = length(TT), newdata = data.frame(i = c(1:3), Ltime = c(Tij[1], 0.2, 0.5)), 
+#'                        numTEvalPoints = length(TT),
+#'                         newdata = data.frame(i = c(1:3),
+#'                         Ltime = c(Tij[1], 0.2, 0.5)), 
 #'                        fbps.knots = 35, fbps.p = 3, fbps.m = 2,
 #'                        LongiModel.method='lme',
-#'                        mFPCA.pve = 0.95, mFPCA.knots = 35, mFPCA.p = 3, mFPCA.m = 2, mFPCA.npc = NULL,
+#'                        mFPCA.pve = 0.95, mFPCA.knots = 35, 
+#'                        mFPCA.p = 3, mFPCA.m = 2, mFPCA.npc = NULL,
 #'                        gam.method = 'REML', gam.kT = 10)
 #' 
-#'   plot_shiny(x = est.lme)
+#'   plot_shiny(obj = est.lme)
 
 
 #####################################################################################################################
