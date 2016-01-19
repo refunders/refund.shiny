@@ -4,22 +4,25 @@
 #' 
 #' This package builds on the \code{refund} package: tools in \code{refund} are used to 
 #' conduct analyses and functions in this package create interactive visualizations of the results
-#' of those analyses. There are two major categories of analyses that can be viewed:
+#' of those analyses. There are three major categories of analyses that can be viewed:
 #' \enumerate{
 #' \item{Functional principal components analyses implemented by \code{\link{fpca.sc}}, \code{\link{fpca.face}}, 
 #' \code{\link{fpca.ssvd}}, and \code{\link{fpca2s}}. Plots show the mean +/- 2SD times each FPC; scree plots;
 #' linear combinations of score values and FPCs; reconstructions for each subject; and score scatterplots.}
 #' \item{Function-on-scalar regression analyses implemented by \code{\link{bayes_fosr}}. Plots show the raw data
 #' colored by covariate values; fitted values depending on covariates; coefficient functions; and residuals.}
+#' \item{Multilevel functional principal components analyses implemented by \code{\link{mfpca.sc}}.  Plots show the mean +/- 2SD times each FPC; 
+#' scree plots; linear combinations of score values and FPCs; reconstructions for each subject; and score scatterplots for levels 1 and 2.}
 #' }
 #' 
-#' @title plot_shiny: The generic function for interactive plots of functional data analyses
-#' @param obj object to be plotted. Currently, allowed data types are \code{fpca} and \code{fosr}.
+#' @title plot_shiny The generic function for interactive plots of functional data analyses
+#' @param obj object to be plotted. Currently, allowed data types are \code{fpca} \code{mfpca} \code{lfpca} and \code{fosr}.
 #' @param ... additional arguments passed to plotting functions
 #' 
 #' @author Jeff Goldsmith \email{jeff.goldsmith@@columbia.edu}, 
 #' Julia Wrobel \email{jw3134@@cumc.columbia.edu}
-#' @seealso \code{\link{plot_shiny.fpca}}, \code{\link{plot_shiny.fosr}}
+#' @seealso \code{\link{plot_shiny.fpca}}, \code{\link{plot_shiny.mfpca}},  \code{\link{plot_shiny.fosr}}
+#' @import refund
 #' @export plot_shiny
 #' 
 #' @examples
@@ -71,10 +74,10 @@
 #' DTI$gender = factor(sample(c("male","female"), dim(DTI)[1], replace = TRUE))
 #' DTI$status = factor(sample(c("RRMS", "SPMS", "PPMS"), dim(DTI)[1], replace = TRUE))
 #' 
-#' fosr.dti1 = fosr_gls(cca ~ pasat, data = DTI)
+#' fosr.dti1 = bayes_fosr(cca ~ pasat, data = DTI)
 #' plot_shiny(fosr.dti1)
 #' 
-#' fosr.dti2 = fosr_gls(cca ~ pasat * gender + status, data = DTI)
+#' fosr.dti2 = bayes_fosr(cca ~ pasat * gender + status, data = DTI)
 #' plot_shiny(fosr.dti2)
 #' 
 #' 
@@ -83,9 +86,17 @@
 #' DTI$cca[1,] = DTI$cca[1,] + .4
 #' DTI$cca[2,] = DTI$cca[2,] + .4
 #' 
-#' fosr.dti3 = fosr_gls(cca ~ pasat * gender + status, data = DTI)
+#' fosr.dti3 = bayes_fosr(cca ~ pasat * gender + status, data = DTI)
 #' plot_shiny(fosr.dti3)
 #' 
+#' ##### MFPCA Example #####
+#' 
+#' data(DTI)
+#' Y = DTI$cca
+#' id = DTI$ID
+#' 
+#' mfpca.dti = mfpca.sc(Y=Y, id = id, twoway = FALSE)
+#' plot_shiny(mfpca.dti)
 #' ##### Longitudinal FoSR Examples #####
 #' 
 #' data(DTI2)

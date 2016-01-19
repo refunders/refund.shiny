@@ -56,10 +56,9 @@
 #' @references Park, S.Y. and Staicu, A.M. (2015). Longitudinal functional data analysis. Stat 4 212-226.
 #'
 #' 
-#' @importFrom lme4 lmer
-#' @importFrom mgcv gam s 
+#' @import lme4
+#' @import mgcv
 #' @importFrom splines spline.des
-#' @importFrom Matrix kronecker as.matrix
 #'  
 #' @examples 
 #'
