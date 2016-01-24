@@ -13,102 +13,12 @@
 #' 
 #' @references Park, S.Y. and Staicu, A.M. (2015). Longitudinal functional data analysis. Stat 4 212-226.
 #' 
-#' @seealso \code{\link{plot_shiny}}; \code{fpca.lfda} in the Refund package for estimation method. 
+#' @seealso \code{\link{plot_shiny}}; \code{fpca.lfda} in the refund package for estimation method. 
 #' @import shiny
 #' @import ggplot2
 #' @import lme4
 #'  
-#' @examples 
-#'
-#'   ###########################################################################################
-#'   # data generation
-#'   ###########################################################################################
-#'   library(refund)
-#'   library(lme4)
-#'   set.seed(1)
-#'   n <- 100 # number of subjects
-#'   ss <- seq(0,1,length.out=101) 
-#'   TT <- seq(0, 1, length.out=41)
-#'   mi <- runif(n, min=6, max=15)
-#'   ij <- sapply(mi, function(a) sort(sample(1:41, size=a, replace=FALSE)))
-#'   
-#'   # error variances
-#'   sigma <- 0.1 
-#'   sigma_wn <- 0.2
-#'
-#'   lambdaTrue <- c(1,0.5) # True eigenvalues
-#'   eta1True <- c(0.5, 0.5^2, 0.5^3) # True eigenvalues
-#'   eta2True <- c(0.5^2, 0.5^3) # True eigenvalues
-#'   
-#'   phi <- sqrt(2)*cbind(sin(2*pi*ss),cos(2*pi*ss))
-#'   psi1 <- cbind(rep(1,length(TT)), sqrt(3)*(2*TT-1), sqrt(5)*(6*TT^2-6*TT+1))
-#'   psi2 <- sqrt(2)*cbind(sin(2*pi*TT),cos(2*pi*TT))
-#'   
-#'   zeta1 <- sapply(eta1True, function(a) rnorm(n = n, mean = 0, sd = a))
-#'   zeta2 <- sapply(eta2True, function(a) rnorm(n = n, mean = 0, sd = a))
-#'   
-#'   xi1 <- unlist(lapply(1:n, function(a) (zeta1 %*% t(psi1))[a,ij[[a]]] ))
-#'   xi2 <- unlist(lapply(1:n, function(a) (zeta2 %*% t(psi2))[a,ij[[a]]] ))
-#'   xi <- cbind(xi1, xi2)
-#'   
-#'   Tij <- unlist(lapply(1:n, function(i) TT[ij[[i]]] ))
-#'   i <- unlist(lapply(1:n, function(i) rep(i, length(ij[[i]]))))
-#'   j <- unlist(lapply(1:n, function(i) 1:length(ij[[i]])))
-#'   
-#'   X <- xi %*% t(phi)
-#'   meanFn <- function(s,t){ 0.5*t + 1.5*s + 1.3*s*t}
-#'   mu <- matrix(meanFn(s = rep(ss, each=length(Tij)), t=rep(Tij, length(ss)) ) , nrow=nrow(X))
-#'
-#'   Y <- mu +  X + 
-#'      matrix(rnorm(nrow(X)*ncol(phi), 0, sigma), 
-#'      nrow=nrow(X)) %*% t(phi) + # correlated error process
-#'      matrix(rnorm(length(X), 0, sigma_wn), nrow=nrow(X)) # white noise
-#'
-#'   # END: data generation
-#'   
-#'   ###########################################################################################
-#'   # Illustration I : when covariance of scores from a mFPCA step is estimated using fpca.sc
-#'   ###########################################################################################
-#'   est <- fpca.lfda(Y = Y, 
-#'                    subject.index = i,
-#'                    visit.index = j,
-#'                    obsT = Tij,
-#'                    funcArg = ss,
-#'                    numTEvalPoints = length(TT), newdata = data.frame(i = c(1:3), 
-#'                    Ltime = c(Tij[1], 0.2, 0.5)), 
-#'                    fbps.knots = 35, fbps.p = 3, fbps.m = 2,
-#'                    LongiModel.method='fpca.sc',
-#'                    mFPCA.pve = 0.95, mFPCA.knots = 35, 
-#'                    mFPCA.p = 3, mFPCA.m = 2, mFPCA.npc = NULL,
-#'                    sFPCA.pve = 0.95, sFPCA.nbasis = 10,
-#'                    sFPCA.npc = NULL,
-#'                    gam.method = 'REML', gam.kT = 10)
-#'
-#'   plot_shiny(obj = est)
-#'   
-#'   ###########################################################################################
-#'   # Illustration II : when covariance of scores from a mFPCA step is estimated using lmer
-#'   ###########################################################################################
-#'   est.lme <- fpca.lfda(Y = Y, 
-#'                        subject.index = i,
-#'                        visit.index = j,
-#'                        obsT = Tij,
-#'                        funcArg = ss,
-#'                        numTEvalPoints = length(TT),
-#'                         newdata = data.frame(i = c(1:3),
-#'                         Ltime = c(Tij[1], 0.2, 0.5)), 
-#'                        fbps.knots = 35, fbps.p = 3, fbps.m = 2,
-#'                        LongiModel.method='lme',
-#'                        mFPCA.pve = 0.95, mFPCA.knots = 35, 
-#'                        mFPCA.p = 3, mFPCA.m = 2, mFPCA.npc = NULL,
-#'                        gam.method = 'REML', gam.kT = 10)
-#' 
-#'   plot_shiny(obj = est.lme)
-
-
-#####################################################################################################################
-#####################################################################################################################
-
+#'  
 plot_shiny.lfpca <- function(obj, xlab = "", ylab="", title = "", ...){
   
   ##################################
@@ -342,7 +252,7 @@ plot_shiny.lfpca <- function(obj, xlab = "", ylab="", title = "", ...){
                                         column(9, h4("Estimated Covariance of Longitudinal Dynamics"), plotOutput('LDCOVk'))
                                ),
                                
-                               tabPanel("Basis Coefficients (2nd FPCA)", icon=icon("user", lib = "font-awesome"),
+                               tabPanel("Basis Coefficients", icon=icon("user", lib = "font-awesome"),
                                         column(3, hr(),
                                                checkboxInput("allSubject", h4("Show all subjects in background"), TRUE),
                                                hr(),
@@ -436,14 +346,15 @@ plot_shiny.lfpca <- function(obj, xlab = "", ylab="", title = "", ...){
         TijSubj <- vecSelectedData$longTimes
         
         args <- list(inputId="longiTime", label=h4("actual time of visits (scaled)"), 
-                     value = 0, 
+                     value = min(unique(TijSubj)), 
                      animate=animationOptions(interval=2000), 
-                     ticks = c(0, unique(TijSubj), 1))
+                     ticks = c(unique(TijSubj)),
+                     round = -2)
         args$min = 1
         args$max = length(args$ticks)
         if (sessionInfo()$otherPkgs$shiny$Version>="0.11") {
           
-          ticks <- paste0(args$ticks, collapse=',')
+          ticks <- paste0(round(args$ticks, digits=2), collapse=',')
           args$ticks <- TRUE
           html  <- do.call('sliderInput', args)
           html$children[[2]]$attribs[['data-values']] <- ticks;
@@ -467,14 +378,14 @@ plot_shiny.lfpca <- function(obj, xlab = "", ylab="", title = "", ...){
         ind <- input$longiTime
         if(input$allDatbySubj){
           p <- ggplot(data=vecSelectedData, aes(x=funArg, y=y, group=curveID)) + geom_line(colour="#b6b6b6")  + theme_bw() + ylim(my.Ylim)
-          if(any(c((ind==0), (ind==nrep+1), (length(ind) < 1)))){
-            p <- p + xlab("s") + ylab("y")+ggtitle(paste("Subject ", subjectChoice, "; Total of ", nrep, " visits", sep=""))
-          }else{
-            p <- p + geom_line(data=vecSelectedData[which(vecSelectedData$j==ind), ], aes(x=funArg, y=y, group=curveID), colour="red")
+#           if(any(c((ind==0), (ind==nrep+1), (length(ind) < 1)))){
+#             p <- p + xlab("s") + ylab("y")+ggtitle(paste("Subject ", subjectChoice, "; Total of ", nrep, " visits", sep=""))
+#           }else{
+            p <- p + geom_line(data=vecSelectedData[which(vecSelectedData$j==(ind+1)), ], aes(x=funArg, y=y, group=curveID), colour="red")
             p <- p + xlab("s") + ylab("y") + 
               ggtitle(paste("Subject ", subjectChoice, "; Total of ", nrep, " visits; ", "Actual time of ", ind, "-th visit (red) = ",
-                            unique(TijSubj)[ind], sep=""))
-          }
+                            round(unique(TijSubj)[ind+1], digits=2), sep=""))
+          # }
           
           if(input$meanBySubj) p <- p + geom_line(mapping=aes(x=x,y=y, group=rep(1,length(myDat$funcArg))), data=data.frame(x=myDat$funcArg, y=colMeans(obsBySubj)), colour="blue", linetype=1, size=1)
           if(input$overallMean1) p <- p + geom_line(mapping=aes(x=x,y=y, group=rep(1,length(myDat$funcArg))), data=data.frame(x=myDat$funcArg, y=overallMean), colour="black", linetype=2, size=1)
@@ -483,14 +394,14 @@ plot_shiny.lfpca <- function(obj, xlab = "", ylab="", title = "", ...){
           
         }else{
           p <- ggplot(data=vecSelectedData, aes(x=funArg, y=y, group=curveID)) + geom_line(linetype="blank")  + theme_bw() + ylim(my.Ylim)
-          if(any(c((ind==0), (ind==nrep+1), (length(ind) < 1)))){
-            p <- p + xlab("s") + ylab("y")+ggtitle(paste("Subject ", subjectChoice, "; Total of ", nrep, " visits", sep=""))
-          }else{
-            p <- p + geom_line(data=vecSelectedData[which(vecSelectedData$j==ind), ], aes(x=funArg, y=y, group=curveID), colour="red")
+#           if(any(c((ind==0), (ind==nrep+1), (length(ind) < 1)))){
+#             p <- p + xlab("s") + ylab("y")+ggtitle(paste("Subject ", subjectChoice, "; Total of ", nrep, " visits", sep=""))
+#           }else{
+            p <- p + geom_line(data=vecSelectedData[which(vecSelectedData$j==(ind+1)), ], aes(x=funArg, y=y, group=curveID), colour="red")
             p <- p + xlab("s") + ylab("y") + 
               ggtitle(paste("Subject ", subjectChoice, "; Total of ", nrep, " visits; ", "Actual time of ", ind, "-th visit (red) = ",
-                            unique(TijSubj)[ind], sep=""))
-          } 
+                            round(unique(TijSubj)[ind+1], digits=2), sep=""))
+          # } 
           if(input$meanBySubj) p <- p + geom_line(mapping=aes(x=x,y=y, group=rep(1,length(myDat$funcArg))), data=data.frame(x=myDat$funcArg, y=colMeans(obsBySubj)), colour="blue", linetype=1, size=1)
           if(input$overallMean1) p <- p + geom_line(mapping=aes(x=x,y=y, group=rep(1,length(myDat$funcArg))), data=data.frame(x=myDat$funcArg, y=overallMean), colour="black", linetype=2, size=1)
           

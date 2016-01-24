@@ -102,6 +102,7 @@ id = DTI$ID
 
 mfpca.dti = mfpca.sc(Y=Y, id = id, twoway = FALSE)
 plot_shiny(mfpca.dti)
+
 ##### Longitudinal FoSR Examples #####
 
 data(DTI2)
@@ -112,6 +113,30 @@ DTI2 = DTI2[complete.cases(DTI2),]
 fosr.dti4 = bayes_fosr(cca ~ pasat + re(id), data = DTI2, Kt = 10, Kp = 4, cov.method = "FPCA")
 plot_shiny(fosr.dti4)
 plot_shiny(fosr.dti4$fpca.obj)
+
+##### LFPCA Example on real data #####
+
+data(DTI)
+MS <- subset(DTI, case ==1)  # subset data with multiple sclerosis (MS) case
+
+index.na <- which(is.na(MS$cca))  
+Y <- MS$cca; Y[index.na] <- fpca.sc(Y)$Yhat[index.na]; sum(is.na(Y))
+id <- MS$ID 
+visit.index <- MS$visit 
+visit.time <- MS$visit.time/max(MS$visit.time)
+
+lfpca.dti1 <- fpca.lfda(Y = Y, subject.index = id,  
+                       visit.index = visit.index, obsT = visit.time, 
+                       LongiModel.method = 'lme',
+                       mFPCA.pve = 0.95)
+plot_shiny(lfpca.dti1)
+
+lfpca.dti2 <- fpca.lfda(Y = Y, subject.index = id,  
+                       visit.index = visit.index, obsT = visit.time, 
+                       LongiModel.method = 'fpca.sc',
+                       mFPCA.pve = 0.80, sFPCA.pve = 0.80)
+plot_shiny(lfpca.dti2)
+
 
 }
 
