@@ -539,7 +539,7 @@ plot_shiny.lfpca <- function(obj, xlab = "", ylab="", title = "", ...){
         p <- p + geom_point(data = data.frame(x=result$funcArg, y=(colMeans(result$bivariateSmoothMeanFunc)  - 2*sqrt(result$mFPCA.evalues[PCchoice])*result$mFPCA.efunctions[,PCchoice])),
                             color = "red", size = 4, shape = '-')
         p <- p + ylim(range(result$fitted.values.all)) + xlab("s") + ylab("")+
-          ggtitle(bquote(""~phi[.(PCchoice)](s) ~ "," ~.(100*round(result$mFPCA.pve[(PCchoice)],3)) ~ "% Variance explained"))   
+          ggtitle(bquote(""~psi[.(PCchoice)](s) ~ "," ~.(100*round(result$mFPCA.pve[(PCchoice)],3)) ~ "% Variance explained"))   
         p
       })
       
