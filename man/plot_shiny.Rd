@@ -19,15 +19,17 @@ Function for interactive plotting of functional data analysis results.
 
 This package builds on the \code{refund} package: tools in \code{refund} are used to
 conduct analyses and functions in this package create interactive visualizations of the results
-of those analyses. There are three major categories of analyses that can be viewed:
+of those analyses. There are four major categories of analyses that can be viewed:
 \enumerate{
 \item{Functional principal components analyses implemented by \code{\link{fpca.sc}}, \code{\link{fpca.face}},
 \code{\link{fpca.ssvd}}, and \code{\link{fpca2s}}. Plots show the mean +/- 2SD times each FPC; scree plots;
 linear combinations of score values and FPCs; reconstructions for each subject; and score scatterplots.}
 \item{Function-on-scalar regression analyses implemented by \code{\link{bayes_fosr}}. Plots show the raw data
 colored by covariate values; fitted values depending on covariates; coefficient functions; and residuals.}
-\item{Multilevel functional principal components analyses implemented by \code{\link{mfpca.sc}}.  Plots show the mean +/- 2SD times each FPC;
-scree plots; linear combinations of score values and FPCs; reconstructions for each subject; and score scatterplots for levels 1 and 2.}
+\item{Multilevel functional principal components analyses implemented by \code{\link{mfpca.sc}}.  Plots show the
+mean +/- 2SD times each FPC; scree plots; linear combinations of score values and FPCs;
+reconstructions for each subject; and score scatterplots for levels 1 and 2.}
+#' \item{Longitudinal functional principal components analyses}
 }
 }
 \examples{
@@ -73,17 +75,9 @@ plot_shiny(S)
 ##### FoSR Example #####
 
 data(DTI)
-DTI = subset(DTI, select = c(cca, case, pasat))
 DTI = DTI[complete.cases(DTI),]
-DTI$gender = factor(sample(c("male","female"), dim(DTI)[1], replace = TRUE))
-DTI$status = factor(sample(c("RRMS", "SPMS", "PPMS"), dim(DTI)[1], replace = TRUE))
-
-fosr.dti1 = bayes_fosr(cca ~ pasat, data = DTI)
-plot_shiny(fosr.dti1)
-
-fosr.dti2 = bayes_fosr(cca ~ pasat * gender + status, data = DTI)
-plot_shiny(fosr.dti2)
-
+fit.fosr = bayes_fosr(cca ~ pasat + sex, data = DTI)
+plot_shiny(fit.fosr)
 
 ##### FoSR Example with outliers #####
 

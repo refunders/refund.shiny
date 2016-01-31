@@ -25,35 +25,39 @@ plot_shiny.lfpca <- function(obj, xlab = "", ylab="", title = "", ...){
   # for exploratory analysis
   ##################################
   x <- obj
-  result <<- x
-  myDat <<- result$obsData
-  n <<- length(unique(myDat$i))
-  numFuncArg <<- length(myDat$funcArg)
-  numCurves <<- length(myDat$i)
-  vecData <<- data.frame(curveID = rep(1:numCurves, each=numFuncArg),
+  
+  ### NULLify global values called in ggplot
+  funArg = y = curveID = MEAN = COV = lambda = i = NULL
+  
+  result <- x
+  myDat <- result$obsData
+  n <- length(unique(myDat$i))
+  numFuncArg <- length(myDat$funcArg)
+  numCurves <- length(myDat$i)
+  vecData <- data.frame(curveID = rep(1:numCurves, each=numFuncArg),
                          i=rep(myDat$i, each = numFuncArg), 
                          j=rep(myDat$j,each = numFuncArg), 
                          y=as.vector(t(myDat$y)), 
                          funArg = rep(myDat$funcArg, numCurves), 
                          longTimes = rep(myDat$Tij, each = numFuncArg))
-  overallMean <<- as.vector(colMeans(myDat$y) )
-  mgin <<- diff(range(vecData$y))*0.01
-  my.Ylim <<- c(range(vecData$y)[1] - mgin, range(vecData$y)[2] + mgin)
+  overallMean <- as.vector(colMeans(myDat$y) )
+  mgin <- diff(range(vecData$y))*0.01
+  my.Ylim <- c(range(vecData$y)[1] - mgin, range(vecData$y)[2] + mgin)
   
   ##################################
   # for longitudinal fpca 
   ##################################
   
   
-  result$TT <<- seq(min(result$visitTime), max(result$visitTime), length.out=nrow(result$bivariateSmoothMeanFunc))
+  result$TT <- seq(min(result$visitTime), max(result$visitTime), length.out=nrow(result$bivariateSmoothMeanFunc))
   
   b<-list()
   for(k in 1:result$mFPCA.npc){
     a <- do.call(rbind, lapply(result$sFPCA.xiHat.bySubj, function(i) i[,k]))
     b[[k]] <- a
   }
-  result$sFPCA.xiHat <<- b
-  result$mFPCA.pve <<- cumsum(result$mFPCA.scree.eval)/sum(result$mFPCA.scree.eval)
+  result$sFPCA.xiHat <- b
+  result$mFPCA.pve <- cumsum(result$mFPCA.scree.eval)/sum(result$mFPCA.scree.eval)
   
   
   
