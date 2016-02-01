@@ -69,6 +69,14 @@
 #' plot_shiny(SSVD)
 #' plot_shiny(S)
 #' 
+#' #' ##### MFPCA Example #####
+#' 
+#' data(DTI)
+#' Y = DTI$cca
+#' id = DTI$ID
+#' 
+#' mfpca.dti = mfpca.sc(Y=Y, id = id, twoway = FALSE)
+#' plot_shiny(mfpca.dti)
 #' 
 #' ##### FoSR Example #####
 #' 
@@ -82,17 +90,8 @@
 #' DTI$cca[1,] = DTI$cca[1,] + .4
 #' DTI$cca[2,] = DTI$cca[2,] + .4
 #' 
-#' fosr.dti3 = bayes_fosr(cca ~ pasat * gender + status, data = DTI)
-#' plot_shiny(fosr.dti3)
-#' 
-#' ##### MFPCA Example #####
-#' 
-#' data(DTI)
-#' Y = DTI$cca
-#' id = DTI$ID
-#' 
-#' mfpca.dti = mfpca.sc(Y=Y, id = id, twoway = FALSE)
-#' plot_shiny(mfpca.dti)
+#' fosr.dti2 = bayes_fosr(cca ~ pasat + sex, data = DTI)
+#' plot_shiny(fosr.dti2)
 #' 
 #' ##### Longitudinal FoSR Examples #####
 #' 
@@ -101,9 +100,9 @@
 #' DTI2 = subset(DTI2, select = c(cca, id, pasat))
 #' DTI2 = DTI2[complete.cases(DTI2),]
 #' 
-#' fosr.dti4 = bayes_fosr(cca ~ pasat + re(id), data = DTI2, Kt = 10, Kp = 4, cov.method = "FPCA")
-#' plot_shiny(fosr.dti4)
-#' plot_shiny(fosr.dti4$fpca.obj)
+#' fosr.dti3 = bayes_fosr(cca ~ pasat + re(id), data = DTI2, Kt = 10, Kp = 4, cov.method = "FPCA")
+#' plot_shiny(fosr.dti3)
+#' plot_shiny(fosr.dti3$fpca.obj)
 #' 
 #' ##### LFPCA Example on real data #####
 #' 
