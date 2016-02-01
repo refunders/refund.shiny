@@ -17,7 +17,8 @@
 #' @import shiny
 #' @import ggplot2
 #' @import lme4
-#'  
+#' @importFrom grDevices rainbow
+#' @importFrom utils sessionInfo
 #'  
 plot_shiny.lfpca <- function(obj, xlab = "", ylab="", title = "", ...){
   
