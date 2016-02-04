@@ -59,7 +59,7 @@ plot_shiny.lfpca <- function(obj, xlab = "", ylab="", title = "", ...){
   
   shinyApp(
     
-    ui = navbarPage(title = strong(style = "color: #ACD6FF; padding: 0px 0px 10px 10px; opacity: 0.95; ", "LFPCA Plot"), windowTitle = "PlotInteractiveLFDA", 
+    ui = navbarPage(title = strong(style = "color: #ACD6FF; padding: 0px 0px 10px 10px; opacity: 0.95; ", "TFPCA Plot"), windowTitle = "PlotInteractiveLFDA", 
                     collapsible = FALSE, id = "nav",
                     inverse = TRUE, header = NULL,
                     
