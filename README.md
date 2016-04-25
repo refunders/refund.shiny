@@ -11,5 +11,5 @@ The primary function is `plot.shiny`, which calls other functions depending on t
 
 To install the latest version directly from Github, please use:
 <pre><code>install.packages("devtools")
-devtools::install_github("refunders/refund.shiny")
+devtools::install_github("refunders/refund.shiny", ref = "jw-devel")
 </code></pre>
