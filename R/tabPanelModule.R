@@ -12,12 +12,12 @@
 #' @param calls2 Unevaluated expression that stores Shiny widgets for the (optional) second plot
 #' @param helperText2 Optional help text for the (optional) second plot
 #' @param title2 plot title for the (optional) second plot
-#' @param trackBrush defaults to FALSE, no brushing for the plot. If TRUE, brushing is allowed. For use in score scatterplots 
+#' @param brushName character vector indicating the name of brush if you want brushing for the plot. For use in score scatterplots 
 #' for \code{plot_shiny.fpca()} and \code{plot_shiny.mfpca()}. 
 #' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu}
 #'
 tabPanelModuleUI <- function(id, tabTitle, icon = NULL, calls = NULL, helperText = NULL, twoPlots = FALSE, calls2 = NULL, helperText2 = NULL,
-                             title2 = NULL, trackBrush = FALSE){
+                             title2 = NULL, brushName = NULL){
   ns <- NS(id)
   
   plot2.layout <- tagList(
@@ -44,7 +44,7 @@ tabPanelModuleUI <- function(id, tabTitle, icon = NULL, calls = NULL, helperText
              ),
              column(9,
                     h4(tabTitle), 
-                    plotOutput(ns("plot"), brush = if(trackBrush) { ns("brush") }  )
+                    plotOutput(ns("plot"), brush = brushName  )
              )
            ),
            fluidRow(

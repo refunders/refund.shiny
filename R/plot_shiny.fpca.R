@@ -92,7 +92,7 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
                     tabPanelModuleUI("subjects",tabTitle = "Subject Fits", icon = icon("user"), calls = subjects.call,
                                      helperText = subjects.help ),
                     tabPanelModuleUI("scoreplots",tabTitle = "Score Scatterplot", icon = icon("binoculars"), calls = score.call,
-                                     helperText = score.help1, twoPlots = TRUE, helperText2 = score.help2, trackBrush = TRUE)
+                                     helperText = score.help1, twoPlots = TRUE, helperText2 = score.help2, brushName = "scorebrush")
                     ),
 
     #################################
@@ -171,42 +171,16 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
       ## Code for score plots
       #################################
 
-      fda.obj = fpca.obj
-      
-      scoredata = as.data.frame(cbind(fda.obj$scores, fda.obj$Yhat))
-      colnames(scoredata) = c(paste0("PC", 1:fda.obj$npc), paste0("subj", 1:dim(fda.obj$Yhat)[2]))
-      
-      ## get PCs selected for X and Y axis
-      PCX <- reactive({ paste0("PC", input$PCX) })
-      PCY <- reactive({ paste0("PC", input$PCY) })
+      scoreplots = scoreStuff(fpca.obj, scorebrush)
       
       
-      ## first score plot
+      # first scoreplot
       plotInputScore1 <- reactive({
-        p1 <-  ggplot(scoredata, aes_string(x = PCX(), y = PCY()))+geom_point(color = "blue", alpha = 1/5, size = 3)+theme_bw()+
+        p1 <- ggplot(scoredata, aes_string(x = PCX(), y = PCY()))+geom_point(color = "blue", alpha = 1/5, size = 3)+theme_bw()+
           xlab(paste("Scores for FPC", input$PCX))+ylab(paste("Scores for FPC", input$PCY))
       })
       
-      ### second score plot
-      Yhat.all.m = melt(fda.obj$Yhat)
-      colnames(Yhat.all.m) = c("subj", "time", "value")
-      baseplot = ggplot(Yhat.all.m, aes(x=time, y=value, group = subj)) + geom_line(alpha = 1/5, color="black") + plotDefaults
-      
-      
-      plotInputScore2 <- reactive({
-        if(!is.null(input$brush)){
-          points = brushedPoints(scoredata, input$brush, xvar=PCX(), yvar = PCY())
-          Yhat.m = melt(as.matrix(points[,-c(1:fda.obj$npc)]))
-          
-        }else{
-          Yhat.m = as.data.frame(cbind(1, 1:length(fda.obj$mu), fda.obj$mu))
-        }
-        
-        colnames(Yhat.m) <- c("subj", "time", "value")
-        p2 <- baseplot+geom_line(data= Yhat.m, aes(x=as.numeric(time), y=value, group = subj), color="cornflowerblue")
-      })
-      
-      callModule(tabPanelModule, "scoreplots", plotObject = plotInputScore1, plotName = "scoreplots", plotObject2 = plotInputScore2)
+      callModule(tabPanelModule, "scoreplots", plotObject = scoreplots$plot1, plotName = "scoreplots", plotObject2 = scoreplots$plot2)
       
 
     } ## end server
