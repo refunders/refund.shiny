@@ -42,9 +42,11 @@ plot_shiny.mfpca = function(obj, xlab = "", ylab="", title = "", ...) {
   #################################
   ## Tab 3: mean +/- FPC plot
   #################################
-  muPCtext = "Solid black line indicates population mean. For the FPC selected below, blue and red lines
+  muPC_help = "Solid black line indicates population mean. For the FPC selected below, blue and red lines
                                              indicate the population mean +/- the FPC times 2 SDs of the associated score distribution."
 
+  muPC_call1
+  muPC_call2
   #################################
   ## Tab 2: scree plot
   #################################
@@ -116,9 +118,13 @@ plot_shiny.mfpca = function(obj, xlab = "", ylab="", title = "", ...) {
   ## UI
   #################################
 
-    ui = navbarPage(title = strong(style = "color: #ACD6FF; padding: 0px 0px 10px 10px; opacity: 0.95; ", "MFPCA Plot"), windowTitle = "refund.shiny",
-                    collapsible = FALSE, id = "nav",
-                    inverse = TRUE, header = NULL,
+    ui = navbarPage(title = strong(style = "color: #ACD6FF; padding: 0px 0px 10px 10px; opacity: 0.95; ", "MFPCA Plot"), 
+                    windowTitle = "refund.shiny", collapsible = FALSE, id = "nav", inverse = TRUE, header = NULL,
+                    
+                    tabPanel("Mean +/- FPCs", icon = icon("stats", lib = "glyphicon"),
+                             tabPanelModuleUI("level1", tabTitle = "Level 1", calls = muPC_call1, helperText = muPC_help ),
+                             tabPanelModuleUI("level2", tabTitle = "Level 2", calls = muPC_call2, helperText = muPC_help )
+                             ),
                     tabPanel("Mean +/- FPCs", icon = icon("stats", lib = "glyphicon"),
                         tabsetPanel(
                              tabPanel("Level 1",

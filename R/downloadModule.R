@@ -22,7 +22,6 @@ tagList(
 #' @param session Shiny variable for server modules
 #' @param plotObject Reactive plot object defined elsewhere in the server function.
 #' @param plotName Character string designating name of the plot for PDF output.
-#' @param title title of plot object, will show up when plot is downloaded
 #' 
 #' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu}
 #'

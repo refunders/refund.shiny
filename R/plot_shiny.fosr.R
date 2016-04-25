@@ -43,19 +43,32 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
   covar.list[1] = "None"
   covarInputValues = 1:length(covar.list)
   names(covarInputValues) = covar.list
-
+  observed.help = "Observed response data, colored according to the covariate selected below."
+  observed.call = eval(call("selectInput", inputId = "CovarChoice", label = ("Select Covariate"), choices = covarInputValues, selected = 1))
+  
+  
   ## Tab 2: fitted values
   pred.list = names(attributes(terms(fosr.obj$terms))$dataClasses)[-1]
-  calls <- vector("list", length(pred.list))
+  fitted.help = "Fitted response curve for a subject with covariate values specified below."
+  fitted.call <- vector("list", length(pred.list))
   for(i in 1:length(pred.list)){
-    calls[[i]] =  eval(createInputCall(pred.list[i], get(pred.list[i], fosr.obj$data) ))
+    fitted.call[[i]] =  eval(createInputCall(pred.list[i], get(pred.list[i], fosr.obj$data) ))
   }
 
   ## Tab 3: coefficient functions
   coef.list = colnames(model.matrix(fosr.obj$terms, fosr.obj$data[1,]))
   coefInputValues = 1:p
   names(coefInputValues) = coef.list
-
+  coef.help = "Coefficient function and confidence bounds for the predictor selected below."
+  coef.call = eval(call("selectInput", inputId = "CoefChoice", label = ("Select Predictor"), choices = coefInputValues, selected = 1))
+  
+  ## Tab 4: plot of residual curves
+  residuals.help = "If 'Show Outliers' is selected, the median and outlying curves are shown in blue and red respectively. If 'Rainbowize' 
+                    is selected, curves are ordered by band depth with most outlying curves shown in red and 
+                    curves closest to the median shown in violet."
+  residuals.call = eval(call("radioButtons","residOptions", label="Plot Options", 
+                             choices = list("None"=1, "Show Median and Outliers"=2,"Rainbowize by Depth"=3), selected=1))
+  
   #################################
   ## App
   #################################
@@ -66,59 +79,15 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
   ## UI
   #################################
 
-    ui = navbarPage(title = strong(style = "color: #ACD6FF; padding: 0px 0px 10px 10px; opacity: 0.95; ", "FoSR Plot"), windowTitle = "refund.shiny",
-                    collapsible = FALSE, id = "nav",
-                    inverse = TRUE, header = NULL,
-                    tabPanel("Observed Data", icon = icon("stats", lib = "glyphicon"),
-                             column(3,
-                                    helpText("Observed response data, colored according to the covariate selected below."), hr(),
-                                    selectInput("CovarChoice", label = ("Select Covariate"), choices = covarInputValues, selected = 1),hr(),
-                                    downloadButton('downloadPDFObs', "Download Plot as PDF"), br(), br(),
-                                    downloadButton("downloadPlotObs", "Download Plot as Object", class = "plot-download")
-                                    ),
-                             column(9, h4("Observed Data"),
-                                    plotOutput('ObsDataPlot')
-                                    )
-                            ),
-                    tabPanel("Fitted Values", icon = icon("line-chart"),
-                             column(3,
-                                    helpText("Fitted response curve for a subject with covariate values specified below."), hr(),
-                                    eval(calls), hr(),
-                                    downloadButton('downloadPDFFittedVal', "Download Plot as PDF"), br(), br(),
-                                    downloadButton("downloadPlotFittedVal", "Download Plot as Object", class = "plot-download")
-                                   ),
-                             column(9, h4("Fitted Response Curve"),
-                                   plotOutput('FittedValPlot')
-                                   )
-                            ),
-                    tabPanel("Coefficient Functions", icon = icon("area-chart"),
-                             column(3,
-                                    helpText("Coefficient function and confidence bounds for the predictor selected below"), hr(),
-                                    selectInput("CoefChoice", label = ("Select Predictor"), choices = coefInputValues, selected = 1), hr(),
-                                    downloadButton('downloadPDFCoefFunc', "Download Plot as PDF"), br(), br(),
-                                    downloadButton("downloadPlotCoefFunc", "Download Plot as Object", class = "plot-download")
-                                    ),
-                             column(9, h4("Coefficient Function"),
-                                    plotOutput('CoefFunc')
-                                    )
-                            ),
-                    tabPanel("Residuals", icon = icon("medkit"),
-                             column(3,
-                                    helpText("Plot of residual curves."), hr(),
-                                    #checkboxInput("outliers", label="Show median and outliers"),
-                                    radioButtons("residOptions", label="Plot Options",
-                                                 choices = list("None"=1, "Show Median and Outliers"=2,"Rainbowize by Depth"=3),
-                                                 selected=1),
-                                    helpText("If 'Show Outliers' is selected, the median and outlying curves are shown
-                                             in blue and red respectively. If 'Rainbowize' is selected, curves are ordered by band depth
-                                             with most outlying curves shown in red and curves closest to the median shown in violet"), hr(),
-                                    downloadButton('downloadPDFresid', "Download Plot as PDF"), br(), br(),
-                                    downloadButton("downloadPlotresid", "Download Plot as Object", class = "plot-download")
-                                    ),
-                             column(9, h4("Residuals"),
-                                    plotOutput('resid')
-                                    )
-                            )
+    ui = navbarPage(title = strong(style = "color: #ACD6FF; padding: 0px 0px 10px 10px; opacity: 0.95; ", "FoSR Plot"), 
+                    windowTitle = "refund.shiny", collapsible = FALSE, id = "nav", inverse = TRUE, header = NULL,
+                    ##### start tabs
+                    tabPanelModuleUI("observed", tabTitle = "Observed Data", icon("stats", lib = "glyphicon"), calls = observed.call,
+                                     helperText = observed.help, twoPlots = TRUE, title2 = "Lasagna Plot"),
+                    tabPanelModuleUI("fitted", tabTitle = "Fitted Values", icon("line-chart"), calls = fitted.call,helperText = fitted.help ),
+                    tabPanelModuleUI("coef", tabTitle = "Coefficient Functions", icon("area-chart"), calls = coef.call, helperText = coef.help),
+                    tabPanelModuleUI("residuals", tabTitle = "Residuals", icon("medkit"), calls = residuals.call,helperText = residuals.help )
+                    ##### end tabs
                     ),
 
     #################################
@@ -154,11 +123,14 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
             theme_bw() + xlab("") + ylab("") + theme(legend.position="bottom", legend.title=element_blank())
         }
       })
-
-      output$ObsDataPlot <- renderPlot(print(plotInputObsData()) )
-
-      output$downloadPDFObs <- savePDF("ObsData.pdf", plotInputObsData())
-      output$downloadPlotObs <- savePlot("ObsData.RData", plotInputObsData())
+      
+      plotInputLasagna <- reactive({
+        ## this is where we will add code for lasagna plot
+        df = data.frame(x = 1:100, y = 1:100)
+        p <- ggplot(df, aes(x=x, y=y)) + geom_point(color = rainbow(100)) + theme_bw()
+      })
+      
+      callModule(tabPanelModule, "observed", plotObject = plotInputObsData, plotName = "observed", plotObject2 = plotInputLasagna)
 
       #################################
       ## Code for FittedValues Tab
@@ -192,11 +164,8 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
           xlab(xlab) + ylab(ylab) + ylim(c(.9, 1.1) * range(fosr.obj$Yhat))
 
       })
-
-      output$FittedValPlot <- renderPlot(print(plotInputFittedVal()) )
-
-      output$downloadPDFFittedVal <- savePDF("FittedVal.pdf", plotInputFittedVal())
-      output$downloadPlotFittedVal <- savePlot("FittedVal.RData", plotInputFittedVal())
+      
+      callModule(tabPanelModule, "fitted", plotObject = plotInputFittedVal, plotName = "fitted")
 
       #################################
       ## Code for CoefFunc Tab
@@ -216,11 +185,9 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
 
       })
 
-      output$CoefFunc <- renderPlot(print(plotInputCoefFunc()) )
-
-      output$downloadPDFCoefFunc <- savePDF("CoefFunc.pdf", plotInputCoefFunc())
-      output$downloadPlotCoefFunc <- savePlot("CoefFunc.RData", plotInputCoefFunc())
-
+      
+      callModule(tabPanelModule, "coef", plotObject = plotInputCoefFunc, plotName = "coef")
+      
       #################################
       ## Code for Residual plot
       #################################
@@ -267,15 +234,10 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
         residPlot  + xlab("") + ylab("")
       })
 
-
-      output$resid <- renderPlot(plotInputResid() )
-
-      output$downloadPDFresid <- savePDF("resid.pdf", plotInputResid())
-      output$downloadPlotresid <- savePlot("resid.RData", plotInputResid())
-
+       callModule(tabPanelModule, "residuals", plotObject = plotInputResid, plotName = "residuals")
 
       ## add subject number
-
+  
     } ## end server
   )
 }

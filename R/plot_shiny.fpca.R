@@ -31,41 +31,44 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
   ################################
 
   ## Tab 1:
-  muPC_help = "Solid black line indicates population mean. For the FPC selected below, blue and red lines
+  muPC.help = "Solid black line indicates population mean. For the FPC selected below, blue and red lines
                                              indicate the population mean +/- the FPC times 2 SDs of the associated score distribution."
-  muPC_call = eval(call("selectInput", inputId = "PCchoice", label = ("Select FPC"), choices = 1:fpca.obj$npc, selected = 1))
+  muPC.call = eval(call("selectInput", inputId = "PCchoice", label = ("Select FPC"), choices = 1:fpca.obj$npc, selected = 1))
     
   ## Tab 2: scree plot
   
-  scree_help = "Scree plots; the left panel shows the plot of eigenvalues and the right panel shows the cumulative percent variance explained."
+  scree.help = "Scree plots; the left panel shows the plot of eigenvalues and the right panel shows the cumulative percent variance explained."
   scree = data.frame(k = rep(1:fpca.obj$npc, 2),
                       lambda = c(fpca.obj$evalues, cumsum(fpca.obj$evalues)/ sum(fpca.obj$evalues)),
                       type = rep(c("Eigenvalue", "Percent Variance Explained"), each = fpca.obj$npc))
 
   ## Tab 3: linear combination of PCs
-  LinCom_help = "Plot shows the linear combination of mean and FPCs with the scores specified using the sliders below."
+  LinCom.help = "Plot shows the linear combination of mean and FPCs with the scores specified using the sliders below."
   varpercent = lapply(fpca.obj$evalues, function(i){100*round(i/sum(fpca.obj$evalues),3)}) # calculates percent variance explained
-  LinCom_calls <- as.list(rep(NA, fpca.obj$npc))
+  LinCom.call <- as.list(rep(NA, fpca.obj$npc))
   PCs <- rep(NA, fpca.obj$npc)
   for(i in 1:fpca.obj$npc){
 
     PCnum = paste("PC", i, sep="")
 
-    LinCom_calls[[i]] =  eval(call("sliderInput", inputId= PCnum, label = paste(PCnum, ": ", varpercent[[i]],  "% Variance", sep=""),
+    LinCom.call[[i]] =  eval(call("sliderInput", inputId= PCnum, label = paste(PCnum, ": ", varpercent[[i]],  "% Variance", sep=""),
                             min = -2, max = 2, step = .1, value = 0, post = " SD", animate = animationOptions(interval=400, loop=T)))
 
     PCs[i] = PCnum
   }
 
   ## Tab 4: subject fits
-  subjects_help = "Plot shows observed data and fitted values for the subject selected below."
-  subjects_call = eval(call("selectInput", inputId = "subject" ,label = ("Select Subject"), choices = 1:dim(fpca.obj$Yhat)[1], selected = 1))
+  subjects.help = "Plot shows observed data and fitted values for the subject selected below."
+  subjects.call = eval(call("selectInput", inputId = "subject" ,label = ("Select Subject"), choices = 1:dim(fpca.obj$Yhat)[1], selected = 1))
   
   ## Tab 5: score plots
-  score_help1 = "Use the drop down menus to select FPCs for the X and Y axis. Plot shows observed score
+  score.help1 = "Use the drop down menus to select FPCs for the X and Y axis. Plot shows observed score
                                              scatterplot for selected FPCs; click and drag on the scatterplot to select subjects."
-  score_help2 = "Black curves are fitted values for all subjects. Blue curves correspond to subjects
+  score.help2 = "Black curves are fitted values for all subjects. Blue curves correspond to subjects
                                                   selected in the graph above. If no points are selected, the mean curve is shown."
+  
+  score.call = tagList(  selectInput("PCX", label = ("Select X-axis FPC"), choices = 1:fpca.obj$npc, selected = 1),
+    selectInput("PCY", label = ("Select Y-axis FPC"), choices = 1:fpca.obj$npc, selected = 2) )
   
   #################################
   ## App
@@ -80,23 +83,16 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
     ui = navbarPage(title = strong(style = "color: #ACD6FF; padding: 0px 0px 10px 10px; opacity: 0.95; ", "FPCA Plot"), 
                     windowTitle = "refund.shiny", collapsible = FALSE, id = "nav", inverse = TRUE, header = NULL,
                     ##### start tabs
-                    tabPanelModuleUI("muPC", tabTitle = "Mean +/- FPCs", icon("stats", lib = "glyphicon"), calls = muPC_call, 
-                                     helperText = muPC_help
-                                     ),
+                    tabPanelModuleUI("muPC", tabTitle = "Mean +/- FPCs", icon("stats", lib = "glyphicon"), calls = muPC.call, 
+                                     helperText = muPC.help ),
                     tabPanelModuleUI("screeplots", tabTitle = "Scree Plots", icon = icon("medkit"), calls = NULL, 
-                                     helperText = scree_help
-                                     ),
-                    tabPanelModuleUI("LinCom", tabTitle = "Linear Combinations", icon = icon("line-chart"), calls = LinCom_calls,
-                                     helperText = LinCom_help 
-                                     ),
-                    tabPanelModuleUI("subjects",tabTitle = "Subject Fits", icon = icon("user"), calls = subjects_call,
-                                     helperText = subjects_help
-                                     ),
-
-                    brushTabPanelModuleUI("scoreplots", tabTitle = "Score Scatterplot", icon = icon("binoculars"),
-                                          helperText1 = score_help1, helperText2 = score_help2, fda.obj = fpca.obj
-                                          )
-                    ##### end tabs
+                                     helperText = scree.help),
+                    tabPanelModuleUI("LinCom", tabTitle = "Linear Combinations", icon = icon("line-chart"), calls = LinCom.call,
+                                     helperText = LinCom.help ),
+                    tabPanelModuleUI("subjects",tabTitle = "Subject Fits", icon = icon("user"), calls = subjects.call,
+                                     helperText = subjects.help ),
+                    tabPanelModuleUI("scoreplots",tabTitle = "Score Scatterplot", icon = icon("binoculars"), calls = score.call,
+                                     helperText = score.help1, twoPlots = TRUE, helperText2 = score.help2, trackBrush = TRUE)
                     ),
 
     #################################
@@ -174,7 +170,44 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
       #################################
       ## Code for score plots
       #################################
-      callModule(brushTabPanelModule, "scoreplots", fda.obj = fpca.obj)
+
+      fda.obj = fpca.obj
+      
+      scoredata = as.data.frame(cbind(fda.obj$scores, fda.obj$Yhat))
+      colnames(scoredata) = c(paste0("PC", 1:fda.obj$npc), paste0("subj", 1:dim(fda.obj$Yhat)[2]))
+      
+      ## get PCs selected for X and Y axis
+      PCX <- reactive({ paste0("PC", input$PCX) })
+      PCY <- reactive({ paste0("PC", input$PCY) })
+      
+      
+      ## first score plot
+      plotInputScore1 <- reactive({
+        p1 <-  ggplot(scoredata, aes_string(x = PCX(), y = PCY()))+geom_point(color = "blue", alpha = 1/5, size = 3)+theme_bw()+
+          xlab(paste("Scores for FPC", input$PCX))+ylab(paste("Scores for FPC", input$PCY))
+      })
+      
+      ### second score plot
+      Yhat.all.m = melt(fda.obj$Yhat)
+      colnames(Yhat.all.m) = c("subj", "time", "value")
+      baseplot = ggplot(Yhat.all.m, aes(x=time, y=value, group = subj)) + geom_line(alpha = 1/5, color="black") + plotDefaults
+      
+      
+      plotInputScore2 <- reactive({
+        if(!is.null(input$brush)){
+          points = brushedPoints(scoredata, input$brush, xvar=PCX(), yvar = PCY())
+          Yhat.m = melt(as.matrix(points[,-c(1:fda.obj$npc)]))
+          
+        }else{
+          Yhat.m = as.data.frame(cbind(1, 1:length(fda.obj$mu), fda.obj$mu))
+        }
+        
+        colnames(Yhat.m) <- c("subj", "time", "value")
+        p2 <- baseplot+geom_line(data= Yhat.m, aes(x=as.numeric(time), y=value, group = subj), color="cornflowerblue")
+      })
+      
+      callModule(tabPanelModule, "scoreplots", plotObject = plotInputScore1, plotName = "scoreplots", plotObject2 = plotInputScore2)
+      
 
     } ## end server
   )
