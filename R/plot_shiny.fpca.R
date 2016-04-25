@@ -171,16 +171,39 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
       ## Code for score plots
       #################################
 
-      scoreplots = scoreStuff(fpca.obj, scorebrush)
+      scoredata = as.data.frame(cbind(fpca.obj$scores, fpca.obj$Yhat))
+      colnames(scoredata) = c(paste0("PC", 1:fpca.obj$npc), paste0("subj", 1:dim(fpca.obj$Yhat)[2]))
       
+      ## get PCs selected for X and Y axis
+      PCX <- reactive({ paste0("PC", input$PCX) })
+      PCY <- reactive({ paste0("PC", input$PCY) })
       
-      # first scoreplot
-      plotInputScore1 <- reactive({
-        p1 <- ggplot(scoredata, aes_string(x = PCX(), y = PCY()))+geom_point(color = "blue", alpha = 1/5, size = 3)+theme_bw()+
+      stuff <- reactive({
+        df <- ggplot(scoredata, aes_string(x = PCX(), y = PCY()))+geom_point(color = "blue", alpha = 1/5, size = 3)+theme_bw()+
           xlab(paste("Scores for FPC", input$PCX))+ylab(paste("Scores for FPC", input$PCY))
       })
       
-      callModule(tabPanelModule, "scoreplots", plotObject = scoreplots$plot1, plotName = "scoreplots", plotObject2 = scoreplots$plot2)
+      Yhat.all.m = melt(fpca.obj$Yhat)
+      colnames(Yhat.all.m) = c("subj", "time", "value")
+      baseplot = ggplot(Yhat.all.m, aes(x=time, y=value, group = subj)) + geom_line(alpha = 1/5, color="black") + plotDefaults
+      
+      stuff2 <- reactive({
+        
+        brush <- input$scorebrush
+        if(!is.null(brush)){
+          points = brushedPoints(scoredata, input$scorebrush, xvar=PCX(), yvar = PCY())
+          Yhat.m = melt(as.matrix(points[,-c(1:fpca.obj$npc)]))
+          
+        }else{
+          Yhat.m = as.data.frame(cbind(1, 1:length(fpca.obj$mu), fpca.obj$mu))
+        }
+        
+        colnames(Yhat.m) <- c("subj", "time", "value")
+        baseplot+geom_line(data= Yhat.m, aes(x=as.numeric(time), y=value, group = subj), color="cornflowerblue")
+        
+      })
+      
+      callModule(tabPanelModule, "scoreplots", plotObject = stuff, plotName = "scoreplots", plotObject2 = stuff2)
       
 
     } ## end server

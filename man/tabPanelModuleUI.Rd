@@ -6,7 +6,7 @@
 \usage{
 tabPanelModuleUI(id, tabTitle, icon = NULL, calls = NULL,
   helperText = NULL, twoPlots = FALSE, calls2 = NULL,
-  helperText2 = NULL, title2 = NULL, trackBrush = FALSE)
+  helperText2 = NULL, title2 = NULL, brushName = NULL)
 }
 \arguments{
 \item{id}{Name of module. Allows each call of this module to be uniquely identified.}
@@ -27,7 +27,7 @@ tabPanelModuleUI(id, tabTitle, icon = NULL, calls = NULL,
 
 \item{title2}{plot title for the (optional) second plot}
 
-\item{trackBrush}{defaults to FALSE, no brushing for the plot. If TRUE, brushing is allowed. For use in score scatterplots
+\item{brushName}{character vector indicating the name of brush if you want brushing for the plot. For use in score scatterplots
 for \code{plot_shiny.fpca()} and \code{plot_shiny.mfpca()}.}
 }
 \description{

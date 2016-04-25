@@ -28,7 +28,7 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
   fosr.obj <- obj
 
   ### NULLify global values called in ggplot
-  value = subj = covariate = UB = LB = residual = depth.rank = coef = grid = NULL
+  value = subj = covariate = UB = LB = residual = depth.rank = coef = grid = x = y = NULL
 
   ################################
   ## code for processing tabs

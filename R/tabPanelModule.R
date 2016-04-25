@@ -32,6 +32,12 @@ tabPanelModuleUI <- function(id, tabTitle, icon = NULL, calls = NULL, helperText
            plotOutput(ns("plot2"))
     )
   )
+
+  
+  plotTag <- ifelse(is.null(brushName), 
+                    tagList(plotOutput(ns("plot") ) ),
+                    tagList(plotOutput(ns("plot"), brush = brushOpts(id = brushName, resetOnNew = TRUE))) 
+                    )
   
   # set up the tab panel
   tabPanel(tabTitle, icon = icon,
@@ -44,7 +50,7 @@ tabPanelModuleUI <- function(id, tabTitle, icon = NULL, calls = NULL, helperText
              ),
              column(9,
                     h4(tabTitle), 
-                    plotOutput(ns("plot"), brush = brushName  )
+                    plotTag
              )
            ),
            fluidRow(

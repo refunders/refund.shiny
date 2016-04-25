@@ -26,7 +26,7 @@ plot_shiny.mfpca = function(obj, xlab = "", ylab="", title = "", ...) {
 
   mfpca.obj <- obj
   ### NULLify global values called in ggplot
-  Y = id = k = lambda = value = mu_visit = mu_subj = visit = subj = time = grid = NULL
+  Y = id = k = lambda = value = mu_visit = mu_subj = visit = subj = time = grid = muPC_call1 = muPC_call2 = muPCtext = NULL
 
   ################################
   ## code for processing tabs
