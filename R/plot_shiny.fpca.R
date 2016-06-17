@@ -13,8 +13,6 @@
 #' Jeff Goldsmith \email{jeff.goldsmith@@columbia.edu}
 #'
 #' @seealso \code{\link{plot_shiny}}
-#' @import shiny
-#' @import ggplot2
 #' @importFrom reshape2 melt
 #'
 #' @export
@@ -26,6 +24,23 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
   ### NULLify global values called in ggplot
   V1 = V2 = V3 = V4 = k = lambda = value = subj = time = NULL
 
+  ################################
+  ## convert matrices storing functional data to dfs
+  ################################
+
+  if (is.matrix(fpca.obj$Y)) {
+  	Y_df = as_refundObj(fpca.obj$Y)
+  } else {
+  	Y_df = fpca.obj$Y
+  }
+  
+  if (is.matrix(fpca.obj$Yhat)) {
+  	Yhat_df = as_refundObj(fpca.obj$Yhat)
+  } else {
+  	Yhat_df = fpca.obj$Yhat
+  }
+  
+  
   ################################
   ## code for processing tabs
   ################################
@@ -98,7 +113,7 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
                     tabPanel("Subject Fits",  icon = icon("user"),
                              column(3,
                                     helpText("Plot shows observed data and fitted values for the subject selected below"),
-                                    selectInput("subject", label = ("Select Subject"), choices = 1:dim(fpca.obj$Yhat)[1], selected =1), hr(),
+                                    selectInput("subject", label = ("Select Subject"), choices = unique(Yhat_df$id), selected = unique(Yhat_df$id)[1]), hr(),
                                     downloadButton("downloadPDFSubject", "Download Plot as PDF"), br(), br(),
                                     downloadButton("downloadPlotSubject", "Download Plot as Object", class = "plot-download")
                                     ),
@@ -141,7 +156,7 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
       efunctions = fpca.obj$efunctions; sqrt.evalues = diag(sqrt(fpca.obj$evalues))
       scaled_efunctions = efunctions %*% sqrt.evalues
 
-      plotDefaults = list(theme_bw(), xlab(xlab), ylab(ylab), ylim(c(range(fpca.obj$Yhat)[1], range(fpca.obj$Yhat)[2])),
+      plotDefaults = list(theme_bw(), xlab(xlab), ylab(ylab), ylim(c(range(Yhat_df$value)[1], range(Yhat_df$value)[2])),
                           scale_x_continuous(breaks = seq(0, length(fpca.obj$mu)-1, length=6), labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1))) )
 
       #################################
@@ -206,12 +221,13 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
       #################################
 
       plotInputSubject <- reactive({
-        subjectnum = as.numeric(input$subject)
-        df = as.data.frame(cbind(1:length(fpca.obj$mu), fpca.obj$mu, fpca.obj$Yhat[subjectnum,], fpca.obj$Y[subjectnum,]))
+        subjectnum = input$subject
+        mu_df = data.frame(index = fpca.obj$index,
+        									 value = fpca.obj$mu)
 
-        p4 <- ggplot(data = df, aes(x=V1,y=V2)) + geom_line(lwd=0.5, color = "gray") + plotDefaults +
-          geom_line(data = df, aes(y=V3), size=1, color = "cornflowerblue") +
-          geom_point(data = df, aes(y=V4), color = "blue", alpha = 1/3)
+        p4 = ggplot(data = mu_df, aes(x = index, y = value)) + geom_line(lwd = 0.5, color = "gray") + plotDefaults +
+          geom_line(data = filter(Yhat_df, id == subjectnum), size=1, color = "cornflowerblue") +
+          geom_point(data = filter(Y_df, id == subjectnum), color = "blue", alpha = 1/3)
       })
 
       output$Subject <- renderPlot( print(plotInputSubject()) )
@@ -222,38 +238,35 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
       #################################
       ## Code for score plots
       #################################
-      scoredata = as.data.frame(cbind(fpca.obj$scores, fpca.obj$Yhat))
-      colnames(scoredata) = c(paste0("PC", 1:fpca.obj$npc), paste0("subj", 1:dim(fpca.obj$Yhat)[2]))
+      
+      scoredata = as.data.frame(cbind(fpca.obj$scores))
+      colnames(scoredata) = c(paste0("PC", 1:fpca.obj$npc))
+      scoredata = mutate(scoredata, id = unique(Yhat_df$id))
 
       ## get PCs selected for X and Y axis
       PCX <- reactive({ paste0("PC", input$PCX) })
       PCY <- reactive({ paste0("PC", input$PCY) })
 
-
       ## Tab 5 Plot
       output$ScorePlot <- renderPlot({
-        ggplot(scoredata, aes_string(x = PCX(), y = PCY()))+geom_point(color = "blue", alpha = 1/5, size = 3)+theme_bw()+
-          xlab(paste("Scores for FPC", input$PCX))+ylab(paste("Scores for FPC", input$PCY))
+        ggplot(scoredata, aes_string(x = PCX(), y = PCY())) + geom_point(color = "blue", alpha = 1/5, size = 3) +
+          xlab(paste("Scores for FPC", input$PCX)) + ylab(paste("Scores for FPC", input$PCY)) + theme_bw()
       })
 
       ### second score plot
-      Yhat.all.m = melt(fpca.obj$Yhat)
-      colnames(Yhat.all.m) = c("subj", "time", "value")
-      baseplot = ggplot(Yhat.all.m, aes(x=time, y=value, group = subj)) + geom_line(alpha = 1/5, color="black") + plotDefaults
+      baseplot = ggplot(Yhat_df, aes(x = index, y = value, group = id)) + geom_line(alpha = 1/5, color="black") + plotDefaults
 
       output$ScorePlot2 <- renderPlot({
 
         brush <- input$ScorePlot_brush
         if(!is.null(brush)){
           points = brushedPoints(scoredata, input$ScorePlot_brush, xvar=PCX(), yvar = PCY())
-          Yhat.m = melt(as.matrix(points[,-c(1:fpca.obj$npc)]))
-
+          brushed_subjs = points$id
         }else{
-          Yhat.m = as.data.frame(cbind(1, 1:length(fpca.obj$mu), fpca.obj$mu))
+        	brushed_subjs = NULL
         }
 
-        colnames(Yhat.m) <- c("subj", "time", "value")
-        baseplot+geom_line(data= Yhat.m, aes(x=as.numeric(time), y=value, group = subj), color="cornflowerblue")
+        baseplot + geom_line(data = filter(Yhat_df, id %in% brushed_subjs), color="cornflowerblue")
 
       })
 
