@@ -4,19 +4,21 @@
 \alias{as_refundObj.matrix}
 \title{Convert matrices to dataframes for use in functional data analyses}
 \usage{
-\method{as_refundObj}{matrix}(mat, index = NULL)
+\method{as_refundObj}{matrix}(obj, index = NULL, ...)
 }
 \arguments{
-\item{mat}{Matrix to be converted; rows contain functional observations on subjects.}
+\item{obj}{Matrix object to be converted; rows contain functional observations on subjects.}
 
 \item{index}{Time grid on which functional data are observed; defaults to \code{NULL},
-which assumes an equally-spaced grid on [0,1]}
+which assumes an equally-spaced grid on [0,1].}
+
+\item{...}{additional arguments to be passed to methods (not used).}
 }
 \value{
 An object of classes \code{data.frame} and \code{refund.object}, the latter of
-which is so far not used. Columns are \code{id} (taken from the rownames of \code{mat},
+which is so far not used. Columns are \code{id} (taken from the rownames of \code{obj},
 if they exist), \code{index} (with behavior described above), and \code{value} (taken
-from entries in \code{mat}).
+from entries in \code{obj}).
 }
 \description{
 Convert matrices to dataframes for use in functional data analyses

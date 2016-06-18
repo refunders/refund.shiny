@@ -33,14 +33,14 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
   } else {
   	Y_df = fpca.obj$Y
   }
-  
+
   if (is.matrix(fpca.obj$Yhat)) {
   	Yhat_df = as_refundObj(fpca.obj$Yhat)
   } else {
   	Yhat_df = fpca.obj$Yhat
   }
-  
-  
+
+
   ################################
   ## code for processing tabs
   ################################
@@ -167,9 +167,9 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
         PCchoice = as.numeric(input$PCchoice)
         scaled_efuncs = scaled_efunctions[,PCchoice]
 
-        p1 <- ggplot(mu, aes(x = V1, y = V2)) + geom_line(lwd=1) + plotDefaults +
-          geom_point(data = as.data.frame(cbind(1:length(fpca.obj$mu), fpca.obj$mu + 2*scaled_efuncs)), color = "blue", size = 4, shape = '+')+
-          geom_point(data = as.data.frame(cbind(1:length(fpca.obj$mu), fpca.obj$mu - 2*scaled_efuncs)), color = "indianred", size = 4, shape = "-")+
+        p1 <- ggplot(mu, aes(x = V1, y = V2)) + geom_line(lwd = 1) + plotDefaults +
+          geom_point(data = as.data.frame(cbind(1:length(fpca.obj$mu), fpca.obj$mu + 2*scaled_efuncs)), color = "blue", size = 4, shape = '+') +
+          geom_point(data = as.data.frame(cbind(1:length(fpca.obj$mu), fpca.obj$mu - 2*scaled_efuncs)), color = "indianred", size = 4, shape = "-") +
           ggtitle(bquote(psi[.(input$PCchoice)]~(t) ~ "," ~.(100*round(fpca.obj$evalues[as.numeric(input$PCchoice)]/sum(fpca.obj$evalues),3)) ~ "% Variance"))
       })
 
@@ -185,8 +185,8 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
       #################################
 
       plotInputScree <- reactive({
-        p2 <-screeplots <- ggplot(scree, aes(x=k, y=lambda))+geom_line(linetype=1, lwd=1.5, color="black")+
-          geom_point(size = 4, color = "black")+ theme_bw() + xlab("Principal Component") + ylab("") +
+        p2 = screeplots <- ggplot(scree, aes(x = k, y = lambda)) + geom_line(linetype = 1, lwd = 1.5, color = "black") +
+          geom_point(size = 4, color = "black") + theme_bw() + xlab("Principal Component") + ylab("") +
           facet_wrap(~type, scales = "free_y") + ylim(0, NA)
       })
 
@@ -203,11 +203,12 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
       #################################
 
       plotInputLinCom <- reactive({
-        PCweights = rep(NA, length(PCs)); for(i in 1:length(PCs)){PCweights[i] = input[[PCs[i]]]}
-        df = as.data.frame(cbind(1:length(fpca.obj$mu), as.matrix(fpca.obj$mu)+efunctions %*% sqrt.evalues %*% PCweights ))
+        PCweights = rep(NA, length(PCs))
+        for (i in 1:length(PCs)) {PCweights[i] = input[[PCs[i]]]}
+        df = as.data.frame(cbind(1:length(fpca.obj$mu), as.matrix(fpca.obj$mu) + efunctions %*% sqrt.evalues %*% PCweights ))
 
-        p3 <- ggplot(mu, aes(x=V1, y=V2))+geom_line(lwd=0.75, aes(color= "mu"))+  plotDefaults + theme(legend.key = element_blank()) +
-          geom_line(data = df, lwd = 1.5, aes(color = "subject")) + xlab(xlab) + ylab(ylab) + ggtitle(title)+
+        p3 <- ggplot(mu, aes(x = V1, y = V2)) + geom_line(lwd = 0.75, aes(color = "mu")) + plotDefaults + theme(legend.key = element_blank()) +
+          geom_line(data = df, lwd = 1.5, aes(color = "subject")) + xlab(xlab) + ylab(ylab) + ggtitle(title) +
           scale_color_manual("Line Legend", values = c(mu = "gray", subject = "cornflowerblue"), guide = FALSE)
       })
 
@@ -226,7 +227,7 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
         									 value = fpca.obj$mu)
 
         p4 = ggplot(data = mu_df, aes(x = index, y = value)) + geom_line(lwd = 0.5, color = "gray") + plotDefaults +
-          geom_line(data = filter(Yhat_df, id == subjectnum), size=1, color = "cornflowerblue") +
+          geom_line(data = filter(Yhat_df, id == subjectnum), size = 1, color = "cornflowerblue") +
           geom_point(data = filter(Y_df, id == subjectnum), color = "blue", alpha = 1/3)
       })
 
@@ -238,7 +239,7 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
       #################################
       ## Code for score plots
       #################################
-      
+
       scoredata = as.data.frame(cbind(fpca.obj$scores))
       colnames(scoredata) = c(paste0("PC", 1:fpca.obj$npc))
       scoredata = mutate(scoredata, id = unique(Yhat_df$id))
@@ -254,19 +255,19 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
       })
 
       ### second score plot
-      baseplot = ggplot(Yhat_df, aes(x = index, y = value, group = id)) + geom_line(alpha = 1/5, color="black") + plotDefaults
+      baseplot = ggplot(Yhat_df, aes(x = index, y = value, group = id)) + geom_line(alpha = 1/5, color = "black") + plotDefaults
 
       output$ScorePlot2 <- renderPlot({
 
         brush <- input$ScorePlot_brush
-        if(!is.null(brush)){
-          points = brushedPoints(scoredata, input$ScorePlot_brush, xvar=PCX(), yvar = PCY())
+        if (!is.null(brush)) {
+          points = brushedPoints(scoredata, input$ScorePlot_brush, xvar = PCX(), yvar = PCY())
           brushed_subjs = points$id
-        }else{
+        } else {
         	brushed_subjs = NULL
         }
 
-        baseplot + geom_line(data = filter(Yhat_df, id %in% brushed_subjs), color="cornflowerblue")
+        baseplot + geom_line(data = filter(Yhat_df, id %in% brushed_subjs), color = "cornflowerblue")
 
       })
 

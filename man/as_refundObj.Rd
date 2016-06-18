@@ -10,13 +10,13 @@ as_refundObj(obj, ...)
 \item{obj}{Object to be converted. Currently supports class \code{matrix}, formatted
 so that rows contain functional observations on subjects.}
 
-\item{{...}}{additional arguments to be passed to methods.}
+\item{...}{additional arguments to be passed to methods.}
 }
 \value{
 An object of classes \code{data.frame} and \code{refund.object}, the latter of
-which is so far not used. Columns are \code{id} (taken from the rownames of \code{mat},
+which is so far not used. Columns are \code{id} (taken from the rownames of \code{obj},
 if they exist), \code{index} (with behavior described above), and \code{value} (taken
-from entries in \code{mat}).
+from entries in \code{obj}).
 }
 \description{
 Very experimental function, primarily used to convert matrices storing functional data
