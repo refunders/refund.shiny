@@ -22,20 +22,20 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
   fpca.obj <- obj
 
   ### NULLify global values called in ggplot
-  V1 = V2 = V3 = V4 = k = lambda = value = subj = time = NULL
+  V1 = V2 = V3 = V4 = k = lambda = value = subj = time = index = NULL
 
   ################################
   ## convert matrices storing functional data to dfs
   ################################
 
   if (is.matrix(fpca.obj$Y)) {
-  	Y_df = as_refundObj(fpca.obj$Y)
+  	Y_df = as_refundObj(fpca.obj$Y, index = fpca.obj$argvals)
   } else {
   	Y_df = fpca.obj$Y
   }
 
   if (is.matrix(fpca.obj$Yhat)) {
-  	Yhat_df = as_refundObj(fpca.obj$Yhat)
+  	Yhat_df = as_refundObj(fpca.obj$Yhat, index = fpca.obj$argvals)
   } else {
   	Yhat_df = fpca.obj$Yhat
   }
@@ -60,7 +60,7 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
 
     PCnum = paste("PC", i, sep="")
 
-    calls[[i]] =  eval(call("sliderInput", inputId= PCnum, label = paste(PCnum, ": ", varpercent[[i]],  "% Variance", sep=""),
+    calls[[i]] =  eval(call("sliderInput", inputId = PCnum, label = paste(PCnum, ": ", varpercent[[i]],  "% Variance", sep=""),
                             min = -2, max = 2, step = .1, value = 0, post = " SD", animate = animationOptions(interval=400, loop=T)))
 
     PCs[i] = PCnum
