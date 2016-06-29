@@ -21,8 +21,11 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
 
   fpca.obj <- obj
 
-  ### NULLify global values called in ggplot
-  V1 = V2 = V3 = V4 = k = lambda = value = subj = time = index = NULL
+  ## NULLify global values called in ggplot
+  V1 = V2 = k = lambda = value = subj = index = NULL
+
+  ## establish inverse link function for plotting
+  inv_link = createInvLink(family = fpca.obj$family)
 
   ################################
   ## convert matrices storing functional data to dfs
@@ -40,15 +43,15 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
   	Yhat_df = fpca.obj$Yhat
   }
 
-
   ################################
   ## code for processing tabs
   ################################
 
   ## Tab 1:
   muPC.help = "Solid black line indicates population mean. For the FPC selected below, blue and red lines
-                                             indicate the population mean +/- the FPC times 2 SDs of the associated score distribution."
-  muPC.call = eval(call("selectInput", inputId = "PCchoice", label = ("Select FPC"), choices = 1:fpca.obj$npc, selected = 1))
+               indicate the population mean +/- the FPC times 2 SDs of the associated score distribution."
+  muPC.call = as.list(NA)
+  muPC.call[[1]] = selectInput(inputId = "PCchoice", label = ("Select FPC"), choices = 1:fpca.obj$npc, selected = 1)
 
   ## Tab 2: scree plot
 
@@ -85,6 +88,12 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
   score.call = tagList(  selectInput("PCX", label = ("Select X-axis FPC"), choices = 1:fpca.obj$npc, selected = 1),
     selectInput("PCY", label = ("Select Y-axis FPC"), choices = 1:fpca.obj$npc, selected = 2) )
 
+  ## add y-axis scale input if family is not gaussian
+  if (!(is.null(fpca.obj$family) || fpca.obj$family == "gaussian")) {
+    muPC.call[[2]] = selectInput("muPC_scale", label = ("Select Y-axis Scale"), choices = c("Natural", "Response"), selected = "Natural")
+    LinCom.call[[fpca.obj$npc + 1]] = selectInput("lincom_scale", label = ("Select Y-axis Scale"), choices = c("Natural", "Response"), selected = "Natural")
+  }
+
   #################################
   ## App
   #################################
@@ -116,12 +125,25 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
 
     server = function(input, output){
 
-      mu = as.data.frame(cbind(1:length(fpca.obj$mu), fpca.obj$mu))
-      efunctions = fpca.obj$efunctions; sqrt.evalues = diag(sqrt(fpca.obj$evalues))
+      ## define global objects
+      mu_df = as_refundObj(matrix(fpca.obj$mu, nrow = 1), index = fpca.obj$argvals)
+      efunctions = fpca.obj$efunctions
+      sqrt.evalues = diag(sqrt(fpca.obj$evalues))
       scaled_efunctions = efunctions %*% sqrt.evalues
 
-      plotDefaults = list(theme_bw(), xlab(xlab), ylab(ylab), ylim(c(range(Yhat_df$value)[1], range(Yhat_df$value)[2])),
-                          scale_x_continuous(breaks = seq(0, length(fpca.obj$mu) - 1, length = 6), labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1))))
+      ## prep objects for plotting on response scale; used in subject plot tabs
+      mu_df_inv_link = mu_df
+      mu_df_inv_link = mutate(mu_df_inv_link, value = inv_link(value))
+
+      Yhat_df_inv_link = Yhat_df
+      Yhat_df_inv_link = mutate(Yhat_df_inv_link, value = inv_link(value))
+
+      ## define plot defaults
+      plotDefaults = list(theme = theme_bw(),
+                          xlab = xlab(xlab),
+                          ylab = ylab(ylab),
+                          ylim = ylim(c(range(Yhat_df$value)[1], range(Yhat_df$value)[2])),
+                          x_scale = scale_x_continuous(breaks = seq(0, length(fpca.obj$mu) - 1, length = 6), labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1))))
 
       #################################
       ## Code for mu PC plot
@@ -131,9 +153,23 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
         PCchoice = as.numeric(input$PCchoice)
         scaled_efuncs = scaled_efunctions[,PCchoice]
 
-        p1 <- ggplot(mu, aes(x = V1, y = V2)) + geom_line(lwd = 1) + plotDefaults +
-          geom_point(data = as.data.frame(cbind(1:length(fpca.obj$mu), fpca.obj$mu + 2*scaled_efuncs)), color = "blue", size = 4, shape = '+') +
-          geom_point(data = as.data.frame(cbind(1:length(fpca.obj$mu), fpca.obj$mu - 2*scaled_efuncs)), color = "indianred", size = 4, shape = "-") +
+        df_plus = as_refundObj(matrix(fpca.obj$mu + 2 * scaled_efuncs, nrow = 1), index = fpca.obj$index)
+        df_plus$id = 2
+
+        df_minus = as_refundObj(matrix(fpca.obj$mu - 2 * scaled_efuncs, nrow = 1), index = fpca.obj$index)
+        df_minus$id = 3
+
+        plot_df = bind_rows(mu_df, df_plus, df_minus) %>%
+          mutate(id = as.character(id))
+
+        if (!(is.null(fpca.obj$family) || fpca.obj$family == "gaussian") && input[["muPC_scale"]] == "Response") {
+          plot_df = mutate(plot_df, value = inv_link(value))
+          plotDefaults[["ylim"]] = ylim(c(range(Y_df$value)[1], range(Y_df$value)[2]))
+        }
+
+        p1 <- ggplot(filter(plot_df, id == "1"), aes(x = index, y = value)) + geom_line(lwd = 1) + plotDefaults +
+          geom_point(data = filter(plot_df, id == "2"), color = "blue", size = 4, shape = '+') +
+          geom_point(data = filter(plot_df, id == "3"), color = "indianred", size = 4, shape = "-") +
           ggtitle(bquote(psi[.(input$PCchoice)]~(t) ~ "," ~.(100*round(fpca.obj$evalues[as.numeric(input$PCchoice)]/sum(fpca.obj$evalues),3)) ~ "% Variance"))
       })
 
@@ -158,11 +194,22 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
       plotInputLinCom <- reactive({
         PCweights = rep(NA, length(PCs))
         for (i in 1:length(PCs)) {PCweights[i] = input[[PCs[i]]]}
-        df = as.data.frame(cbind(1:length(fpca.obj$mu), as.matrix(fpca.obj$mu) + efunctions %*% sqrt.evalues %*% PCweights ))
+        df = as_refundObj(matrix(fpca.obj$mu, nrow = 1) + t(efunctions %*% sqrt.evalues %*% PCweights),
+                          index = fpca.obj$argvals)
+        df$id = 2
+        plot_df = bind_rows(mu_df, df) %>%
+          mutate(id = as.character(id))
 
-        p3 <- ggplot(mu, aes(x = V1, y = V2)) + geom_line(lwd = 0.75, aes(color = "mu")) + plotDefaults + theme(legend.key = element_blank()) +
-          geom_line(data = df, lwd = 1.5, aes(color = "subject")) + xlab(xlab) + ylab(ylab) + ggtitle(title) +
-          scale_color_manual("Line Legend", values = c(mu = "gray", subject = "cornflowerblue"), guide = FALSE)
+        if (!(is.null(fpca.obj$family) || fpca.obj$family == "gaussian") && input[["lincom_scale"]] == "Response") {
+          plot_df = mutate(plot_df, value = inv_link(value))
+          plotDefaults[["ylim"]] = ylim(c(range(Y_df$value)[1], range(Y_df$value)[2]))
+        }
+
+        p3 <- ggplot(plot_df, aes(x = index, y = value, color = id, lwd = id)) + geom_line() + plotDefaults +
+          theme(legend.key = element_blank()) + xlab(xlab) + ylab(ylab) + ggtitle(title) +
+          scale_color_manual("Line Legend", values = c("1" = "gray", "2" = "cornflowerblue"), guide = FALSE) +
+          scale_size_manual("Line Legend", values = c("1" = 0.75, "2" = 1.3), guide = FALSE)
+
       })
 
       callModule(tabPanelModule, "LinCom", plotObject = plotInputLinCom, plotName = "LinCom")
@@ -173,11 +220,13 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
 
       plotInputSubject <- reactive({
         subjectnum = input$subject
-        mu_df = as_refundObj(matrix(fpca.obj$mu, nrow = 1), index = fpca.obj$argvals)
 
-        p4 = ggplot(data = mu_df, aes(x = index, y = value)) + geom_line(lwd = 0.5, color = "gray") + plotDefaults +
-          geom_line(data = filter(Yhat_df, id == subjectnum), size = 1, color = "cornflowerblue") +
-          geom_point(data = filter(Y_df, id == subjectnum), color = "blue", alpha = 1/3)
+        p4 = ggplot(data = mu_df_inv_link, aes(x = index, y = value)) + geom_line(lwd = 0.5, color = "gray") +
+          geom_line(data = filter(Yhat_df_inv_link, id == subjectnum), size = 1, color = "cornflowerblue") +
+          geom_point(data = filter(Y_df, id == subjectnum), color = "blue", alpha = 1/3) +
+          theme_bw() + xlab(xlab) + ylab(ylab) + ylim(c(range(Y_df$value)[1], range(Y_df$value)[2])) +
+          scale_x_continuous(breaks = seq(0, length(fpca.obj$mu) - 1, length = 6), labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1)))
+
       })
 
       callModule(tabPanelModule, "subjects", plotObject = plotInputSubject, plotName = "subjects")
