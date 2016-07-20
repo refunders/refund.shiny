@@ -564,7 +564,7 @@ plot_shiny.lfpca <- function(obj, xlab = "", ylab="", title = "", ...){
         scree <- data.frame(k = rep(1:(result$mFPCA.npc+1), 2), 
                             lambda = c(result$mFPCA.scree.eval[1:(result$mFPCA.npc+1)], 
                                        result$mFPCA.pve[1:(result$mFPCA.npc+1)]),
-                            type = rep(c("Eigenvalue", "Percent Variance Explained"), each = (result$mFPCA.npc+1)))
+                            type = rep(c("Score Variance", "Percent Variance Explained"), each = (result$mFPCA.npc+1)))
         
         p <- ggplot(data=scree, aes(x=k, y=lambda))+geom_line(linetype=1, lwd=1.5, color="black")+
           geom_point(size = 4, color = "black")+ theme_bw() + xlab("Principal Component") + ylab("") +

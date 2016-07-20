@@ -53,7 +53,7 @@ plot_shiny.mfpca = function(obj, xlab = "", ylab="", title = "", ...) {
   scree <- lapply(names(npc), function(level) {
     data.frame(k = rep(1:npc[[level]], 2),
                lambda = c(mfpca.obj$evalues[[level]], cumsum(mfpca.obj$evalues[[level]])/ sum(mfpca.obj$evalues[[level]])),
-               type = rep(c("Eigenvalue", "Percent Variance Explained"), each = npc[[level]]))
+               type = rep(c("Score Variance", "Percent Variance Explained"), each = npc[[level]]))
   })
   names(scree) <- c("level1", "level2")
 

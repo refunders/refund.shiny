@@ -58,7 +58,7 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
   scree.help = "Scree plots; the left panel shows the plot of eigenvalues and the right panel shows the cumulative percent variance explained."
   scree = data.frame(k = rep(1:fpca.obj$npc, 2),
                       lambda = c(fpca.obj$evalues, cumsum(fpca.obj$evalues)/ sum(fpca.obj$evalues)),
-                      type = rep(c("Eigenvalue", "Percent Variance Explained"), each = fpca.obj$npc))
+                      type = rep(c("Score Variance", "Percent Variance Explained"), each = fpca.obj$npc))
 
   ## Tab 3: linear combination of PCs
   LinCom.help = "Plot shows the linear combination of mean and FPCs with the scores specified using the sliders below."
