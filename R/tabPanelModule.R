@@ -14,10 +14,11 @@
 #' @param title2 plot title for the (optional) second plot
 #' @param brushName character vector indicating the name of brush if you want brushing for the plot. For use in score scatterplots 
 #' for \code{plot_shiny.fpca()} and \code{plot_shiny.mfpca()}. 
+#' @param is.plotly Indicates if plots are plotly generated. Defaults to FALSE.
 #' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu}
 #'
 tabPanelModuleUI <- function(id, tabTitle, icon = NULL, calls = NULL, helperText = NULL, twoPlots = FALSE, calls2 = NULL, helperText2 = NULL,
-                             title2 = NULL, brushName = NULL){
+                             title2 = NULL, brushName = NULL, is.plotly = FALSE){
   ns <- NS(id)
   
   plot2.layout <- tagList(
@@ -29,15 +30,23 @@ tabPanelModuleUI <- function(id, tabTitle, icon = NULL, calls = NULL, helperText
     ),
     column(9,
            h4(title2), 
-           plotOutput(ns("plot2"))
+           ifelse(is.plotly, plotlyOutput(ns("plot2")), plotOutput(ns("plot2")))
     )
   )
 
+  if(is.plotly){
+    plotTag <- ifelse(is.null(brushName), 
+                      tagList(plotlyOutput(ns("plot") ) ),
+                      tagList(plotlyOutput(ns("plot"), brush = brushOpts(id = brushName, resetOnNew = TRUE))) 
+    )
+  }else{
+    plotTag <- ifelse(is.null(brushName), 
+                      tagList(plotOutput(ns("plot") ) ),
+                      tagList(plotOutput(ns("plot"), brush = brushOpts(id = brushName, resetOnNew = TRUE))) 
+    )
+  }
   
-  plotTag <- ifelse(is.null(brushName), 
-                    tagList(plotOutput(ns("plot") ) ),
-                    tagList(plotOutput(ns("plot"), brush = brushOpts(id = brushName, resetOnNew = TRUE))) 
-                    )
+  
   
   # set up the tab panel
   tabPanel(tabTitle, icon = icon,
@@ -76,18 +85,30 @@ tabPanelModuleUI <- function(id, tabTitle, icon = NULL, calls = NULL, helperText
 #' @param plotName Character string designating name of the plot for PDF output.
 #' @param plotObject2 Reactive plot object for the (optional) second plot.
 #' @param plotName2 Character string designating name of the (optional) second plot for the PDF output
+#' @param is.plotly Indicates if plots are plotly generated. Defaults to FALSE.
 #' 
 #' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu}
 #'
-tabPanelModule <- function(input,output, session, plotObject = NULL, plotName = NULL, plotObject2 = NULL, plotName2 = NULL){
-  
-  output$plot <- renderPlot(
-    print(plotObject())
-  )
-  
-  output$plot2 <- renderPlot(
-    print(plotObject2())
-  )
+tabPanelModule <- function(input,output, session, plotObject = NULL, plotName = NULL, plotObject2 = NULL, plotName2 = NULL,
+                           is.plotly = FALSE){
+  if(is.plotly){
+    output$plot <- renderPlotly(
+      print(plotObject())
+    )
+    
+    output$plot2 <- renderPlotly(
+      print(plotObject2())
+    )
+    
+  }else{
+    output$plot <- renderPlot(
+      print(plotObject())
+    )
+    
+    output$plot2 <- renderPlot(
+      print(plotObject2())
+    )
+  }
   
   #callModule(downloadModule, "download", plot = plotObject, title = plotName)
 }

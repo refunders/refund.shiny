@@ -116,7 +116,9 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
                     tabPanelModuleUI("subjects",tabTitle = "Subject Fits", icon = icon("user"), calls = subjects.call,
                                      helperText = subjects.help ),
                     tabPanelModuleUI("scoreplots",tabTitle = "Score Scatterplot", icon = icon("binoculars"), calls = score.call,
-                                     helperText = score.help1, twoPlots = TRUE, helperText2 = score.help2, brushName = "scorebrush")
+                                     helperText = score.help1, twoPlots = TRUE, helperText2 = score.help2, is.plotly = TRUE)
+                                     #brushName = "scorebrush",
+                                     
                     ),
 
     #################################
@@ -246,28 +248,42 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
 
       ## Tab 5 Plot
       stuff <- reactive({
-        df <- ggplot(scoredata, aes_string(x = PCX(), y = PCY())) + geom_point(color = "blue", alpha = 1/5, size = 3) +
+        gg1 <- ggplot(scoredata, aes_string(x = PCX(), y = PCY())) + geom_point(color = "blue", alpha = 1/5, size = 3, aes(text = id)) +
           xlab(paste("Scores for FPC", input$PCX)) + ylab(paste("Scores for FPC", input$PCY)) + theme_bw()
+        
+        ggplotly(gg1) %>% layout(dragmode = "select")
       })
 
       ### second score plot
-      baseplot = ggplot(Yhat_df, aes(x = index, y = value, group = id)) + geom_line(alpha = 1/5, color = "black") + plotDefaults
+      baseplot = ggplot(Yhat_df, aes(x = index, y = value, group = id)) + geom_line(alpha = 1/5, color = "black", aes(text = id)) +
+        plotDefaults
 
+      
       stuff2 <- reactive({
 
-        brush <- input$ScorePlot_brush
-        if (!is.null(brush)) {
-          points = brushedPoints(scoredata, input$ScorePlot_brush, xvar = PCX(), yvar = PCY())
-          brushed_subjs = points$id
-        } else {
-          brushed_subjs = NULL
+        brush <- event_data("plotly_selected", source = "subset")
+        
+        if(is.null(brush)){
+          
+        }else{
+          brushed_subj = subset()
         }
+        
+        #if (!is.null(brush)) {
+          #points = brushedPoints(scoredata, brush, xvar = PCX(), yvar = PCY())
+        #  brushed_subjs = brush$key
+        #} else {
+        #  brushed_subjs = NULL
+        #}
 
-        baseplot + geom_line(data = filter(Yhat_df, id %in% brushed_subjs), color = "cornflowerblue")
+        baseplot.gg = baseplot #+ geom_line(data = filter(Yhat_df, id %in% brushed_subjs), color = "cornflowerblue")
+        ggplotly(baseplot.gg)
 
+   
       })
 
-      callModule(tabPanelModule, "scoreplots", plotObject = stuff, plotName = "scoreplots", plotObject2 = stuff2)
+      #callModule(tabPanelModule, "scoreplots", plotObject = stuff, plotName = "scoreplots", plotObject2 = stuff2)
+      callModule(tabPanelModule, "scoreplots", plotObject = stuff, plotName = "scoreplots", plotObject2 = stuff2, is.plotly = TRUE)
 
     } ## end server
   )
