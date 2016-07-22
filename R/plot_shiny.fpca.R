@@ -141,11 +141,17 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
       Yhat_df_inv_link = mutate(Yhat_df_inv_link, value = inv_link(value))
 
       ## define plot defaults
+      ## set y axes to be max(2 SDs from mu of PC1, fitted values)
+      max.y = max(fpca.obj$mu + 2 * abs(scaled_efunctions[, 1])) 
+      min.y = min(fpca.obj$mu - 2 * abs(scaled_efunctions[, 1])) 
+            
       plotDefaults = list(theme = theme_bw(),
+                          title = theme(plot.title = element_text(size=22)),
                           xlab = xlab(xlab),
                           ylab = ylab(ylab),
-                          ylim = ylim(c(range(Yhat_df$value)[1], range(Yhat_df$value)[2])),
-                          x_scale = scale_x_continuous(breaks = seq(0, length(fpca.obj$mu) - 1, length = 6), labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1))))
+                          ylim = ylim(c(min(min.y, range(Yhat_df$value)[1]), max(max.y,range(Yhat_df$value)[2]))),
+                          x_scale = scale_x_continuous(breaks = seq(0, length(fpca.obj$mu) - 1, length = 6), 
+                                                       labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1))))
 
       #################################
       ## Code for mu PC plot
