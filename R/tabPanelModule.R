@@ -100,6 +100,7 @@ tabPanelModule <- function(input,output, session, plotObject = NULL, plotName = 
       print(plotObject2())
     )
     
+    
   }else{
     output$plot <- renderPlot(
       print(plotObject())

@@ -251,7 +251,7 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
         gg1 <- ggplot(scoredata, aes_string(x = PCX(), y = PCY())) + geom_point(color = "blue", alpha = 1/5, size = 3, aes(text = id)) +
           xlab(paste("Scores for FPC", input$PCX)) + ylab(paste("Scores for FPC", input$PCY)) + theme_bw()
         
-        ggplotly(gg1) %>% layout(dragmode = "select")
+        ggplotly(gg1, source = "scoreplot") %>% layout(dragmode = "select")
       })
 
       ### second score plot
@@ -261,12 +261,15 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
       
       stuff2 <- reactive({
 
-        brush <- event_data("plotly_selected", source = "subset")
+        brush <- event_data("plotly_selected", source = "scoreplot")
         
         if(is.null(brush)){
-          
+          brushed_subjs = NULL
+          baseplot.gg = baseplot
         }else{
-          brushed_subj = subset()
+          indices = as.numeric(brush$pointNumber)
+          brushed_subjs = scoredata$id[indices]
+          baseplot.gg = baseplot + geom_line(data = filter(Yhat_df, id %in% brushed_subjs), color = "cornflowerblue")
         }
         
         #if (!is.null(brush)) {
@@ -276,7 +279,7 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
         #  brushed_subjs = NULL
         #}
 
-        baseplot.gg = baseplot #+ geom_line(data = filter(Yhat_df, id %in% brushed_subjs), color = "cornflowerblue")
+       
         ggplotly(baseplot.gg)
 
    
