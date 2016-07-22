@@ -146,7 +146,7 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
       min.y = min(fpca.obj$mu - 2 * abs(scaled_efunctions[, 1])) 
             
       plotDefaults = list(theme = theme_bw(),
-                          title = theme(plot.title = element_text(size=22)),
+                          title = theme(plot.title = element_text(size=20)),
                           xlab = xlab(xlab),
                           ylab = ylab(ylab),
                           ylim = ylim(c(min(min.y, range(Yhat_df$value)[1]), max(max.y,range(Yhat_df$value)[2]))),
