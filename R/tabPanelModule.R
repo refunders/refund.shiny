@@ -15,6 +15,9 @@
 #' @param brushName character vector indicating the name of brush if you want brushing for the plot. For use in score scatterplots 
 #' for \code{plot_shiny.fpca()} and \code{plot_shiny.mfpca()}. 
 #' @param is.plotly Indicates if plots are plotly generated. Defaults to FALSE.
+#' 
+#' @importFrom plotly plotlyOutput renderPlotly
+#' 
 #' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu}
 #'
 tabPanelModuleUI <- function(id, tabTitle, icon = NULL, calls = NULL, helperText = NULL, twoPlots = FALSE, calls2 = NULL, helperText2 = NULL,
@@ -35,10 +38,7 @@ tabPanelModuleUI <- function(id, tabTitle, icon = NULL, calls = NULL, helperText
   )
 
   if(is.plotly){
-    plotTag <- ifelse(is.null(brushName), 
-                      tagList(plotlyOutput(ns("plot") ) ),
-                      tagList(plotlyOutput(ns("plot"), brush = brushOpts(id = brushName, resetOnNew = TRUE))) 
-    )
+    plotTag <- tagList(plotlyOutput(ns("plot") ) )
   }else{
     plotTag <- ifelse(is.null(brushName), 
                       tagList(plotOutput(ns("plot") ) ),
@@ -86,6 +86,8 @@ tabPanelModuleUI <- function(id, tabTitle, icon = NULL, calls = NULL, helperText
 #' @param plotObject2 Reactive plot object for the (optional) second plot.
 #' @param plotName2 Character string designating name of the (optional) second plot for the PDF output
 #' @param is.plotly Indicates if plots are plotly generated. Defaults to FALSE.
+#' 
+#' @importFrom plotly plotlyOutput renderPlotly
 #' 
 #' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu}
 #'
