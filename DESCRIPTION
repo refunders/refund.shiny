@@ -15,6 +15,7 @@ Imports:
     dplyr,
     gridExtra,
     lme4,
+    plotly,
     refund
 License: GPL (>= 2)
 LazyData: true
