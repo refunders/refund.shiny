@@ -16,7 +16,7 @@
 #' for \code{plot_shiny.fpca()} and \code{plot_shiny.mfpca()}. 
 #' @param is.plotly Indicates if plots are plotly generated. Defaults to FALSE.
 #' 
-#' @importFrom plotly plotlyOutput renderPlotly
+#' @importFrom plotly plotlyOutput renderPlotly as.widget
 #' 
 #' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu}
 #'
@@ -87,7 +87,7 @@ tabPanelModuleUI <- function(id, tabTitle, icon = NULL, calls = NULL, helperText
 #' @param plotName2 Character string designating name of the (optional) second plot for the PDF output
 #' @param is.plotly Indicates if plots are plotly generated. Defaults to FALSE.
 #' 
-#' @importFrom plotly plotlyOutput renderPlotly
+#' @importFrom plotly plotlyOutput renderPlotly as.widget
 #' 
 #' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu}
 #'

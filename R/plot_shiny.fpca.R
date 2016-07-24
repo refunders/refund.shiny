@@ -14,7 +14,7 @@
 #'
 #' @seealso \code{\link{plot_shiny}}
 #' @importFrom reshape2 melt
-#' @importFrom plotly ggplotly event_data layout
+#' @importFrom plotly ggplotly event_data layout as.widget
 #'
 #' @export
 #'
