@@ -14,5 +14,5 @@ This [paper](http://arxiv.org/abs/1602.04091) describes the functionality in the
 
 To install the latest version directly from Github, please use:
 <pre><code>install.packages("devtools")
-devtools::install_github("refunders/refund.shiny", ref = "jw-devel")
+devtools::install_github("refunders/refund.shiny")
 </code></pre>
