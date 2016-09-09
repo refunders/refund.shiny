@@ -29,7 +29,7 @@ plot_shiny.flcm = function(obj, xlab = "", ylab="", title = "", ...) {
   flcm.obj <- obj
 
   ### NULLify global values called in ggplot
-  value = subj = covariate = UB = LB = residual = depth.rank = coef = grid = x = y = NULL
+  value = subj = covariate = UB = LB = residual = depth.rank = coef = index = x = y = NULL
 
   ################################
   ## code for processing tabs
