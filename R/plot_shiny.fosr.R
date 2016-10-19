@@ -126,12 +126,16 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
       
       plotInputLasagna <- reactive({
         ## this is where we will add code for lasagna plot
-        df = data.frame(x = 1:100, y = 1:100)
-        p <- ggplot(df, aes(x=x, y=y)) + geom_point(color = rainbow(100)) + theme_bw()
+        y.obs = fosr.obj$data[,names(attributes(terms(fosr.obj$terms))$dataClasses)[1]]
+        df = makeLasagna(data = fosr.obj$data, outcome = y.obs, covariate = NULL)
+        plots = bakeLasagna(data = fosr.obj$data, data.long = df$data.long, covariate = NULL)[[1]]
+        plots$lasagnaPlot
       })
       
       callModule(tabPanelModule, "observed", plotObject = plotInputObsData, plotName = "observed", plotObject2 = plotInputLasagna)
 
+      
+      #callModule(tabPanelModule, "scoreplots", plotObject = stuff, plotName = "scoreplots", plotObject2 = stuff2, is.plotly = TRUE)
       #################################
       ## Code for FittedValues Tab
       #################################
