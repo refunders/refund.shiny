@@ -9,10 +9,13 @@
 #' Defaults to NULL, in which case data is sorted by row number.
 #' 
 #' @author Julia Wrobel \email{ajg2202@@cumc.columbia.edu}
-#' @author Nicole Marie Lapointe Jameson \email{nml2145@columbia.edu}
+#' @author Nicole Marie Lapointe Jameson 
 #' 
 
 bakeLasagna <- function(data, data.long, covariate = NULL){
+  
+  ## NULLify global variables 
+  grid = plot.y = value = h = NULL
   
   if(length(covariate) == 0) { 
     covariate = "indexList"

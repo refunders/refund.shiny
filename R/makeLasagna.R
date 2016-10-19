@@ -10,9 +10,12 @@
 #' Defaults to NULL, in which case data is sorted by row number.
 #' 
 #' @author Julia Wrobel \email{ajg2202@@cumc.columbia.edu}
-#' @author Nicole Marie Lapointe Jameson \email{nml2145@columbia.edu}
+#' @author Nicole Marie Lapointe Jameson 
 #' 
-makeLasagna <- function(data = DTI, outcome, covariate = NULL){
+makeLasagna <- function(data, outcome, covariate = NULL){
+  
+  ## NULLify global variables 
+  hist = subj = NULL
   
   if(length(covariate) == 0) { 
     covariate = "indexList"

@@ -21,6 +21,6 @@ The distribution plot gives distribution of sorting covariate.
 \author{
 Julia Wrobel \email{ajg2202@cumc.columbia.edu}
 
-Nicole Marie Lapointe Jameson \email{nml2145@columbia.edu}
+Nicole Marie Lapointe Jameson
 }
 

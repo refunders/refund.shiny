@@ -4,7 +4,7 @@
 \alias{makeLasagna}
 \title{Pre-process data for lasagna plot}
 \usage{
-makeLasagna(data = DTI, outcome, covariate = NULL)
+makeLasagna(data, outcome, covariate = NULL)
 }
 \arguments{
 \item{data}{Dataset for lasagna plot.}
@@ -22,6 +22,6 @@ The resulting dataframe is used with \code{bakeLasagna()} to create lasagna plot
 \author{
 Julia Wrobel \email{ajg2202@cumc.columbia.edu}
 
-Nicole Marie Lapointe Jameson \email{nml2145@columbia.edu}
+Nicole Marie Lapointe Jameson
 }
 
