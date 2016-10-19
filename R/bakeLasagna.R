@@ -26,7 +26,8 @@ bakeLasagna <- function(data, data.long, covariate = NULL){
   l <- ggplot(data.long, aes(x= grid, y = plot.y, fill = value)) + 
     geom_tile(aes(height = h)) +  
     scale_fill_continuous(low = "#104E8B", high = "#BFEFFF", guide= "colourbar") +
-    ggtitle("Lasagna Plot")+ xlab("") + ylab("")+
+    #ggtitle("Lasagna Plot")+
+    xlab("") + ylab("")+
     
     theme(axis.text=element_text(size=12),
           axis.title=element_text(size=14),
@@ -46,7 +47,7 @@ bakeLasagna <- function(data, data.long, covariate = NULL){
   d <-ggplot(data, aes(x = data[[covariate]])) + {
     if(class(data[[covariate]]) == "factor") geom_bar(colour="#FF9912", fill="#FFE4B5", width = 1) 
     else geom_density(colour="#FF9912", fill="#FFE4B5", alpha=.3) } +
-    ggtitle("Covariate") +
+    #ggtitle("Covariate") +
     coord_flip() + 
     theme(
       axis.text=element_text(size=12),
