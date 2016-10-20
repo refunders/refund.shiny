@@ -18,7 +18,11 @@ createInvLink = function(family = NULL){
   } else if (family == "binomial") {
     f = function(x){
       exp(x) / (1 + exp(x))
-    }
+    } 
+  } else if (family == "poisson") {
+  	f = function(x){
+  		exp(x)
+  	} 
   }
   
 }

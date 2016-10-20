@@ -119,7 +119,7 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
                     tabPanelModuleUI("scoreplots",tabTitle = "Score Scatterplot", icon = icon("binoculars"), calls = score.call,
                                      helperText = score.help1, twoPlots = TRUE, helperText2 = score.help2, is.plotly = TRUE)
                                      #brushName = "scorebrush",
-                                     
+
                     ),
 
     #################################
@@ -130,8 +130,8 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
 
       ## define global objects
       mu_df = as_refundObj(matrix(fpca.obj$mu, nrow = 1), index = fpca.obj$argvals)
-      efunctions = fpca.obj$efunctions
-      sqrt.evalues = diag(sqrt(fpca.obj$evalues))
+      efunctions = matrix(fpca.obj$efunctions, ncol = fpca.obj$npc)
+      sqrt.evalues = diag(sqrt(fpca.obj$evalues), fpca.obj$npc, fpca.obj$npc)
       scaled_efunctions = efunctions %*% sqrt.evalues
 
       ## prep objects for plotting on response scale; used in subject plot tabs
@@ -143,15 +143,15 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
 
       ## define plot defaults
       ## set y axes to be max(2 SDs from mu of PC1, fitted values)
-      max.y = max(fpca.obj$mu + 2 * abs(scaled_efunctions[, 1])) 
-      min.y = min(fpca.obj$mu - 2 * abs(scaled_efunctions[, 1])) 
-            
+      max.y = max(fpca.obj$mu + 2 * abs(scaled_efunctions[, 1]))
+      min.y = min(fpca.obj$mu - 2 * abs(scaled_efunctions[, 1]))
+
       plotDefaults = list(theme = theme_bw(),
-                          title = theme(plot.title = element_text(size=20)),
+                          title = theme(plot.title = element_text(size = 20)),
                           xlab = xlab(xlab),
                           ylab = ylab(ylab),
                           ylim = ylim(c(min(min.y, range(Yhat_df$value)[1]), max(max.y,range(Yhat_df$value)[2]))),
-                          x_scale = scale_x_continuous(breaks = seq(0, length(fpca.obj$mu) - 1, length = 6), 
+                          x_scale = scale_x_continuous(breaks = seq(0, length(fpca.obj$mu) - 1, length = 6),
                                                        labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1))))
 
       #################################
@@ -162,10 +162,10 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
         PCchoice = as.numeric(input$PCchoice)
         scaled_efuncs = scaled_efunctions[,PCchoice]
 
-        df_plus = as_refundObj(matrix(fpca.obj$mu + 2 * scaled_efuncs, nrow = 1), index = fpca.obj$index)
+        df_plus = as_refundObj(matrix(fpca.obj$mu + 2 * scaled_efuncs, nrow = 1), index = fpca.obj$argvals)
         df_plus$id = 2
 
-        df_minus = as_refundObj(matrix(fpca.obj$mu - 2 * scaled_efuncs, nrow = 1), index = fpca.obj$index)
+        df_minus = as_refundObj(matrix(fpca.obj$mu - 2 * scaled_efuncs, nrow = 1), index = fpca.obj$argvals)
         df_minus$id = 3
 
         plot_df = bind_rows(mu_df, df_plus, df_minus) %>%
@@ -257,7 +257,7 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
       stuff <- reactive({
         gg1 <- ggplot(scoredata, aes_string(x = PCX(), y = PCY())) + geom_point(color = "blue", alpha = 1/5, size = 3, aes(text = id)) +
           xlab(paste("Scores for FPC", input$PCX)) + ylab(paste("Scores for FPC", input$PCY)) + theme_bw()
-        
+
         ggplotly(gg1, source = "scoreplot") %>% layout(dragmode = "select")
       })
 
@@ -265,20 +265,20 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
       baseplot = ggplot(Yhat_df, aes(x = index, y = value, group = id)) + geom_line(alpha = 1/5, color = "black", aes(text = id)) +
         plotDefaults
 
-      
+
       stuff2 <- reactive({
 
         brush <- event_data("plotly_selected", source = "scoreplot")
-        
-        if(is.null(brush)){
+
+        if (is.null(brush)) {
           brushed_subjs = NULL
           baseplot.gg = baseplot
-        }else{
+        } else {
           indices = as.numeric(brush$pointNumber)
           brushed_subjs = scoredata$id[indices]
           baseplot.gg = baseplot + geom_line(data = filter(Yhat_df, id %in% brushed_subjs), color = "cornflowerblue")
         }
-        
+
         #if (!is.null(brush)) {
           #points = brushedPoints(scoredata, brush, xvar = PCX(), yvar = PCY())
         #  brushed_subjs = brush$key
@@ -286,10 +286,10 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
         #  brushed_subjs = NULL
         #}
 
-       
+
         ggplotly(baseplot.gg)
 
-   
+
       })
 
       #callModule(tabPanelModule, "scoreplots", plotObject = stuff, plotName = "scoreplots", plotObject2 = stuff2)
