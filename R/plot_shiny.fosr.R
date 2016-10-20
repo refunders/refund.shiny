@@ -100,7 +100,7 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
       ## Code for observed data tab
       #################################
 
-      plotInputObsData <- reactive({
+      plotInputSpagheti <- reactive({
         y.obs = fosr.obj$data[,names(attributes(terms(fosr.obj$terms))$dataClasses)[1]]
         colnames(y.obs) = grid
         y.obs.m = melt(y.obs)
@@ -123,15 +123,31 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
             theme_bw() + xlab("") + ylab("") + theme(legend.position="bottom", legend.title=element_blank())
         }
       })
+
       
-      plotInputLasagna <- reactive({
-        ## this is where we will add code for lasagna plot
-        df = data.frame(x = 1:100, y = 1:100)
-        p <- ggplot(df, aes(x=x, y=y)) + geom_point(color = rainbow(100)) + theme_bw()
+      plotInputLasagna = reactive({
+        y.obs.char = as.character(fit.fosr$terms[[2]]) ## gets character string which is name of outcome variable
+        
+        CovarChoice = as.numeric(input$CovarChoice)
+        selected = covar.list[CovarChoice]
+        if(selected == "None") {
+         covariate = NULL
+        } else {
+         covariate = selected
+        }
+        
+        df = makeLasagna(data = fosr.obj$data, outcome = y.obs.char, covariate = covariate)
+        plots = bakeLasagna(data = fosr.obj$data, data.long = df$data.long, covariate = covariate)
+        
+        p = grid.arrange(plots$lasagnaPlot, plots$densityPlot, ncol=2, nrow=1, widths=c(4, 1))
+        #p = plots$lasagnaPlot
       })
       
-      callModule(tabPanelModule, "observed", plotObject = plotInputObsData, plotName = "observed", plotObject2 = plotInputLasagna)
+      
+      callModule(tabPanelModule, "observed", plotObject = plotInputSpagheti, plotName = "observed", plotObject2 = plotInputLasagna)
 
+      
+      #callModule(tabPanelModule, "scoreplots", plotObject = stuff, plotName = "scoreplots", plotObject2 = stuff2, is.plotly = TRUE)
       #################################
       ## Code for FittedValues Tab
       #################################

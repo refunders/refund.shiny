@@ -33,7 +33,11 @@ tabPanelModuleUI <- function(id, tabTitle, icon = NULL, calls = NULL, helperText
     ),
     column(9,
            h4(title2), 
-           ifelse(is.plotly, plotlyOutput(ns("plot2")), plotOutput(ns("plot2")))
+           if(is.plotly){
+             plotlyOutput(ns("plot2"))
+           }else{
+             plotOutput(ns("plot2"))
+           }
     )
   )
 
