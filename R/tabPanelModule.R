@@ -113,7 +113,7 @@ tabPanelModule <- function(input,output, session, plotObject = NULL, plotName = 
     )
     
     output$plot2 <- renderPlot(
-      print(plotObject2())
+      plotObject2()
     )
   }
   

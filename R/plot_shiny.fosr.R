@@ -139,8 +139,7 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
         df = makeLasagna(data = fosr.obj$data, outcome = y.obs.char, covariate = covariate)
         plots = bakeLasagna(data = fosr.obj$data, data.long = df$data.long, covariate = covariate)
         
-        p = grid.arrange(plots$lasagnaPlot, plots$densityPlot, ncol=2, nrow=1, widths=c(4, 1))
-        #p = plots$lasagnaPlot
+        grid.arrange(plots$lasagnaPlot, plots$densityPlot, ncol=2, nrow=1, widths=c(4, 1))
       })
       
       

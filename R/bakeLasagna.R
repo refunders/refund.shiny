@@ -43,7 +43,7 @@ bakeLasagna <- function(data, data.long, covariate = NULL){
           axis.text.y=element_blank(),
           panel.background=element_blank(),
           panel.grid.minor=element_blank(),
-          legend.position="none") + 
+          legend.position="left") + 
     scale_x_discrete(breaks=1:nrow(data.long))
   
   ## histogram
