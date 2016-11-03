@@ -90,13 +90,15 @@ tabPanelModuleUI <- function(id, tabTitle, icon = NULL, calls = NULL, helperText
 #' @param plotObject2 Reactive plot object for the (optional) second plot.
 #' @param plotName2 Character string designating name of the (optional) second plot for the PDF output
 #' @param is.plotly Indicates if plots are plotly generated. Defaults to FALSE.
+#' @param is.grid Indicates if plot is generated using grid.arrange() to arrange ggplot objects. 
+#'  If TRUE, prints plot object implicitly rather than explicitly. 
 #' 
 #' @importFrom plotly plotlyOutput renderPlotly as.widget
 #' 
 #' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu}
 #'
 tabPanelModule <- function(input,output, session, plotObject = NULL, plotName = NULL, plotObject2 = NULL, plotName2 = NULL,
-                           is.plotly = FALSE){
+                           is.plotly = FALSE, is.grid = FALSE){
   if(is.plotly){
     output$plot <- renderPlotly(
       print(plotObject())
@@ -107,6 +109,14 @@ tabPanelModule <- function(input,output, session, plotObject = NULL, plotName = 
     )
     
     
+  }else if(is.grid){
+    output$plot <- renderPlot(
+      plotObject()
+    )
+    
+    output$plot2 <- renderPlot(
+      plotObject2()
+    )
   }else{
     output$plot <- renderPlot(
       print(plotObject())

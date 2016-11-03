@@ -43,8 +43,12 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
   covar.list[1] = "None"
   covarInputValues = 1:length(covar.list)
   names(covarInputValues) = covar.list
-  observed.help = "Observed response data, colored according to the covariate selected below."
-  observed.call = eval(call("selectInput", inputId = "CovarChoice", label = ("Select Covariate"), choices = covarInputValues, selected = 1))
+  spaghetti.help = "Observed response data, colored according to the covariate selected below."
+  spaghetti.call = eval(call("selectInput", inputId = "CovarChoice", label = ("Select Covariate"), choices = covarInputValues, selected = 1))
+  lasagna.help = "Observed response data, each row is a subject. When a covariate is selected, the rows are ordered and widths 
+                are assigned by value of that covariate. Right plot displays distribution of covariate selected in 
+                correspondence with ordering of the rows at right."
+  lasagna.call = eval(call("selectInput", inputId = "CovarChoice2", label = ("Select Covariate"), choices = covarInputValues, selected = 1))
   
   
   ## Tab 2: fitted values
@@ -81,9 +85,15 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
 
     ui = navbarPage(title = strong(style = "color: #ACD6FF; padding: 0px 0px 10px 10px; opacity: 0.95; ", "FoSR Plot"), 
                     windowTitle = "refund.shiny", collapsible = FALSE, id = "nav", inverse = TRUE, header = NULL,
+                    tabPanel("Observed Data", icon = icon("stats", lib = "glyphicon"),
+                             tabsetPanel(
+                               tabPanelModuleUI("spaghetti", tabTitle = "Spaghetti Plot", calls = spaghetti.call,
+                                                helperText = spaghetti.help),
+                               tabPanelModuleUI("lasagna", tabTitle = "Lasagna Plot", calls = lasagna.call,
+                                                helperText = lasagna.help)
+                             )
+                             ),
                     ##### start tabs
-                    tabPanelModuleUI("observed", tabTitle = "Observed Data", icon("stats", lib = "glyphicon"), calls = observed.call,
-                                     helperText = observed.help, twoPlots = TRUE, title2 = "Lasagna Plot"),
                     tabPanelModuleUI("fitted", tabTitle = "Fitted Values", icon("line-chart"), calls = fitted.call,helperText = fitted.help ),
                     tabPanelModuleUI("coef", tabTitle = "Coefficient Functions", icon("area-chart"), calls = coef.call, helperText = coef.help),
                     tabPanelModuleUI("residuals", tabTitle = "Residuals", icon("medkit"), calls = residuals.call,helperText = residuals.help )
@@ -128,8 +138,8 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
       plotInputLasagna = reactive({
         y.obs.char = as.character(fit.fosr$terms[[2]]) ## gets character string which is name of outcome variable
         
-        CovarChoice = as.numeric(input$CovarChoice)
-        selected = covar.list[CovarChoice]
+        CovarChoice2 = as.numeric(input$CovarChoice2)
+        selected = covar.list[CovarChoice2]
         if(selected == "None") {
          covariate = NULL
         } else {
@@ -142,11 +152,9 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
         grid.arrange(plots$lasagnaPlot, plots$densityPlot, ncol=2, nrow=1, widths=c(4, 1))
       })
       
+      callModule(tabPanelModule, "spaghetti", plotObject = plotInputSpagheti, plotName = "spaghetti")
+      callModule(tabPanelModule, "lasagna", plotObject = plotInputLasagna, plotName = "lasagna", is.grid = TRUE)
       
-      callModule(tabPanelModule, "observed", plotObject = plotInputSpagheti, plotName = "observed", plotObject2 = plotInputLasagna)
-
-      
-      #callModule(tabPanelModule, "scoreplots", plotObject = stuff, plotName = "scoreplots", plotObject2 = stuff2, is.plotly = TRUE)
       #################################
       ## Code for FittedValues Tab
       #################################
