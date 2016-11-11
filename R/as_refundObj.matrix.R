@@ -13,7 +13,7 @@
 #' from entries in \code{obj}).
 #'
 #' @export
-#'
+#' @importFrom stats complete.cases setNames
 #' @examples
 #'
 #' \dontrun{

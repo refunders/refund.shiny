@@ -23,7 +23,7 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
   fpca.obj <- obj
 
   ## NULLify global values called in ggplot
-  V1 = V2 = k = lambda = value = subj = index = NULL
+  PCX = PCY = V1 = V2 = k = lambda = value = subj = index = NULL
 
   ## establish inverse link function for plotting
   inv_link = createInvLink(family = fpca.obj$family)

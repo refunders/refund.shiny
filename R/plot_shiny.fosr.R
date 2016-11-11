@@ -85,15 +85,14 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
 
     ui = navbarPage(title = strong(style = "color: #ACD6FF; padding: 0px 0px 10px 10px; opacity: 0.95; ", "FoSR Plot"), 
                     windowTitle = "refund.shiny", collapsible = FALSE, id = "nav", inverse = TRUE, header = NULL,
+                    ##### start tabs
                     tabPanel("Observed Data", icon = icon("stats", lib = "glyphicon"),
                              tabsetPanel(
                                tabPanelModuleUI("spaghetti", tabTitle = "Spaghetti Plot", calls = spaghetti.call,
                                                 helperText = spaghetti.help),
                                tabPanelModuleUI("lasagna", tabTitle = "Lasagna Plot", calls = lasagna.call,
                                                 helperText = lasagna.help)
-                             )
-                             ),
-                    ##### start tabs
+                             ) ),
                     tabPanelModuleUI("fitted", tabTitle = "Fitted Values", icon("line-chart"), calls = fitted.call,helperText = fitted.help ),
                     tabPanelModuleUI("coef", tabTitle = "Coefficient Functions", icon("area-chart"), calls = coef.call, helperText = coef.help),
                     tabPanelModuleUI("residuals", tabTitle = "Residuals", icon("medkit"), calls = residuals.call,helperText = residuals.help )
@@ -136,7 +135,7 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
 
       
       plotInputLasagna = reactive({
-        y.obs.char = as.character(fit.fosr$terms[[2]]) ## gets character string which is name of outcome variable
+        y.obs.char = as.character(fosr.obj$terms[[2]]) ## gets character string which is name of outcome variable
         
         CovarChoice2 = as.numeric(input$CovarChoice2)
         selected = covar.list[CovarChoice2]
