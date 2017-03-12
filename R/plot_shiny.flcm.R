@@ -48,7 +48,7 @@ plot_shiny.flcm = function(obj, xlab = "", ylab="", title = "", ...) {
   coef.list = colnames(model.matrix(flcm.obj$terms, flcm.obj$data.model[1,]))
   coefInputValues = 1:(p + 1)
   names(coefInputValues) = c("Show all", coef.list)
-  coef.help = "Coefficient function and confidence bounds for the predictor selected below."
+  coef.help = "Coefficient function for the predictor selected below."
   coef.call = eval(call("selectInput", inputId = "CoefChoice", label = ("Select Predictor"), choices = coefInputValues, selected = 1))
 
   ## Tab 4: plot of residual curves
