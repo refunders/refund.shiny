@@ -120,6 +120,9 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
         if(selected == "None") {
           y.obs.m$covariate = NULL
         } else {
+          if(length(table(y.obs.m$covariate)) < 3) {
+            y.obs.m$covariate = factor(y.obs.m$covariate)
+          }
           y.obs.m$covariate = rep(fosr.obj$data[,selected], length(grid))
         }
         #y.obs.m
