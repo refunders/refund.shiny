@@ -17,4 +17,3 @@ function used in method for fast modified band depth (MBD) calculation
 \author{
 Ying Sun and Marc G.Genton
 }
-

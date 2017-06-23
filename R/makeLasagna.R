@@ -9,7 +9,7 @@
 #' @param covariate User-selected covariate for sorting the rows in the lasagna plot. 
 #' Defaults to NULL, in which case data is sorted by row number.
 #' 
-#' @author Julia Wrobel \email{ajg2202@@cumc.columbia.edu}
+#' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu}
 #' @author Nicole Marie Lapointe Jameson 
 #' 
 makeLasagna <- function(data, outcome, covariate = NULL){

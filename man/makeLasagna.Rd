@@ -20,8 +20,7 @@ sorts outcome by the selected covariate, and assigns heights to each row based o
 The resulting dataframe is used with \code{bakeLasagna()} to create lasagna plot.
 }
 \author{
-Julia Wrobel \email{ajg2202@cumc.columbia.edu}
+Julia Wrobel \email{jw3134@cumc.columbia.edu}
 
 Nicole Marie Lapointe Jameson
 }
-

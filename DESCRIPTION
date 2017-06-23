@@ -21,4 +21,4 @@ Imports:
 License: GPL (>= 2)
 LazyData: true
 Repository: CRAN
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1

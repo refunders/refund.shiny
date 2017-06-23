@@ -40,4 +40,3 @@ argument 'twoPlots' is set to TRUE, then the layout allows for two plots, where 
 \author{
 Julia Wrobel \email{jw3134@cumc.columbia.edu}
 }
-

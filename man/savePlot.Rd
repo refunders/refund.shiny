@@ -18,4 +18,3 @@ name of the plot object and it's name to be saved under are passed in and the pl
 \author{
 Julia Wrobel \email{jw3134@cumc.columbia.edu}
 }
-

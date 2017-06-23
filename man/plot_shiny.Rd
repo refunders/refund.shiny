@@ -134,11 +134,10 @@ plot_shiny(lfpca.dti2)
 }
 
 }
+\seealso{
+\code{\link{plot_shiny.fpca}}, \code{\link{plot_shiny.mfpca}},  \code{\link{plot_shiny.fosr}}
+}
 \author{
 Jeff Goldsmith \email{jeff.goldsmith@columbia.edu}, 
 Julia Wrobel \email{jw3134@cumc.columbia.edu}
 }
-\seealso{
-\code{\link{plot_shiny.fpca}}, \code{\link{plot_shiny.mfpca}},  \code{\link{plot_shiny.fosr}}
-}
-

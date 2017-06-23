@@ -19,4 +19,3 @@ Method for fast modified band depth (fMBD) calculation
 \author{
 Ying Sun and Marc G.Genton
 }
-

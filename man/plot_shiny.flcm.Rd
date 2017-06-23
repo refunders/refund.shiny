@@ -21,11 +21,10 @@
 Produces an interactive plot illustrating a functional linear concurrent
 regression analysis.
 }
+\seealso{
+\code{\link{plot_shiny}}
+}
 \author{
 Jeff Goldsmith \email{jeff.goldsmith@columbia.edu},
 Julia Wrobel \email{jw3134@cumc.columbia.edu}
 }
-\seealso{
-\code{\link{plot_shiny}}
-}
-

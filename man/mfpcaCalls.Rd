@@ -24,4 +24,3 @@ corresponding sliders for each FPC are constructed.
 \author{
 Julia Wrobel \email{jw3134@cumc.columbia.edu}
 }
-

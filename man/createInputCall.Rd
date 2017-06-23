@@ -19,4 +19,3 @@ numeric) or drop-down (for factor) input is constructed.
 \author{
 Jeff Goldsmith \email{ajg2202@cumc.columbia.edu}
 }
-

@@ -18,4 +18,3 @@ natural scale and on the response scale.
 \author{
 Jeff Goldsmith \email{ajg2202@cumc.columbia.edu}
 }
-

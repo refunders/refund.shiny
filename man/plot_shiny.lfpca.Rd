@@ -20,13 +20,12 @@
 \description{
 Produces an interactive plot illustrating longitudinal functioanl data analysis (Park and Staicu, 2015).
 }
-\author{
-So Young Park \email{spark13@ncsu.edu}, Ana-Maria Staicu \email{astaicu@ncsu.edu}
-}
 \references{
 Park, S.Y. and Staicu, A.M. (2015). Longitudinal functional data analysis. Stat 4 212-226.
 }
 \seealso{
 \code{\link{plot_shiny}}; \code{fpca.lfda} in the refund package for estimation method.
 }
-
+\author{
+So Young Park \email{spark13@ncsu.edu}, Ana-Maria Staicu \email{astaicu@ncsu.edu}
+}

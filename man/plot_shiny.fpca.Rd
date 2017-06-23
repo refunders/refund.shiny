@@ -21,11 +21,10 @@
 Produces an interactive plot illustrating a functional principal component
 analysis.
 }
+\seealso{
+\code{\link{plot_shiny}}
+}
 \author{
 Julia Wrobel \email{jw3134@cumc.columbia.edu},
 Jeff Goldsmith \email{jeff.goldsmith@columbia.edu}
 }
-\seealso{
-\code{\link{plot_shiny}}
-}
-

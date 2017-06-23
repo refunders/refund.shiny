@@ -23,4 +23,3 @@ Internal method that creates UI with buttons to download a plot as a PDF or ggpl
 \author{
 Julia Wrobel \email{jw3134@cumc.columbia.edu}
 }
-

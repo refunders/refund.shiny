@@ -19,8 +19,7 @@ Internal method used in conjunction with \code{makeLasagna()} to create side-by-
 The distribution plot gives distribution of sorting covariate.
 }
 \author{
-Julia Wrobel \email{ajg2202@cumc.columbia.edu}
+Julia Wrobel \email{jw3134@cumc.columbia.edu}
 
 Nicole Marie Lapointe Jameson
 }
-
