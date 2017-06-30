@@ -1,7 +1,8 @@
 # `refund.shiny`
 [![](https://travis-ci.org/refunders/refund.shiny.svg?branch=master)](https://travis-ci.org/refunders/refund.shiny)
 
-https://cranlogs.r-pkg.org/badges/grand-total/refund.shiny
+[![](https://cranlogs.r-pkg.org/badges/grand-total/refund.shiny)](https://cranlogs.r-pkg.org/badges/grand-total/refund.shiny)
+
 
 ## Interactive plots of functional data analyses.
 
