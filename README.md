@@ -1,6 +1,8 @@
 # `refund.shiny`
 [![](https://travis-ci.org/refunders/refund.shiny.svg?branch=master)](https://travis-ci.org/refunders/refund.shiny)
 
+https://cranlogs.r-pkg.org/badges/grand-total/refund.shiny
+
 ## Interactive plots of functional data analyses.
 
 The primary function is `plot_shiny`, which calls other functions depending on the class of the object. The supported classes are `fpca` for functional principal components analyses, `mfpca` for multilevel FPCA, `lfpca` for longitudinal FPCA, and `fosr` for function-on-scalar regression.
