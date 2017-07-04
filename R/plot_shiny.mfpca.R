@@ -118,13 +118,9 @@ plot_shiny.mfpca = function(obj, xlab = "", ylab="", title = "", ...) {
   ## UI
   #################################
 
-    ui = navbarPage(title = strong(style = "color: #ACD6FF; padding: 0px 0px 10px 10px; opacity: 0.95; ", "MFPCA Plot"), 
+    ui = navbarPage(title = strong(style = "color: #ACD6FF; padding: 0px 0px 10px 10px; opacity: 0.95; ", "MFPCA Plot"),
                     windowTitle = "refund.shiny", collapsible = FALSE, id = "nav", inverse = TRUE, header = NULL,
-                    
-                    tabPanel("Mean +/- FPCs", icon = icon("stats", lib = "glyphicon"),
-                             tabPanelModuleUI("level1", tabTitle = "Level 1", calls = muPC_call1, helperText = muPC_help ),
-                             tabPanelModuleUI("level2", tabTitle = "Level 2", calls = muPC_call2, helperText = muPC_help )
-                             ),
+
                     tabPanel("Mean +/- FPCs", icon = icon("stats", lib = "glyphicon"),
                         tabsetPanel(
                              tabPanel("Level 1",
