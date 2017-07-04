@@ -1,6 +1,6 @@
 Package: refund.shiny
 Title: Interactive Plotting for Functional Data Analyses
-Version: 0.2.0
+Version: 0.3.0
 Authors@R: c(
     person("Julia", "Wrobel", role = c("aut", "cre"), email = "jw3134@cumc.columbia.edu"),
     person("Jeff", "Goldsmith", role = "aut", email = "jeff.goldsmith@columbia.edu")
@@ -10,11 +10,13 @@ Depends:
     R (>= 3.0.1)
 Imports:
     ggplot2,
+    tidyr,
     shiny (>= 0.11),
     reshape2,
     dplyr,
     gridExtra,
     lme4,
+    plotly,
     refund
 License: GPL (>= 2)
 LazyData: true

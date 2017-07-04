@@ -6,7 +6,8 @@
 \usage{
 tabPanelModuleUI(id, tabTitle, icon = NULL, calls = NULL,
   helperText = NULL, twoPlots = FALSE, calls2 = NULL,
-  helperText2 = NULL, title2 = NULL, brushName = NULL)
+  helperText2 = NULL, title2 = NULL, brushName = NULL,
+  is.plotly = FALSE)
 }
 \arguments{
 \item{id}{Name of module. Allows each call of this module to be uniquely identified.}
@@ -29,6 +30,8 @@ tabPanelModuleUI(id, tabTitle, icon = NULL, calls = NULL,
 
 \item{brushName}{character vector indicating the name of brush if you want brushing for the plot. For use in score scatterplots 
 for \code{plot_shiny.fpca()} and \code{plot_shiny.mfpca()}.}
+
+\item{is.plotly}{Indicates if plots are plotly generated. Defaults to FALSE.}
 }
 \description{
 Creates a UI tab with helptext, widgets for user input, a plot, and standardized layout. The default is to create one plot, but if the 

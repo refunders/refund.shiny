@@ -27,6 +27,9 @@
 #' Julia Wrobel \email{jw3134@@cumc.columbia.edu}
 #' @seealso \code{\link{plot_shiny.fpca}}, \code{\link{plot_shiny.mfpca}},  \code{\link{plot_shiny.fosr}}
 #' @import refund
+#' @import shiny
+#' @import ggplot2
+#' @import dplyr
 #' @export plot_shiny
 #' 
 #' @examples

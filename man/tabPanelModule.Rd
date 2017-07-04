@@ -5,7 +5,8 @@
 \title{download Plot as PDF or ggplot Object, modularized server}
 \usage{
 tabPanelModule(input, output, session, plotObject = NULL, plotName = NULL,
-  plotObject2 = NULL, plotName2 = NULL)
+  plotObject2 = NULL, plotName2 = NULL, is.plotly = FALSE,
+  is.grid = FALSE)
 }
 \arguments{
 \item{input}{gets user input from UI}
@@ -21,6 +22,11 @@ tabPanelModule(input, output, session, plotObject = NULL, plotName = NULL,
 \item{plotObject2}{Reactive plot object for the (optional) second plot.}
 
 \item{plotName2}{Character string designating name of the (optional) second plot for the PDF output}
+
+\item{is.plotly}{Indicates if plots are plotly generated. Defaults to FALSE.}
+
+\item{is.grid}{Indicates if plot is generated using grid.arrange() to arrange ggplot objects. 
+If TRUE, prints plot object implicitly rather than explicitly.}
 }
 \description{
 Internal method that creates UI with buttons to download a plot as a PDF or ggplot object.

@@ -42,22 +42,29 @@ plot_shiny.mfpca = function(obj, xlab = "", ylab="", title = "", ...) {
   #################################
   ## Tab 3: mean +/- FPC plot
   #################################
-  muPC_help = "Solid black line indicates population mean. For the FPC selected below, blue and red lines
+  muPC.help = "Solid black line indicates population mean. For the FPC selected below, blue and red lines
                                              indicate the population mean +/- the FPC times 2 SDs of the associated score distribution."
 
-  muPC_call1
-  muPC_call2
+  muPC.call = as.list(rep(NA, 2))
+  muPC.call[[1]] = selectInput(inputId = "PCchoice1", label = ("Select Level 1 FPC"), choices = 1:npc$level1, selected = 1)
+  muPC.call[[2]] = selectInput(inputId = "PCchoice2", label = ("Select Level 2 FPC"), choices = 1:npc$level2, selected = 1)
+
   #################################
   ## Tab 2: scree plot
   #################################
   scree <- lapply(names(npc), function(level) {
     data.frame(k = rep(1:npc[[level]], 2),
                lambda = c(mfpca.obj$evalues[[level]], cumsum(mfpca.obj$evalues[[level]])/ sum(mfpca.obj$evalues[[level]])),
-               type = rep(c("Eigenvalue", "Percent Variance Explained"), each = npc[[level]]))
+               type = rep(c("Score Variance", "Percent Variance Explained"), each = npc[[level]]))
   })
   names(scree) <- c("level1", "level2")
 
   levelVariance = lapply(1:2, function(i) round(sum(mfpca.obj$evalues[[i]])/(sum(mfpca.obj$evalues[[1]])+sum(mfpca.obj$evalues[[2]])), 3)*100)
+
+  scree.help1 = paste0("Scree plots for level 1; the left panel shows the plot of eigenvalues and the right panel shows the
+                      cumulative percent variance explained. Level 1 accounts for ", levelVariance[[1]], "% of total variance." )
+  scree.help2 = paste0("Scree plots for level 2; the left panel shows the plot of eigenvalues and the right panel shows the
+                      cumulative percent variance explained. Level 2 accounts for ", levelVariance[[2]], "% of total variance." )
 
   #################################
   ## Tab 3:Linear combination of PCs
@@ -120,51 +127,17 @@ plot_shiny.mfpca = function(obj, xlab = "", ylab="", title = "", ...) {
 
     ui = navbarPage(title = strong(style = "color: #ACD6FF; padding: 0px 0px 10px 10px; opacity: 0.95; ", "MFPCA Plot"),
                     windowTitle = "refund.shiny", collapsible = FALSE, id = "nav", inverse = TRUE, header = NULL,
-
                     tabPanel("Mean +/- FPCs", icon = icon("stats", lib = "glyphicon"),
-                        tabsetPanel(
-                             tabPanel("Level 1",
-                                      column(3, helpText(muPCtext), hr(),
-                                             selectInput("PCchoice1", label = ("Select Level 1 FPC"), choices = 1:npc$level1, selected = 1),hr(),
-                                              downloadButton("downloadPDFMuPC1", "Download Plot as PDF"), br(), br(),
-                                              downloadButton("downloadPlotMuPC1", "Download Plot as Object", class = "plot-download")
-                                      ),
-                                      column(9, h4("Mean and FPCs for Level 1"), plotOutput('muPCplot1') )
-                             ),
-                             tabPanel("Level 2",
-                                      column(3, helpText(muPCtext), hr(),
-                                             selectInput("PCchoice2", label = ("Select Level 2 FPC"), choices = 1:mfpca.obj$npc$level2, selected = 1),
-                                             hr(), downloadButton("downloadPDFMuPC2", "Download Plot as PDF"), br(), br(),
-                                             downloadButton("downloadPlotMuPC2", "Download Plot as Object",  class = "plot-download")
-                                      ),
-                                      column(9,h4("Mean and FPCs for Level 2"),plotOutput('muPCplot2') )
-                             )
-                        )
-                    ),
+                             tabsetPanel(
+                               tabPanelModuleUI("muPC1", tabTitle = "Level 1", calls = muPC.call[[1]], helperText = muPC.help ),
+                               tabPanelModuleUI("muPC2", tabTitle = "Level 2", calls = muPC.call[[2]], helperText = muPC.help )
+                             ) ),
                     tabPanel("Scree Plot", icon = icon("medkit"),
                              tabsetPanel(
-                               tabPanel("Level 1",
-                                        column(3,helpText(paste0("Scree plots for level 1; the left panel shows the plot of eigenvalues and
-                                                          the right panel shows the cumulative percent variance explained. Level 1 accounts for ",
-                                                                 levelVariance[[1]], "% of total variance." )), hr(),
-                                               downloadButton("downloadPDFScree1", "Download Plot as PDF"), br(), br(),
-                                               downloadButton("downloadPlotScree1", "Download Plot as Object", class = "plot-download")
-                                        ),
-                                        column(9, h4("Scree Plots"), tabPanel("Level 1", plotOutput('Scree1') ) )
-                               ),
-                               tabPanel("Level 2",
-                                        column(3,helpText(paste0("Scree plots for level 2; the left panel shows the plot of eigenvalues and
-                                                          the right panel shows the cumulative percent variance explained. Level 2 accounts for ",
-                                                                 levelVariance[[2]], "% of total variance." )), hr(),
-                                               downloadButton("downloadPDFScree2", "Download Plot as PDF"), br(), br(),
-                                               downloadButton("downloadPlotScree2", "Download Plot as Object", class = "plot-download")
-                                        ),
-                                        column(9, h4("Scree Plots"),tabPanel("Level 2", plotOutput("Scree2") ) )
-                               )
-                              )  ## end tabsetPanel
-                    ),
-                    tabPanel("Linear Combinations", icon = icon("line-chart"),
-                             withMathJax(),
+                               tabPanelModuleUI("scree1", tabTitle = "Level 1", helperText = scree.help1 ),
+                               tabPanelModuleUI("scree2", tabTitle = "Level 2", helperText = scree.help2 )
+                              ) ),
+                    tabPanel("Linear Combinations", icon = icon("line-chart"), withMathJax(),
                              column(3, h4("Sliders for Levels 1 and 2"),
                                     helpText("Plot shows the linear combination of mean and FPCs with the scores
                                              specified using the sliders below. Black curve is population mean; blue curve
@@ -172,9 +145,7 @@ plot_shiny.mfpca = function(obj, xlab = "", ylab="", title = "", ...) {
                                     tabsetPanel(
                                       tabPanel("Level 1", eval(calls[[1]]) ),
                                       tabPanel("Level 2", eval(calls[[2]]) )
-                                    ), hr(),
-                                    downloadButton("downloadPDFLinCom", "Download Plot as PDF"), br(), br(),
-                                    downloadButton("downloadPlotLinCom", "Download Plot as Object", class = "plot-download")
+                                    )
                              ),
                              column(9, h4("Linear Combination of Mean and FPCs"),  plotOutput('LinCom') )
                     ),
@@ -184,14 +155,10 @@ plot_shiny.mfpca = function(obj, xlab = "", ylab="", title = "", ...) {
                                              subject-specific mean, red curves are subject-visit specific fitted values, and red
                                              points are observed data."), hr(),
                                     selectInput("subject", label = ("Select Subject"), choices = ids, selected =ids[1]),
-                                    #selectInput("visit","Select Visit", c(Choose='', 1:dataInputSubject()[[4]]), selectize = TRUE, multiple = TRUE),
-                                    uiOutput("visitnum"),
+                                     uiOutput("visitnum"),
                                     checkboxInput("colorVisit", label="Color by Visit", value =FALSE),
                                     helpText("If 'Color by Visit' is selected, observed values and subject-visit specific fitted values
-                                             are colored by visit number."), hr(),
-                                    downloadButton("downloadPDFSubject", "Download Plot as PDF"), br(), br(),
-                                    downloadButton("downloadPlotSubject", "Download Plot as Object", class = "plot-download")
-                                    ),
+                                             are colored by visit number.")                                  ),
                              column(9, h4("Fitted and Observed Values for Selected Subject"), plotOutput("Subject"))
                     ),
                     tabPanel("Score Scatterplot",icon = icon("binoculars"),
@@ -272,13 +239,10 @@ plot_shiny.mfpca = function(obj, xlab = "", ylab="", title = "", ...) {
         })
       })
 
-      output$muPCplot1 <- renderPlot(print(plotInputMuPC()[[1]]) )    ; output$muPCplot2 <- renderPlot(print(plotInputMuPC()[[2]]) )
+      plotInputMuPC1 <- reactive({ plotInputMuPC()[[1]] }) ; plotInputMuPC2 <- reactive({ plotInputMuPC()[[2]] })
 
-      output$downloadPDFMuPC1 <- savePDF("muPC1.pdf", plotInputMuPC()[[1]])
-      output$downloadPlotMuPC1 <- savePlot("muPC1.RData", plotInputMuPC()[[1]])
-
-      output$downloadPDFMuPC2 <- savePDF("muPC2.pdf", plotInputMuPC()[[2]])
-      output$downloadPlotMuPC2 <- savePlot("muPC2.RData", plotInputMuPC()[[2]])
+      callModule(tabPanelModule, "muPC1", plotObject = plotInputMuPC1, plotName = "muPC1")
+      callModule(tabPanelModule, "muPC2", plotObject = plotInputMuPC2, plotName = "muPC2")
 
       #################################
       ## Code for scree plot
@@ -291,14 +255,10 @@ plot_shiny.mfpca = function(obj, xlab = "", ylab="", title = "", ...) {
             facet_wrap(~type, scales = "free_y") + ylim(0, NA)
         })
       })
+      plotInputScree1 <- reactive({ plotInputScree()[[1]] }) ; plotInputScree2 <- reactive({ plotInputScree()[[2]] })
 
-      output$Scree1 <- renderPlot( print(plotInputScree()[[1]]) )   ; output$Scree2 <- renderPlot(print(plotInputScree()[[2]]) )
-
-      output$downloadPDFScree1 <- savePDF("scree1.pdf", plotInputScree()[[1]])
-      output$downloadPlotScree1 <- savePlot("scree1.RData", plotInputScree()[[1]])
-
-      output$downloadPDFScree2 <- savePDF("scree2.pdf", plotInputScree()[[2]])
-      output$downloadPlotScree2 <- savePlot("scree2.RData", plotInputScree()[[2]])
+      callModule(tabPanelModule, "scree1", plotObject = plotInputScree1, plotName = "scree1")
+      callModule(tabPanelModule, "scree2", plotObject = plotInputScree2, plotName = "scree2")
 
       #################################
       ## Code for linear combinations
@@ -323,11 +283,7 @@ plot_shiny.mfpca = function(obj, xlab = "", ylab="", title = "", ...) {
           scale_color_manual("Line Legend", values = c(mu = "gray", visit = "indianred",  subject = "cornflowerblue"), guide = FALSE)
 
       })
-
       output$LinCom <- renderPlot( print(plotInputLinCom()) )
-
-      output$downloadPDFLinCom <- savePDF("LinCom.pdf", plotInputLinCom())
-      output$downloadPlotLinCom <- savePlot("LinCom.RData", plotInputLinCom())
 
       #################################
       ## Code for subject plots
@@ -371,9 +327,6 @@ plot_shiny.mfpca = function(obj, xlab = "", ylab="", title = "", ...) {
       })
 
       output$Subject <- renderPlot( print(plotInputSubject()) )
-
-      output$downloadPDFSubject <- savePDF("subject.pdf", plotInputSubject())
-      output$downloadPlotSubject <- savePlot("subject.RData", plotInputSubject())
 
       #################################
       ## Code for score plots
