@@ -25,7 +25,9 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
   ## code for processing tabs
   ################################
 
-
+  #### registration
+  ## curves
+  curves.help = "this is a lasagna plot"
   #################################
   ## App
   #################################
@@ -38,11 +40,13 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
     ui = navbarPage(title = strong(style = "color: #ACD6FF; padding: 0px 0px 10px 10px; opacity: 0.95; ", "Registration Plot"),
                     windowTitle = "refund.shiny", collapsible = FALSE, id = "nav", inverse = TRUE, header = NULL,
                     ##### start tabs
-                    tabPanel("registration", icon = icon("stats", lib = "glyphicon"),
-                             tabPanelModuleUI("results", tabTitle = "results"),
-                             tabPanelModuleUI("warps", tabTitle = "warping functions")
+                    tabPanel("registration", icon = icon("transfer", lib = "glyphicon"),
+                             tabsetPanel(
+                               tabPanelModuleUI("curves", tabTitle = "registered curves", helperText = curves.help),
+                               tabPanelModuleUI("warps", tabTitle = "warping functions")
+                             )
                              ),
-                    tabPanel("fpca")
+                    tabPanel("fpca", icon = icon("stats", lib = "glyphicon"))
     ),
 
     #################################
@@ -50,6 +54,18 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
     #################################
 
     server = function(input, output){
+      plotDefaults = list(theme_bw(), xlab(xlab), ylab(ylab),
+                          scale_x_continuous(breaks = seq(0, length(fpca.obj$mu)-1, length=6), labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1))) )
+
+
+      #################################
+      ## Code for curves plot
+      #################################
+
+
+
+      #callModule(tabPanelModule, "curves", plotObject = plotInputMuPC, plotName = "curves")
+
 
     } # end server
 
