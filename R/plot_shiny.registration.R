@@ -13,7 +13,6 @@
 #' Jeff Goldsmith \email{jeff.goldsmith@@columbia.edu}
 #'
 #' @seealso \code{\link{plot_shiny}}
-#' @importFrom plotly ggplotly event_data layout as.widget
 #'
 #' @export
 #'
@@ -21,14 +20,18 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
   reg.obj <- obj$reg_obj
   fpca.obj <- obj$fpca_obj
 
+  Y <- reg.obj$Y
+  Y$t.star <- obj$time_warps[[1]]
+  Y$t.hat <- Y$index
+
   ## establish inverse link function for plotting
   inv_link = createInvLink(family = fpca.obj$family)
 
   ## add y-axis scale input if family is not gaussian
-  if (!(is.null(fpca.obj$family) || fpca.obj$family == "gaussian")) {
-    muPC.call[[2]] = selectInput("muPC_scale", label = ("Select Y-axis Scale"), choices = c("Natural", "Response"), selected = "Natural")
-    LinCom.call[[fpca.obj$npc + 1]] = selectInput("lincom_scale", label = ("Select Y-axis Scale"), choices = c("Natural", "Response"), selected = "Natural")
-  }
+  #if (!(is.null(fpca.obj$family) || fpca.obj$family == "gaussian")) {
+    #muPC.call[[2]] = selectInput("muPC_scale", label = ("Select Y-axis Scale"), choices = c("Natural", "Response"), selected = "Natural")
+    #LinCom.call[[fpca.obj$npc + 1]] = selectInput("lincom_scale", label = ("Select Y-axis Scale"), choices = c("Natural", "Response"), selected = "Natural")
+  #}
 
   ################################
   ## code for processing tabs
@@ -71,11 +74,13 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
       ## Code for curves plot
       #################################
 
-      plotInputCurves <- reactive({
 
+      plotInputCurves <- reactive({
+        curvesPlots = registerLasagna(Y)
+        grid.arrange(curvesPlots[[1]],curvesPlots[[2]], ncol = 2)
       })
 
-      #callModule(tabPanelModule, "curves", plotObject = plotInputMuPC, plotName = "curves")
+      callModule(tabPanelModule, "curves", plotObject = plotInputCurves, plotName = "curves")
 
 
     } # end server

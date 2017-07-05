@@ -22,7 +22,6 @@
 
 #utils::globalVariables(c("value", "subj", "covariate"))
 
-
 plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
 
   fosr.obj <- obj
@@ -141,7 +140,7 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
         selected = covar.list[CovarChoice2]
         if(selected == "None") {
          covariate = NULL
-        } 
+        }
         else if(length(table(fosr.obj$data[, selected])) < 3){
           fosr.obj$data[, selected] = factor(fosr.obj$data[, selected])
           covariate = selected
