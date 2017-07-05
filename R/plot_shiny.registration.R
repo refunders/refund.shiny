@@ -21,6 +21,15 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
   reg.obj <- obj$reg_obj
   fpca.obj <- obj$fpca_obj
 
+  ## establish inverse link function for plotting
+  inv_link = createInvLink(family = fpca.obj$family)
+
+  ## add y-axis scale input if family is not gaussian
+  if (!(is.null(fpca.obj$family) || fpca.obj$family == "gaussian")) {
+    muPC.call[[2]] = selectInput("muPC_scale", label = ("Select Y-axis Scale"), choices = c("Natural", "Response"), selected = "Natural")
+    LinCom.call[[fpca.obj$npc + 1]] = selectInput("lincom_scale", label = ("Select Y-axis Scale"), choices = c("Natural", "Response"), selected = "Natural")
+  }
+
   ################################
   ## code for processing tabs
   ################################
@@ -62,7 +71,9 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
       ## Code for curves plot
       #################################
 
+      plotInputCurves <- reactive({
 
+      })
 
       #callModule(tabPanelModule, "curves", plotObject = plotInputMuPC, plotName = "curves")
 
