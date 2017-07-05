@@ -13,6 +13,7 @@
 #' Jeff Goldsmith \email{jeff.goldsmith@@columbia.edu}
 #'
 #' @seealso \code{\link{plot_shiny}}
+#' @importFrom gridExtra grid.arrange
 #'
 #' @export
 #'
@@ -39,7 +40,9 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
 
   #### registration
   ## curves
-  curves.help = "this is a lasagna plot"
+  curves.help = "Registered (left) and unregistered (right) lasagna plots of observed binary data.
+    Dark and light blue represent values of 0 and 1, respectively."
+
   #################################
   ## App
   #################################
@@ -73,8 +76,6 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
       #################################
       ## Code for curves plot
       #################################
-
-
       plotInputCurves <- reactive({
         curvesPlots = registerLasagna(Y)
         grid.arrange(curvesPlots[[1]],curvesPlots[[2]], ncol = 2)

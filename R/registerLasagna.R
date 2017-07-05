@@ -18,7 +18,6 @@ getWidth = function(z){
 #' @param data Dataset for lasagna plot.
 #' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu}
 #'
-#' @importFrom gridExtra grid.arrange
 #' @import ggplot2
 #'
 #' @export
