@@ -40,8 +40,11 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
 
   #### registration
   ## curves
-  curves.help = "Registered (left) and unregistered (right) lasagna plots of observed binary data.
-    Dark and light blue represent values of 0 and 1, respectively."
+  curves.help = "Registered (left) and unregistered (right) binary data.
+    Each row is a subject. Dark and light blue represent values of 0 and 1, respectively."
+
+  ## loss
+  loss.help = "Loss is calculated with respect to mean from previous iteration FPCA decomposition."
 
   #################################
   ## App
@@ -58,7 +61,8 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
                     tabPanel("registration", icon = icon("transfer", lib = "glyphicon"),
                              tabsetPanel(
                                tabPanelModuleUI("curves", tabTitle = "registered curves", helperText = curves.help),
-                               tabPanelModuleUI("warps", tabTitle = "warping functions")
+                               tabPanelModuleUI("warps", tabTitle = "warping functions"),
+                               tabPanelModuleUI("loss", tabTitle = "loss function", helperText = loss.help)
                              )
                              ),
                     tabPanel("fpca", icon = icon("stats", lib = "glyphicon"))
@@ -69,9 +73,6 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
     #################################
 
     server = function(input, output){
-      plotDefaults = list(theme_bw(), xlab(xlab), ylab(ylab),
-                          scale_x_continuous(breaks = seq(0, length(fpca.obj$mu)-1, length=6), labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1))) )
-
 
       #################################
       ## Code for curves plot
@@ -83,6 +84,32 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
 
       callModule(tabPanelModule, "curves", plotObject = plotInputCurves, plotName = "curves", is.grid = TRUE)
 
+      #################################
+      ## Code for plot of warping functions
+      #################################
+
+      plotInputWarps <- reactive({
+        warps = ggplot(Y, aes(x = t.star, y = t.hat, group = id)) + theme_bw() +
+          labs(x = "observed time", y = "registered time") +
+          geom_path()
+      })
+
+      callModule(tabPanelModule, "warps", plotObject = plotInputWarps, plotName = "warps")
+
+
+      #################################
+      ## Code for plot of loss
+      #################################
+
+      plotInputLoss <- reactive({
+        loss.df = data.frame(loss = obj$loss, iteration = 0:(length(obj$loss) - 1))
+
+        loss = ggplot(loss.df, aes(x = iteration, y = loss)) + theme_bw() +
+          labs(x = "iteration number", y = "loss") +
+          geom_point(size = 3) + geom_line()
+      })
+
+      callModule(tabPanelModule, "loss", plotObject = plotInputLoss, plotName = "loss")
 
     } # end server
 
