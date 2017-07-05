@@ -80,7 +80,7 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
         grid.arrange(curvesPlots[[1]],curvesPlots[[2]], ncol = 2)
       })
 
-      callModule(tabPanelModule, "curves", plotObject = plotInputCurves, plotName = "curves")
+      callModule(tabPanelModule, "curves", plotObject = plotInputCurves, plotName = "curves", is.grid = TRUE)
 
 
     } # end server
