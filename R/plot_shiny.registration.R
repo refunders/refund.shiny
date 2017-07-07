@@ -14,6 +14,7 @@
 #'
 #' @seealso \code{\link{plot_shiny}}
 #' @importFrom gridExtra grid.arrange
+#' @importFrom plotly plot_ly ggplotly event_data layout
 #'
 #' @export
 #'
@@ -21,9 +22,12 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
   reg.obj <- obj$reg_obj
   fpca.obj <- obj$fpca_obj
 
+  ## data management. Probably should think about generalizing this to other distributions.
   Y <- reg.obj$Y
   Y$t.star <- obj$time_warps[[1]]
   Y$t.hat <- Y$index
+  Y$Y.hat <- fpca.obj$Yhat$value
+  Y$pi.hat <- inv.logit(Y$Y.hat)
 
   ## establish inverse link function for plotting
   inv_link = createInvLink(family = fpca.obj$family)
@@ -41,10 +45,15 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
   #### registration
   ## curves
   curves.help = "Registered (left) and unregistered (right) binary data.
-    Each row is a subject. Dark and light blue represent values of 0 and 1, respectively."
+    Each row is a subject. Light and dark blue represent values of 0 and 1, respectively."
 
   ## loss
   loss.help = "Loss is calculated with respect to mean from previous iteration FPCA decomposition."
+
+  ## warps
+  warp.help1 = "Plot shows warping functions for all subjects; click on a specific curve to select a subject."
+  warp.help2 = "Plot shows observed data and fitted values for selected subject.
+  If no subjects are selected then first subject in dataset is shown."
 
   #################################
   ## App
@@ -61,7 +70,8 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
                     tabPanel("registration", icon = icon("transfer", lib = "glyphicon"),
                              tabsetPanel(
                                tabPanelModuleUI("curves", tabTitle = "registered curves", helperText = curves.help),
-                               tabPanelModuleUI("warps", tabTitle = "warping functions"),
+                               tabPanelModuleUI("warps", tabTitle = "warping functions", helperText = warp.help1,
+                                                twoPlots = TRUE, is.plotly = TRUE, helperText2 = warp.help2),
                                tabPanelModuleUI("loss", tabTitle = "loss function", helperText = loss.help)
                              )
                              ),
@@ -89,12 +99,47 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
       #################################
 
       plotInputWarps <- reactive({
-        warps = ggplot(Y, aes(x = t.star, y = t.hat, group = id)) + theme_bw() +
-          labs(x = "observed time", y = "registered time") +
-          geom_path()
+        key = Y$id
+        plot_ly(data = group_by(Y, id), x = ~t.star, y = ~t.hat, type = "scatter",
+                mode = 'lines', alpha = 0.5, source = "timewarps", key = ~key,
+                hoverinfo = 'text', text = ~paste('Id: ', id)) %>% layout(dragmode = "select")
       })
 
-      callModule(tabPanelModule, "warps", plotObject = plotInputWarps, plotName = "warps")
+
+      # for selected subjects plot observed data and fitted value
+      plotInputWarpSelect <- reactive({
+        clicked <- event_data("plotly_click", source = "timewarps")
+
+
+        if(!is.null(clicked)){
+          ## might want to look at this plot relative to an average subject (subject with scores closest to zero)
+          Y.clicked = filter(Y, id %in% clicked$key)
+          plot_ly(data = group_by(Y.clicked, id), x = ~t.star, y = ~value, type = "scatter",
+                  alpha = 0.25, mode = 'markers') %>%
+            add_trace(y = ~pi.hat, mode = 'lines') %>%
+            layout(dragmode = "select", showlegend = FALSE)
+
+        }else{
+          plot_ly(data = filter(Y, id == first(Y$id)), x = ~t.star, y = ~value, type = "scatter",
+                  alpha = 0.25, mode = 'markers') %>%
+            add_trace(y = ~pi.hat, mode = 'lines') %>%
+            layout(dragmode = "select", showlegend = FALSE)
+
+          #warps2 = ggplot(filter(Y, id == 1), aes(x = t.star, y = value, group = id)) + theme_bw() +
+           # geom_point(color = "indianred", alpha = 0.5, size = 0.5) +
+            #geom_path(aes(x = t.hat, y = inv.logit(Y.hat)), color = "cornflowerblue")
+
+          #ggplotly(warps2)
+
+        }
+
+
+
+      })
+
+      callModule(tabPanelModule, "warps", plotObject = plotInputWarps, plotName = "warps",
+                 plotObject2 = plotInputWarpSelect, is.plotly = TRUE)
+
 
 
       #################################

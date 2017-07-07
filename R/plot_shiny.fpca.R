@@ -118,8 +118,6 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
                                      helperText = subjects.help ),
                     tabPanelModuleUI("scoreplots",tabTitle = "Score Scatterplot", icon = icon("binoculars"), calls = score.call,
                                      helperText = score.help1, twoPlots = TRUE, helperText2 = score.help2, is.plotly = TRUE)
-                                     #brushName = "scorebrush",
-
                     ),
 
     #################################
@@ -257,9 +255,7 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
 
       ## Tab 5 Plot
       scoreplot1Input <- reactive({
-        key <- scoredata_new()$id   ## key identifies brushed subjects
-        
-        gg1 <- ggplot(scoredata_new(), aes(x = PCX, y = PCY, key = key)) + 
+        gg1 <- ggplot(scoredata_new(), aes(x = PCX, y = PCY, key = id)) +
           geom_point(color = "blue", alpha = 1/5, size = 3, aes(text = id)) +
           xlab(paste("Scores for FPC", input$PCX)) + ylab(paste("Scores for FPC", input$PCY)) + theme_bw()
 
@@ -267,10 +263,11 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
       })
 
       ### second score plot
-      baseplot = ggplot(Yhat_df, aes(x = index, y = value, group = id)) + geom_line(alpha = 1/5, color = "black", aes(text = id)) +
+      baseplot = ggplot(Yhat_df, aes(x = index, y = value, group = id)) +
+        geom_line(alpha = 1/5, color = "black", aes(text = id)) +
         plotDefaults
 
-      
+
       scoreplot2Input <- reactive({
 
         brush <- event_data("plotly_selected", source = "scoreplot")
