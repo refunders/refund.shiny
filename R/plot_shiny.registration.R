@@ -14,7 +14,7 @@
 #'
 #' @seealso \code{\link{plot_shiny}}
 #' @importFrom gridExtra grid.arrange
-#' @importFrom plotly plot_ly ggplotly event_data layout
+#' @importFrom plotly plot_ly ggplotly event_data add_trace layout
 #'
 #' @export
 #'
@@ -55,6 +55,18 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
   warp.help2 = "Plot shows observed data and fitted values for selected subject.
   If no subjects are selected then first subject in dataset is shown."
 
+  #### fpca
+
+  # muPC plot
+  muPC.help = "Solid black line indicates population mean. For the FPC selected below, blue and red lines
+               indicate the population mean +/- the FPC times 2 SDs of the associated score distribution."
+  muPC.call = as.list(NA)
+  muPC.call[[1]] = selectInput(inputId = "PCchoice", label = ("Select FPC"), choices = 1:fpca.obj$npc, selected = 1)
+
+  # subject fits plot
+
+  # scoreplot (need to edit this in both versions)
+
   #################################
   ## App
   #################################
@@ -75,7 +87,12 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
                                tabPanelModuleUI("loss", tabTitle = "loss function", helperText = loss.help)
                              )
                              ),
-                    tabPanel("fpca", icon = icon("stats", lib = "glyphicon"))
+                    tabPanel("fpca", icon = icon("stats", lib = "glyphicon"),
+                             tabsetPanel(
+                               tabPanelModuleUI("muPC", tabTitle = "Mean +/- FPCs", icon("stats", lib = "glyphicon"),
+                                                calls = muPC.call, helperText = muPC.help )
+                             )
+                             ) # end tabPanel
     ),
 
     #################################
@@ -110,7 +127,6 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
       plotInputWarpSelect <- reactive({
         clicked <- event_data("plotly_click", source = "timewarps")
 
-
         if(!is.null(clicked)){
           ## might want to look at this plot relative to an average subject (subject with scores closest to zero)
           Y.clicked = filter(Y, id %in% clicked$key)
@@ -124,22 +140,11 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
                   alpha = 0.25, mode = 'markers') %>%
             add_trace(y = ~pi.hat, mode = 'lines') %>%
             layout(dragmode = "select", showlegend = FALSE)
-
-          #warps2 = ggplot(filter(Y, id == 1), aes(x = t.star, y = value, group = id)) + theme_bw() +
-           # geom_point(color = "indianred", alpha = 0.5, size = 0.5) +
-            #geom_path(aes(x = t.hat, y = inv.logit(Y.hat)), color = "cornflowerblue")
-
-          #ggplotly(warps2)
-
         }
-
-
-
       })
 
       callModule(tabPanelModule, "warps", plotObject = plotInputWarps, plotName = "warps",
                  plotObject2 = plotInputWarpSelect, is.plotly = TRUE)
-
 
 
       #################################
@@ -155,6 +160,11 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
       })
 
       callModule(tabPanelModule, "loss", plotObject = plotInputLoss, plotName = "loss")
+
+      #################################
+      ## Code for plot of fpca mean +/- PCs
+      #################################
+
 
     } # end server
 
