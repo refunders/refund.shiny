@@ -245,6 +245,9 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
 
       callModule(tabPanelModule, "subjects", plotObject = plotInputSubject, plotName = "subjects")
 
+      #################################
+      ## Code for fpca score plots
+      #################################
 
     } # end server
 
