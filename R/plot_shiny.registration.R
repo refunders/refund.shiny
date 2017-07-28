@@ -14,7 +14,7 @@
 #'
 #' @seealso \code{\link{plot_shiny}}
 #' @importFrom gridExtra grid.arrange
-#' @importFrom plotly plot_ly ggplotly event_data add_trace layout
+#' @importFrom plotly plot_ly event_data layout add_trace
 #'
 #' @export
 #'
@@ -22,17 +22,19 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
   reg.obj <- obj$reg_obj
   fpca.obj <- obj$fpca_obj
 
+  ## establish inverse link function for plotting
+  inv_link = createInvLink(family = fpca.obj$family)
+
   ## data management. Probably should think about generalizing this to other distributions.
   Y <- reg.obj$Y
   Y$t.star <- obj$time_warps[[1]]
   Y$t.hat <- Y$index
   Y$Y.hat <- fpca.obj$Yhat$value
-  Y$pi.hat <- inv.logit(Y$Y.hat)
+  Y$pi.hat <- inv_link(Y$Y.hat)
   Yhat_df <- fpca.obj$Yhat
   Y_df <- fpca.obj$Y
 
-  ## establish inverse link function for plotting
-  inv_link = createInvLink(family = fpca.obj$family)
+
 
   ################################
   ## code for processing tabs
