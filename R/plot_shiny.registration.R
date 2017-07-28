@@ -65,6 +65,9 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
   }
 
   # subject fits plot
+  subjects.help = "Plot shows observed data and fitted values for the subject selected below."
+  subjects.call = eval(call("selectInput", inputId = "subject", label = ("Select Subject"),
+                            choices = unique(Yhat_df$id), selected = unique(Yhat_df$id)[1]))
 
   # scoreplot (need to edit this in both versions)
 
@@ -91,7 +94,9 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
                     tabPanel("fpca", icon = icon("stats", lib = "glyphicon"),
                              tabsetPanel(
                                tabPanelModuleUI("muPC", tabTitle = "Mean +/- FPCs", icon("stats", lib = "glyphicon"),
-                                                calls = muPC.call, helperText = muPC.help )
+                                                calls = muPC.call, helperText = muPC.help ),
+                               tabPanelModuleUI("subjects",tabTitle = "Subject Fits", icon = icon("user"), calls = subjects.call,
+                                                helperText = subjects.help )
                              )
                              ) # end tabPanel
     ),
@@ -222,6 +227,23 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
       })
 
       callModule(tabPanelModule, "muPC", plotObject = plotInputMuPC, plotName = "muPC")
+
+      #################################
+      ## Code for fpca subject plots
+      #################################
+
+      plotInputSubject <- reactive({
+        subjectnum = input$subject
+
+        p4 = ggplot(data = mu_df_inv_link, aes(x = index, y = value)) + geom_line(lwd = 0.5, color = "gray") +
+          geom_line(data = filter(Yhat_df_inv_link, id == subjectnum), size = 1, color = "cornflowerblue") +
+          geom_point(data = filter(Y_df, id == subjectnum), color = "blue", alpha = 1/3) +
+          theme_bw() + xlab(xlab) + ylab(ylab) + ylim(c(range(Y_df$value)[1], range(Y_df$value)[2])) +
+          scale_x_continuous(breaks = seq(0, length(fpca.obj$mu) - 1, length = 6), labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1)))
+
+      })
+
+      callModule(tabPanelModule, "subjects", plotObject = plotInputSubject, plotName = "subjects")
 
 
     } # end server
