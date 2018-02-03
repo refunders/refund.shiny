@@ -22,11 +22,11 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
   fpca.obj <- obj$fpca_obj
 
   ## NULLify global values called in ggplot
-  iteration = value = index = NULL
+  iteration = value = tstar = t_hat = latent_mean  = NULL
 
 
   ## establish inverse link function for plotting
-  inv_link = createInvLink(family = fpca.obj$family)
+  inv_link = createInvLink(family <- fpca.obj$family)
 
   ## data management. Probably should think about generalizing this to other distributions.
   Y <- obj$Y
@@ -108,8 +108,23 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
       ## Code for curves plot
       #################################
       plotInputCurves <- reactive({
-        curvesPlots = registerLasagna(Y)
-        grid.arrange(curvesPlots[[1]],curvesPlots[[2]], ncol = 2)
+        if(family == "binomial"){
+          curvesPlots = registerLasagna(Y)
+          grid.arrange(curvesPlots[[1]],curvesPlots[[2]], ncol = 2)
+        }else if(family == "gaussian"){
+          unreg = ggplot(Y, aes(x = tstar, y = latent_mean, group = id)) +
+            geom_path(alpha = .25) + theme_bw() +
+            labs(x = "t_star", y = "Prob(Y = 1)")
+
+
+          reg = ggplot(Y, aes(x = t_hat, y = latent_mean, group = id)) +
+            geom_path(alpha = .25) + theme_bw() +
+            labs(x = "t_hat", y = "Prob(Y = 1)")
+
+          grid.arrange(unreg, reg, ncol = 2)
+
+        }
+
       })
 
       callModule(tabPanelModule, "curves", plotObject = plotInputCurves, plotName = "curves", is.grid = TRUE)

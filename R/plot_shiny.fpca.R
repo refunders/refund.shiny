@@ -26,7 +26,7 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
   PCX = PCY = V1 = V2 = k = lambda = value = subj = index = NULL
 
   ## establish inverse link function for plotting
-  inv_link = createInvLink(family = fpca.obj$family)
+  inv_link = createInvLink(family <- fpca.obj$family)
 
   ################################
   ## convert matrices storing functional data to dfs
