@@ -41,8 +41,13 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
 
   #### registration
   ## curves
-  curves.help = "Registered (left) and unregistered (right) binary data.
-    Each row is a subject. Light and dark blue represent values of 0 and 1, respectively."
+  curves.help =if(obj$family == "gaussian"){
+    paste0("Unregistered (left) and registered (right) data from the ", obj$family, " exponential family.
+    Each curve is a subject.")
+  }else{
+    paste0("Unregistered (left) and registered data (right) from the ", obj$family, " exponential family.
+    Each row is a subject. Light and dark blue represent values of 0 and 1, respectively.")
+  }
 
   ## warps
   warp.help1 = "Plot shows warping functions for all subjects; click on a specific curve to select a subject."
@@ -116,13 +121,13 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
             geom_path(alpha = .25) + theme_bw() +
             labs(x = "t_star", y = "Prob(Y = 1)")
 
-
           reg = ggplot(Y, aes(x = t_hat, y = latent_mean, group = id)) +
             geom_path(alpha = .25) + theme_bw() +
             labs(x = "t_hat", y = "Prob(Y = 1)")
 
           grid.arrange(unreg, reg, ncol = 2)
-
+        }else{
+          stop("Package currently handles only 'binomial' or 'gaussian' families.")
         }
 
       })
