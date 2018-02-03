@@ -120,9 +120,12 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
 
       plotInputWarps <- reactive({
         key = Y$id
-        plot_ly(data = group_by(Y, id), x = ~tstar, y = ~t_hat, type = "scatter",
+        p = plot_ly(data = group_by(Y, id), x = ~tstar, y = ~t_hat, type = "scatter",
                 mode = 'lines', alpha = 0.5, source = "timewarps", key = ~key,
                 hoverinfo = 'text', text = ~paste('Id: ', id)) %>% layout(dragmode = "select")
+
+        p$elementId <- NULL
+        p
       })
 
 
@@ -133,16 +136,22 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
         if(!is.null(clicked)){
           ## might want to look at this plot relative to an average subject (subject with scores closest to zero)
           Y.clicked = filter(Y, id %in% clicked$key)
-          plot_ly(data = group_by(Y.clicked, id), x = ~tstar, y = ~value, type = "scatter",
+          p = plot_ly(data = group_by(Y.clicked, id), x = ~tstar, y = ~value, type = "scatter",
                   alpha = 0.25, mode = 'markers') %>%
             add_trace(y = ~pi.hat, mode = 'lines') %>%
             layout(dragmode = "select", showlegend = FALSE)
 
+          p$elementId <- NULL
+          p
+
         }else{
-          plot_ly(data = filter(Y, id == first(Y$id)), x = ~tstar, y = ~value, type = "scatter",
+          p = plot_ly(data = filter(Y, id == first(Y$id)), x = ~tstar, y = ~value, type = "scatter",
                   alpha = 0.25, mode = 'markers') %>%
             add_trace(y = ~pi.hat, mode = 'lines') %>%
             layout(dragmode = "select", showlegend = FALSE)
+
+          p$elementId <- NULL
+          p
         }
       })
 
