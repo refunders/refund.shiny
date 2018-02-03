@@ -9,8 +9,7 @@
 #' @param title plot title
 #' @param ... additional arguments passed to plotting functions
 #'
-#' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu},
-#' Jeff Goldsmith \email{jeff.goldsmith@@columbia.edu}
+#' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu}
 #'
 #' @seealso \code{\link{plot_shiny}}
 #' @importFrom gridExtra grid.arrange
@@ -19,14 +18,18 @@
 #' @export
 #'
 plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
-  reg.obj <- obj$reg_obj
+
   fpca.obj <- obj$fpca_obj
+
+  ## NULLify global values called in ggplot
+  iteration = value = index = NULL
+
 
   ## establish inverse link function for plotting
   inv_link = createInvLink(family = fpca.obj$family)
 
   ## data management. Probably should think about generalizing this to other distributions.
-  Y <- reg.obj$Y
+  Y <- obj$Y
   Y$t.star <- obj$time_warps[[1]]
   Y$t.hat <- Y$index
   Y$Y.hat <- fpca.obj$Yhat$value
