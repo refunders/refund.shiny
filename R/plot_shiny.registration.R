@@ -34,8 +34,6 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
   Yhat_df <- fpca.obj$Yhat
   Y_df <- fpca.obj$Y
 
-
-
   ################################
   ## code for processing tabs
   ################################
