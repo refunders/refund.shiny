@@ -46,9 +46,6 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
   curves.help = "Registered (left) and unregistered (right) binary data.
     Each row is a subject. Light and dark blue represent values of 0 and 1, respectively."
 
-  ## loss
-  loss.help = "Loss is calculated with respect to mean from previous iteration FPCA decomposition."
-
   ## warps
   warp.help1 = "Plot shows warping functions for all subjects; click on a specific curve to select a subject."
   warp.help2 = "Plot shows observed data and fitted values for selected subject.
@@ -90,8 +87,7 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
                              tabsetPanel(
                                tabPanelModuleUI("curves", tabTitle = "registered curves", helperText = curves.help),
                                tabPanelModuleUI("warps", tabTitle = "warping functions", helperText = warp.help1,
-                                                twoPlots = TRUE, is.plotly = TRUE, helperText2 = warp.help2),
-                               tabPanelModuleUI("loss", tabTitle = "loss function", helperText = loss.help)
+                                                twoPlots = TRUE, is.plotly = TRUE, helperText2 = warp.help2)
                              )
                              ),
                     tabPanel("fpca", icon = icon("stats", lib = "glyphicon"),
@@ -155,20 +151,6 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
       callModule(tabPanelModule, "warps", plotObject = plotInputWarps, plotName = "warps",
                  plotObject2 = plotInputWarpSelect, is.plotly = TRUE)
 
-
-      #################################
-      ## Code for plot of loss
-      #################################
-
-      plotInputLoss <- reactive({
-        loss.df = data.frame(loss = obj$loss, iteration = 0:(length(obj$loss) - 1))
-
-        loss = ggplot(loss.df, aes(x = iteration, y = loss)) + theme_bw() +
-          labs(x = "iteration number", y = "loss") +
-          geom_point(size = 3) + geom_line()
-      })
-
-      callModule(tabPanelModule, "loss", plotObject = plotInputLoss, plotName = "loss")
 
 
       #################################
