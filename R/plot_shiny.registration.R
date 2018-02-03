@@ -30,8 +30,6 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
 
   ## data management. Probably should think about generalizing this to other distributions.
   Y <- obj$Y
-  Y$t.star <- obj$time_warps[[1]]
-  Y$t.hat <- Y$index
   Y$Y.hat <- fpca.obj$Yhat$value
   Y$pi.hat <- inv_link(Y$Y.hat)
   Yhat_df <- fpca.obj$Yhat
@@ -122,7 +120,7 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
 
       plotInputWarps <- reactive({
         key = Y$id
-        plot_ly(data = group_by(Y, id), x = ~t.star, y = ~t.hat, type = "scatter",
+        plot_ly(data = group_by(Y, id), x = ~tstar, y = ~t_hat, type = "scatter",
                 mode = 'lines', alpha = 0.5, source = "timewarps", key = ~key,
                 hoverinfo = 'text', text = ~paste('Id: ', id)) %>% layout(dragmode = "select")
       })
@@ -135,13 +133,13 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
         if(!is.null(clicked)){
           ## might want to look at this plot relative to an average subject (subject with scores closest to zero)
           Y.clicked = filter(Y, id %in% clicked$key)
-          plot_ly(data = group_by(Y.clicked, id), x = ~t.star, y = ~value, type = "scatter",
+          plot_ly(data = group_by(Y.clicked, id), x = ~tstar, y = ~value, type = "scatter",
                   alpha = 0.25, mode = 'markers') %>%
             add_trace(y = ~pi.hat, mode = 'lines') %>%
             layout(dragmode = "select", showlegend = FALSE)
 
         }else{
-          plot_ly(data = filter(Y, id == first(Y$id)), x = ~t.star, y = ~value, type = "scatter",
+          plot_ly(data = filter(Y, id == first(Y$id)), x = ~tstar, y = ~value, type = "scatter",
                   alpha = 0.25, mode = 'markers') %>%
             add_trace(y = ~pi.hat, mode = 'lines') %>%
             layout(dragmode = "select", showlegend = FALSE)
