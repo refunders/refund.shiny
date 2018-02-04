@@ -22,7 +22,7 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
   fpca.obj <- obj$fpca_obj
 
   ## NULLify global values called in ggplot
-  iteration = value = tstar = t_hat = latent_mean  = NULL
+  iteration = value = tstar = t_hat = latent_mean = index = NULL
 
 
   ## establish inverse link function for plotting
