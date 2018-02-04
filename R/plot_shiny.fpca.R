@@ -83,8 +83,8 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
   ## Tab 5: score plots
   score.help1 = "Use the drop down menus to select FPCs for the X and Y axis. Plot shows observed score
                                              scatterplot for selected FPCs; click and drag on the scatterplot to select subjects."
-  score.help2 = "Black curves are fitted values for all subjects. Blue curves correspond to subjects
-                                                  selected in the graph above. If no points are selected, the mean curve is shown."
+  score.help2 = "Blue curves are fitted values for all subjects. Orange curves correspond to subjects
+                                                  selected in the graph above."
 
   score.call = tagList(  selectInput("PCX", label = ("Select X-axis FPC"), choices = 1:fpca.obj$npc, selected = 1),
     selectInput("PCY", label = ("Select Y-axis FPC"), choices = 1:fpca.obj$npc, selected = 2) )
@@ -255,32 +255,35 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
 
       ## Tab 5 Plot
       scoreplot1Input <- reactive({
-        gg1 <- ggplot(scoredata_new(), aes(x = PCX, y = PCY, key = id)) +
-          geom_point(color = "blue", alpha = 1/5, size = 3, aes(text = id)) +
-          xlab(paste("Scores for FPC", input$PCX)) + ylab(paste("Scores for FPC", input$PCY)) + theme_bw()
-
-        ggplotly(gg1, source = "scoreplot") %>% layout(dragmode = "select")
+        key = scoredata_new()$id
+        p = plot_ly(data = scoredata_new(), x = ~PCX, y = ~PCY, type = "scatter",
+                    mode = 'markers', source = "scoreplot", key = ~key,
+                    hoverinfo = 'text', text = ~paste('Id: ', id)) %>%
+          layout(dragmode = "select")
+        p$elementId <- NULL
+        p
       })
 
       ### second score plot
-      baseplot = ggplot(Yhat_df, aes(x = index, y = value, group = id)) +
-        geom_line(alpha = 1/5, color = "black", aes(text = id)) +
-        plotDefaults
-
+      baseplot = plot_ly(data = group_by(Yhat_df, id), x = ~index, y = ~value, type = "scatter",
+                         mode = 'lines', alpha = 0.15, hoverinfo = 'text', text = ~paste('Id: ', id))
 
       scoreplot2Input <- reactive({
+        clicked <- event_data("plotly_click", source = "scoreplot")
+        brushed <- event_data("plotly_selected", source = "scoreplot")
+        selected_ids = c(clicked$key, brushed$key)
 
-        brush <- event_data("plotly_selected", source = "scoreplot")
+        if(!is.null(selected_ids)){
+          Y.clicked = filter(Yhat_df, id %in% selected_ids)
 
-        if (is.null(brush)) {
-          brushed_subjs = NULL
-          baseplot.gg = baseplot
-        }else{
-          brushed_subjs = brush$key
-          baseplot.gg = baseplot + geom_line(data = filter(Yhat_df, id %in% brushed_subjs), color = "cornflowerblue")
+          baseplot = baseplot %>%
+            add_trace(data = group_by(Y.clicked, id), x = ~index, y = ~value, mode = 'lines', alpha = 0.75)
         }
-        ggplotly(baseplot.gg)
+        baseplot$elementId <- NULL
+        baseplot %>% layout(showlegend = FALSE)
+
       })
+
 
       callModule(tabPanelModule, "scoreplots", plotObject = scoreplot1Input, plotName = "scoreplots", plotObject2 = scoreplot2Input, is.plotly = TRUE)
 

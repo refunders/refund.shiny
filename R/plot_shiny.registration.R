@@ -165,8 +165,6 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
         clicked <- event_data("plotly_click", source = "timewarps")
 
         if(!is.null(clicked)){
-          ## might want to look at this plot relative to an average subject
-              # (subject with scores closest to zero)
           Y.clicked = filter(Y, id %in% clicked$key)
           p = plot_ly(data = group_by(Y.clicked, id), x = ~tstar, y = ~value, type = "scatter",
                   alpha = 0.25, mode = 'markers') %>%
@@ -280,7 +278,8 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
         key = scoredata$id
         p = plot_ly(data = scoredata, x = ~PC1, y = ~PC2, type = "scatter",
                     mode = 'markers', source = "scoreplot", key = ~key,
-                    hoverinfo = 'text', text = ~paste('Id: ', id)) %>% layout(dragmode = "select")
+                    hoverinfo = 'text', text = ~paste('Id: ', id)) %>%
+          layout(dragmode = "select")
         p$elementId <- NULL
         p
       })
