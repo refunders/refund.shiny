@@ -34,7 +34,7 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
   Y$pi.hat <- inv_link(Y$Y.hat)
   Yhat_df <- fpca.obj$Yhat
   Y_df <- fpca.obj$Y
-
+  Y = mutate(Y, pi_mean = rep(inv_link(fpca.obj$mu), length.out = dim(Y)[1]))
   ################################
   ## code for processing tabs
   ################################
@@ -52,6 +52,7 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
   ## warps
   warp.help1 = "Plot shows warping functions for all subjects; click on a specific curve to select a subject."
   warp.help2 = "Plot shows observed data and fitted values for selected subject.
+  Green curve is population mean.
   If no subjects are selected then first subject in dataset is shown."
 
   #### fpca
@@ -73,6 +74,14 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
                             choices = unique(Yhat_df$id), selected = unique(Yhat_df$id)[1]))
 
   # scoreplot (need to edit this in both versions)
+  scoredata = as.data.frame(fpca.obj$scores)
+  colnames(scoredata) = c(paste0("PC", 1:fpca.obj$npc))
+  scoredata = mutate(scoredata, id = unique(Y$id))
+
+  score.help1 = "Plot shows observed score scatterplot for first and second FPC; click on the scatterplot to select a subject."
+  score.help2 = "Plot shows observed data and fitted values for selected subject.
+  Green curve is population mean."
+
 
   #################################
   ## App
@@ -98,7 +107,9 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
                                tabPanelModuleUI("muPC", tabTitle = "Mean +/- FPCs", icon("stats", lib = "glyphicon"),
                                                 calls = muPC.call, helperText = muPC.help ),
                                tabPanelModuleUI("subjects",tabTitle = "Subject Fits", icon = icon("user"), calls = subjects.call,
-                                                helperText = subjects.help )
+                                                helperText = subjects.help ),
+                               tabPanelModuleUI("scoreplots",tabTitle = "Score Scatterplot", icon = icon("binoculars"), calls = NULL,
+                                                helperText = score.help1, twoPlots = TRUE, helperText2 = score.help2, is.plotly = TRUE)
                              )
                              ) # end tabPanel
     ),
@@ -154,11 +165,13 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
         clicked <- event_data("plotly_click", source = "timewarps")
 
         if(!is.null(clicked)){
-          ## might want to look at this plot relative to an average subject (subject with scores closest to zero)
+          ## might want to look at this plot relative to an average subject
+              # (subject with scores closest to zero)
           Y.clicked = filter(Y, id %in% clicked$key)
           p = plot_ly(data = group_by(Y.clicked, id), x = ~tstar, y = ~value, type = "scatter",
                   alpha = 0.25, mode = 'markers') %>%
             add_trace(y = ~pi.hat, mode = 'lines') %>%
+            add_trace(y = ~pi_mean, mode = 'lines') %>%
             layout(dragmode = "select", showlegend = FALSE)
 
           p$elementId <- NULL
@@ -168,6 +181,7 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
           p = plot_ly(data = filter(Y, id == first(Y$id)), x = ~tstar, y = ~value, type = "scatter",
                   alpha = 0.25, mode = 'markers') %>%
             add_trace(y = ~pi.hat, mode = 'lines') %>%
+            add_trace(y = ~pi_mean, mode = 'lines') %>%
             layout(dragmode = "select", showlegend = FALSE)
 
           p$elementId <- NULL
@@ -177,7 +191,6 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
 
       callModule(tabPanelModule, "warps", plotObject = plotInputWarps, plotName = "warps",
                  plotObject2 = plotInputWarpSelect, is.plotly = TRUE)
-
 
 
       #################################
@@ -260,6 +273,48 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
       #################################
       ## Code for fpca score plots
       #################################
+      ## score plots
+      if(fpca.obj$npc == 1){scoredata$PC2 = scoredata$PC1}
+
+      plotInputScore <- reactive({
+        key = scoredata$id
+        p = plot_ly(data = scoredata, x = ~PC1, y = ~PC2, type = "scatter",
+                    mode = 'markers', source = "scoreplot", key = ~key,
+                    hoverinfo = 'text', text = ~paste('Id: ', id)) %>% layout(dragmode = "select")
+        p$elementId <- NULL
+        p
+      })
+
+
+      plotInputScoreSelect <- reactive({
+        clicked <- event_data("plotly_click", source = "scoreplot")
+
+        if(!is.null(clicked)){
+          Y.clicked = filter(Y, id %in% clicked$key)
+          p = plot_ly(data = group_by(Y.clicked, id), x = ~tstar, y = ~value, type = "scatter",
+                      alpha = 0.25, mode = 'markers') %>%
+            add_trace(y = ~pi.hat, mode = 'lines') %>%
+            add_trace(y = ~pi_mean, mode = 'lines') %>%
+            layout(dragmode = "select", showlegend = FALSE)
+
+          p$elementId <- NULL
+          p
+
+        }else{
+          p = plot_ly(data = filter(Y, id == first(Y$id)), x = ~tstar, y = ~value, type = "scatter",
+                      alpha = 0.25, mode = 'markers') %>%
+            add_trace(y = ~pi.hat, mode = 'lines') %>%
+            add_trace(y = ~pi_mean, mode = 'lines') %>%
+            layout(dragmode = "select", showlegend = FALSE)
+
+          p$elementId <- NULL
+          p
+        }
+      })
+
+
+      callModule(tabPanelModule, "scoreplots", plotObject = plotInputScore,
+                 plotObject2 = plotInputScoreSelect, is.plotly = TRUE)
 
     } # end server
 
