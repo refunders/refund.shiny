@@ -7,6 +7,7 @@
 #' @param xlab x axis label
 #' @param ylab y axis label
 #' @param title plot title
+#' @param thin_data If TRUE data is thinned for each subject to make plotting faster. Defaults to FALSE.
 #' @param ... additional arguments passed to plotting functions
 #'
 #' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu}
@@ -17,13 +18,12 @@
 #'
 #' @export
 #'
-plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
+plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_data = FALSE, ...){
 
   fpca.obj <- obj$fpca_obj
 
   ## NULLify global values called in ggplot
-  iteration = value = tstar = t_hat = latent_mean = index = NULL
-
+  iteration = value = tstar = t_hat = index = NULL
 
   ## establish inverse link function for plotting
   inv_link = createInvLink(family <- fpca.obj$family)
@@ -35,6 +35,20 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
   Yhat_df <- fpca.obj$Yhat
   Y_df <- fpca.obj$Y
   Y = mutate(Y, pi_mean = rep(inv_link(fpca.obj$mu), length.out = dim(Y)[1]))
+
+  ## define global fpca objects
+  mu_df = as_refundObj(matrix(fpca.obj$mu, nrow = 1), index = fpca.obj$argvals)
+  efunctions = matrix(fpca.obj$efunctions, ncol = fpca.obj$npc)
+  sqrt.evalues = diag(sqrt(fpca.obj$evalues), fpca.obj$npc, fpca.obj$npc)
+  scaled_efunctions = efunctions %*% sqrt.evalues
+
+
+  if(thin_data){
+    Y = thin_functional_data(Y)
+    Yhat_df = thin_functional_data(Yhat_df)
+    Y_df = thin_functional_data(Y_df)
+    mu_df = thin_functional_data(mu_df)
+  }
   ################################
   ## code for processing tabs
   ################################
@@ -82,7 +96,6 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
   score.help2 = "Plot shows observed data and fitted values for selected subject.
   Green curve is population mean."
 
-
   #################################
   ## App
   #################################
@@ -128,11 +141,11 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
           curvesPlots = registerLasagna(Y)
           grid.arrange(curvesPlots[[1]],curvesPlots[[2]], ncol = 2)
         }else if(family == "gaussian"){
-          unreg = ggplot(Y, aes(x = tstar, y = latent_mean, group = id)) +
+          unreg = ggplot(Y, aes(x = tstar, y = value, group = id)) +
             geom_path(alpha = .25) + theme_bw() +
             labs(x = "t_star", y = "Prob(Y = 1)")
 
-          reg = ggplot(Y, aes(x = t_hat, y = latent_mean, group = id)) +
+          reg = ggplot(Y, aes(x = t_hat, y = value, group = id)) +
             geom_path(alpha = .25) + theme_bw() +
             labs(x = "t_hat", y = "Prob(Y = 1)")
 
@@ -195,11 +208,6 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
       ## Define fpca objects
       #################################
 
-      ## define global objects
-      mu_df = as_refundObj(matrix(fpca.obj$mu, nrow = 1), index = fpca.obj$argvals)
-      efunctions = matrix(fpca.obj$efunctions, ncol = fpca.obj$npc)
-      sqrt.evalues = diag(sqrt(fpca.obj$evalues), fpca.obj$npc, fpca.obj$npc)
-      scaled_efunctions = efunctions %*% sqrt.evalues
 
       ## prep objects for plotting on response scale; used in subject plot tabs
       mu_df_inv_link = mu_df
@@ -234,6 +242,11 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", ...){
 
         df_minus = as_refundObj(matrix(fpca.obj$mu - 2 * scaled_efuncs, nrow = 1), index = fpca.obj$argvals)
         df_minus$id = 3
+
+        if(thin_data){
+          df_plus = thin_functional_data(df_plus)
+          df_minus = thin_functional_data(df_minus)
+        }
 
         plot_df = bind_rows(mu_df, df_plus, df_minus) %>%
           mutate(id = as.character(id))

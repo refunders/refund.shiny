@@ -15,5 +15,6 @@
 #'
 thin_functional_data = function(Y, length_out = 100){
   Y_grouped = group_by(Y, id)
-  slice(Y_grouped, seq(1, n(), length.out = length_out))
+  Y_thin = slice(Y_grouped, seq(1, n(), length.out = length_out))
+  ungroup(Y_thin)
 }
