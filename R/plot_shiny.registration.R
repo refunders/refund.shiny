@@ -17,7 +17,6 @@
 #' @importFrom plotly plot_ly event_data layout add_trace
 #'
 #' @export
-#'
 plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_data = FALSE, ...){
 
   fpca.obj <- obj$fpca_obj
