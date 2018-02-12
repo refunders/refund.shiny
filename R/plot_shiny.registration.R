@@ -163,7 +163,7 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_dat
 
       plotInputWarps <- reactive({
         key = Y$id
-        p = plot_ly(data = group_by(Y, id), x = ~tstar, y = ~t_hat, type = "scatter",
+        p = plot_ly(data = group_by(Y, id), x = ~t_hat, y = ~tstar, type = "scatter",
                 mode = 'lines', alpha = 0.5, source = "timewarps", key = ~key,
                 hoverinfo = 'text', text = ~paste('Id: ', id)) %>% layout(dragmode = "select")
 
@@ -178,7 +178,7 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_dat
 
         if(!is.null(clicked)){
           Y.clicked = filter(Y, id %in% clicked$key)
-          p = plot_ly(data = group_by(Y.clicked, id), x = ~tstar, y = ~value, type = "scatter",
+          p = plot_ly(data = group_by(Y.clicked, id), x = ~t_hat, y = ~value, type = "scatter",
                   alpha = 0.25, mode = 'markers') %>%
             add_trace(y = ~pi.hat, mode = 'lines') %>%
             add_trace(y = ~pi_mean, mode = 'lines') %>%
@@ -188,7 +188,8 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_dat
           p
 
         }else{
-          p = plot_ly(data = filter(Y, id == first(Y$id)), x = ~tstar, y = ~value, type = "scatter",
+          p = plot_ly(data = filter(Y, id == first(Y$id)), x = ~t_hat, y = ~value,
+                      type = "scatter",
                   alpha = 0.25, mode = 'markers') %>%
             add_trace(y = ~pi.hat, mode = 'lines') %>%
             add_trace(y = ~pi_mean, mode = 'lines') %>%
@@ -302,7 +303,7 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_dat
 
         if(!is.null(clicked)){
           Y.clicked = filter(Y, id %in% clicked$key)
-          p = plot_ly(data = group_by(Y.clicked, id), x = ~tstar, y = ~value, type = "scatter",
+          p = plot_ly(data = group_by(Y.clicked, id), x = ~t_hat, y = ~value, type = "scatter",
                       alpha = 0.25, mode = 'markers') %>%
             add_trace(y = ~pi.hat, mode = 'lines') %>%
             add_trace(y = ~pi_mean, mode = 'lines') %>%
@@ -312,7 +313,8 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_dat
           p
 
         }else{
-          p = plot_ly(data = filter(Y, id == first(Y$id)), x = ~tstar, y = ~value, type = "scatter",
+          p = plot_ly(data = filter(Y, id == first(Y$id)), x = ~t_hat,
+                      y = ~value, type = "scatter",
                       alpha = 0.25, mode = 'markers') %>%
             add_trace(y = ~pi.hat, mode = 'lines') %>%
             add_trace(y = ~pi_mean, mode = 'lines') %>%
