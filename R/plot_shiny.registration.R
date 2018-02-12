@@ -181,7 +181,7 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_dat
           p = plot_ly(data = group_by(Y.clicked, id), x = ~t_hat, y = ~value, type = "scatter",
                   alpha = 0.25, mode = 'markers') %>%
             add_trace(y = ~pi.hat, mode = 'lines') %>%
-            add_trace(y = ~pi_mean, mode = 'lines') %>%
+            add_trace(x = ~tstar, y = ~pi_mean, mode = 'lines') %>%
             layout(dragmode = "select", showlegend = FALSE)
 
           p$elementId <- NULL
@@ -192,7 +192,7 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_dat
                       type = "scatter",
                   alpha = 0.25, mode = 'markers') %>%
             add_trace(y = ~pi.hat, mode = 'lines') %>%
-            add_trace(y = ~pi_mean, mode = 'lines') %>%
+            add_trace(x = ~tstar, y = ~pi_mean, mode = 'lines') %>%
             layout(dragmode = "select", showlegend = FALSE)
 
           p$elementId <- NULL
@@ -306,7 +306,7 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_dat
           p = plot_ly(data = group_by(Y.clicked, id), x = ~t_hat, y = ~value, type = "scatter",
                       alpha = 0.25, mode = 'markers') %>%
             add_trace(y = ~pi.hat, mode = 'lines') %>%
-            add_trace(y = ~pi_mean, mode = 'lines') %>%
+            add_trace(x = ~tstar, y = ~pi_mean, mode = 'lines') %>%
             layout(dragmode = "select", showlegend = FALSE)
 
           p$elementId <- NULL
@@ -317,7 +317,7 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_dat
                       y = ~value, type = "scatter",
                       alpha = 0.25, mode = 'markers') %>%
             add_trace(y = ~pi.hat, mode = 'lines') %>%
-            add_trace(y = ~pi_mean, mode = 'lines') %>%
+            add_trace(x = ~tstar, y = ~pi_mean, mode = 'lines') %>%
             layout(dragmode = "select", showlegend = FALSE)
 
           p$elementId <- NULL
