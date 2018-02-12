@@ -28,6 +28,10 @@ registerLasagna = function(data){
   ## NULLify global values called in ggplot
   value = tstar = t_hat = NULL
 
+  if(is.character(data$id)){
+    data$id = as.numeric(as.factor(data$id))
+  }
+
   ids = unique(data$id)
 
   width.tstar = as.vector( sapply(ids, function(id) getWidth(data$tstar[data$id %in% id ]) ) )
