@@ -210,11 +210,8 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_dat
 
 
       ## prep objects for plotting on response scale; used in subject plot tabs
-      mu_df_inv_link = mu_df
-      mu_df_inv_link = mutate(mu_df_inv_link, value = inv_link(value))
-
-      Yhat_df_inv_link = Yhat_df
-      Yhat_df_inv_link = mutate(Yhat_df_inv_link, value = inv_link(value))
+      mu_df_inv_link = mutate(mu_df, value = inv_link(value))
+      Yhat_df_inv_link = mutate(Yhat_df, value = inv_link(value))
 
       ## define plot defaults
       ## set y axes to be max(2 SDs from mu of PC1, fitted values)
@@ -235,32 +232,22 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_dat
 
       plotInputMuPC <- reactive({
         PCchoice = as.numeric(input$PCchoice)
-        scaled_efuncs = scaled_efunctions[,PCchoice]
 
-        df_plus = as_refundObj(matrix(fpca.obj$mu + 2 * scaled_efuncs, nrow = 1), index = fpca.obj$argvals)
-        df_plus$id = 2
 
-        df_minus = as_refundObj(matrix(fpca.obj$mu - 2 * scaled_efuncs, nrow = 1), index = fpca.obj$argvals)
-        df_minus$id = 3
 
-        if(thin_data){
-          df_plus = thin_functional_data(df_plus)
-          df_minus = thin_functional_data(df_minus)
-        }
 
-        plot_df = bind_rows(mu_df, df_plus, df_minus) %>%
-          mutate(id = as.character(id))
-
-        if (!(is.null(fpca.obj$family) || fpca.obj$family == "gaussian") && input[["muPC_scale"]] == "Response") {
-          plot_df = mutate(plot_df, value = inv_link(value))
-          plotDefaults[["ylim"]] = ylim(c(range(Y_df$value)[1], range(Y_df$value)[2]))
-        }
-
-        p1 <- ggplot(filter(plot_df, id == "1"), aes(x = index, y = value)) + geom_line(lwd = 1) + plotDefaults +
-          geom_point(data = filter(plot_df, id == "2"), color = "blue", size = 4, shape = '+') +
-          geom_point(data = filter(plot_df, id == "3"), color = "indianred", size = 4, shape = "-") +
-          ggtitle(bquote(psi[.(input$PCchoice)]~(t) ~ "," ~.(100*round(fpca.obj$evalues[as.numeric(input$PCchoice)]/sum(fpca.obj$evalues),3)) ~ "% Variance"))
+        # if (!(is.null(fpca.obj$family) || fpca.obj$family == "gaussian") && input[["muPC_scale"]] == "Response") {
+        #   plot_df = mutate(plot_df, value = inv_link(value))
+        #   plotDefaults[["ylim"]] = ylim(c(range(Y_df$value)[1], range(Y_df$value)[2]))
+        # }
+        #
+        # p1 <- ggplot(filter(plot_df, id == "1"), aes(x = index, y = value)) + geom_line(lwd = 1) + plotDefaults +
+        #   geom_point(data = filter(plot_df, id == "2"), color = "blue", size = 4, shape = '+') +
+        #   geom_point(data = filter(plot_df, id == "3"), color = "indianred", size = 4, shape = "-") +
+        #   ggtitle(bquote(psi[.(input$PCchoice)]~(t) ~ "," ~.(100*round(fpca.obj$evalues[as.numeric(input$PCchoice)]/sum(fpca.obj$evalues),3)) ~ "% Variance"))
       })
+
+      p1 <- make_muPC(fpca.obj, plotInputMuPC())
 
       callModule(tabPanelModule, "muPC", plotObject = plotInputMuPC, plotName = "muPC")
 
