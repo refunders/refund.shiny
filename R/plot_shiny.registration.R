@@ -41,7 +41,6 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_dat
   sqrt.evalues = diag(sqrt(fpca.obj$evalues), fpca.obj$npc, fpca.obj$npc)
   scaled_efunctions = efunctions %*% sqrt.evalues
 
-
   if(thin_data){
     Y = thin_functional_data(Y)
     Yhat_df = thin_functional_data(Yhat_df)
@@ -233,21 +232,15 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_dat
       plotInputMuPC <- reactive({
         PCchoice = as.numeric(input$PCchoice)
 
+        if (!(is.null(fpca.obj$family) || fpca.obj$family == "gaussian") && input[["muPC_scale"]] == "Response") {
+          response_scale = TRUE
+        }else{
+          response_scale = FALSE
+        }
 
-
-
-        # if (!(is.null(fpca.obj$family) || fpca.obj$family == "gaussian") && input[["muPC_scale"]] == "Response") {
-        #   plot_df = mutate(plot_df, value = inv_link(value))
-        #   plotDefaults[["ylim"]] = ylim(c(range(Y_df$value)[1], range(Y_df$value)[2]))
-        # }
-        #
-        # p1 <- ggplot(filter(plot_df, id == "1"), aes(x = index, y = value)) + geom_line(lwd = 1) + plotDefaults +
-        #   geom_point(data = filter(plot_df, id == "2"), color = "blue", size = 4, shape = '+') +
-        #   geom_point(data = filter(plot_df, id == "3"), color = "indianred", size = 4, shape = "-") +
-        #   ggtitle(bquote(psi[.(input$PCchoice)]~(t) ~ "," ~.(100*round(fpca.obj$evalues[as.numeric(input$PCchoice)]/sum(fpca.obj$evalues),3)) ~ "% Variance"))
+        p1 <- make_muPC(fpca.obj, PCchoice, response_scale)
       })
 
-      p1 <- make_muPC(fpca.obj, plotInputMuPC())
 
       callModule(tabPanelModule, "muPC", plotObject = plotInputMuPC, plotName = "muPC")
 
@@ -257,6 +250,8 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_dat
 
       plotInputSubject <- reactive({
         subjectnum = input$subject
+
+        #p4 = make_subjectPlot()
 
         p4 = ggplot(data = mu_df_inv_link, aes(x = index, y = value)) + geom_line(lwd = 0.5, color = "gray") +
           geom_line(data = filter(Yhat_df_inv_link, id == subjectnum), size = 1, color = "cornflowerblue") +

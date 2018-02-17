@@ -4,12 +4,15 @@
 \alias{make_muPC}
 \title{Create muPC plot for FPCA panels}
 \usage{
-make_muPC(obj, pc_choice)
+make_muPC(obj, pc_choice, response_scale = FALSE)
 }
 \arguments{
 \item{obj}{fpca object to be plotted.}
 
 \item{pc_choice}{FPC to be plotted.}
+
+\item{response_scale}{Scale of reponse to be plotted. If TRUE results are plotted on response scale,
+if FALSE results are plotted on natural scale.}
 }
 \description{
 Produces a ggplot with mean plus or minus two standard deviations of a selected FPC.
