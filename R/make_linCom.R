@@ -26,7 +26,7 @@ make_linCom = function(obj, pc_weights, response_scale = FALSE){
   max.y = max(c(obj$mu + 2 * abs(scaled_efunctions[, 1]), range(obj$Yhat$value)[2]))
 
   df = data.frame(id = 1,
-                  lincom = obj$mu + scaled_efunctions %*% pc_weights,
+                  lincom = as.vector(obj$mu) + scaled_efunctions %*% pc_weights,
                   mu = obj$mu,
                   index = seq(min.x, max.x, length.out = length(obj$mu)))
 

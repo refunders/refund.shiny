@@ -45,9 +45,9 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", thin_data = FALS
   	Yhat_df = fpca.obj$Yhat
   }
 
-  Y = mutate(Y, pop_mean = rep(inv_link(fpca.obj$mu), length.out = dim(Y)[1]),
-             Y.hat = fpca.obj$Yhat$value,
-             yhat_inv_link = inv_link(Y.hat))
+  Yhat_df = mutate(Yhat_df,
+                   yhat_inv_link = inv_link(value),
+                   pop_mean = rep(inv_link(fpca.obj$mu), length.out = dim(Yhat_df)[1]))
 
   if(thin_data){
     Y = thin_functional_data(Y)
@@ -139,6 +139,8 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", thin_data = FALS
       ## Code for mu PC plot
       #################################
 
+      fpca.obj$Y = Y
+      fpca.obj$Yhat = Yhat_df
       plotInputMuPC <- reactive({
         PCchoice = as.numeric(input$PCchoice)
 
@@ -194,11 +196,14 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", thin_data = FALS
 
         Y_sub = filter(Y, id == subjectnum)
 
-        p4 = ggplot(Y_sub, aes(index, pop_mean)) +
-          geom_line(lwd = 0.5, color = "gray") +
-          geom_line(aes(y = yhat_inv_link), size = 1, color = "cornflowerblue") +
-          geom_point(aes(y = value), color = "blue", alpha = 1/3) +
-          theme_bw() + xlab(xlab) + ylab(ylab)
+        p4 = ggplot(Y_sub, aes(index, value)) +
+          geom_point(color = "blue", alpha = 1/3) +
+          geom_line(data = filter(Yhat_df, id == subjectnum),
+                    aes(y = pop_mean), lwd = 0.5, color = "gray") +
+          geom_line(data = filter(Yhat_df, id == subjectnum),
+                    aes(y = yhat_inv_link), size = 1, color = "cornflowerblue") +
+          theme_bw() + xlab(xlab) + ylab(ylab) +
+          ylim(min(fpca.obj$Y$value), max(fpca.obj$Y$value))
       })
 
       callModule(tabPanelModule, "subjects", plotObject = plotInputSubject, plotName = "subjects")
