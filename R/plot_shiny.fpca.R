@@ -7,6 +7,7 @@
 #' @param xlab x axis label
 #' @param ylab y axis label
 #' @param title plot title
+#' @param thin_data If TRUE data is thinned for each subject to make plotting faster. Defaults to FALSE.
 #' @param ... additional arguments passed to plotting functions
 #'
 #' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu},
@@ -18,12 +19,12 @@
 #'
 #' @export
 #'
-plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
+plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", thin_data = FALSE, ...) {
 
   fpca.obj <- obj
 
   ## NULLify global values called in ggplot
-  PCX = PCY = V1 = V2 = k = lambda = value = subj = index = NULL
+  PCX = PCY = V1 = V2 = k = lambda = value = subj = index = pop_mean = yhat_inv_link = Y.hat = NULL
 
   ## establish inverse link function for plotting
   inv_link = createInvLink(family <- fpca.obj$family)
@@ -33,9 +34,9 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
   ################################
 
   if (is.matrix(fpca.obj$Y)) {
-  	Y_df = as_refundObj(fpca.obj$Y, index = fpca.obj$argvals)
+  	Y = as_refundObj(fpca.obj$Y, index = fpca.obj$argvals)
   } else {
-  	Y_df = fpca.obj$Y
+  	Y = fpca.obj$Y
   }
 
   if (is.matrix(fpca.obj$Yhat)) {
@@ -44,12 +45,14 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
   	Yhat_df = fpca.obj$Yhat
   }
 
-  Y = fpca.obj$Y
   Y = mutate(Y, pop_mean = rep(inv_link(fpca.obj$mu), length.out = dim(Y)[1]),
              Y.hat = fpca.obj$Yhat$value,
              yhat_inv_link = inv_link(Y.hat))
 
-
+  if(thin_data){
+    Y = thin_functional_data(Y)
+    Yhat_df = thin_functional_data(Yhat_df)
+  }
   ################################
   ## code for processing tabs
   ################################
@@ -84,7 +87,7 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
 
   ## Tab 4: subject fits
   subjects.help = "Plot shows observed data and fitted values for the subject selected below."
-  subjects.call = eval(call("selectInput", inputId = "subject", label = ("Select Subject"), choices = unique(Yhat_df$id), selected = unique(Yhat_df$id)[1]))
+  subjects.call = eval(call("selectInput", inputId = "subject", label = ("Select Subject"), choices = unique(Y$id), selected = unique(Y$id)[1]))
 
   ## Tab 5: score plots
   score.help1 = "Use the drop down menus to select FPCs for the X and Y axis. Plot shows observed score
@@ -132,32 +135,6 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
 
     server = function(input, output){
 
-      ## define global objects
-      mu_df = as_refundObj(matrix(fpca.obj$mu, nrow = 1), index = fpca.obj$argvals)
-      efunctions = matrix(fpca.obj$efunctions, ncol = fpca.obj$npc)
-      sqrt.evalues = diag(sqrt(fpca.obj$evalues), fpca.obj$npc, fpca.obj$npc)
-      scaled_efunctions = efunctions %*% sqrt.evalues
-
-      ## prep objects for plotting on response scale; used in subject plot tabs
-      mu_df_inv_link = mu_df
-      mu_df_inv_link = mutate(mu_df_inv_link, value = inv_link(value))
-
-      Yhat_df_inv_link = Yhat_df
-      Yhat_df_inv_link = mutate(Yhat_df_inv_link, value = inv_link(value))
-
-      ## define plot defaults
-      ## set y axes to be max(2 SDs from mu of PC1, fitted values)
-      max.y = max(fpca.obj$mu + 2 * abs(scaled_efunctions[, 1]))
-      min.y = min(fpca.obj$mu - 2 * abs(scaled_efunctions[, 1]))
-
-      plotDefaults = list(theme = theme_bw(),
-                          title = theme(plot.title = element_text(size = 20)),
-                          xlab = xlab(xlab),
-                          ylab = ylab(ylab),
-                          ylim = ylim(c(min(min.y, range(Yhat_df$value)[1]), max(max.y,range(Yhat_df$value)[2]))),
-                          x_scale = scale_x_continuous(breaks = seq(0, length(fpca.obj$mu) - 1, length = 6),
-                                                       labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1))))
-
       #################################
       ## Code for mu PC plot
       #################################
@@ -195,21 +172,14 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
       plotInputLinCom <- reactive({
         PCweights = rep(NA, length(PCs))
         for (i in 1:length(PCs)) {PCweights[i] = input[[PCs[i]]]}
-        df = as_refundObj(matrix(fpca.obj$mu, nrow = 1) + t(efunctions %*% sqrt.evalues %*% PCweights),
-                          index = fpca.obj$argvals)
-        df$id = 2
-        plot_df = bind_rows(mu_df, df) %>%
-          mutate(id = as.character(id))
 
         if (!(is.null(fpca.obj$family) || fpca.obj$family == "gaussian") && input[["lincom_scale"]] == "Response") {
-          plot_df = mutate(plot_df, value = inv_link(value))
-          plotDefaults[["ylim"]] = ylim(c(range(Y_df$value)[1], range(Y_df$value)[2]))
+          response_scale = TRUE
+        }else{
+          response_scale = FALSE
         }
 
-        p3 <- ggplot(plot_df, aes(x = index, y = value, color = id, lwd = id)) + geom_line() + plotDefaults +
-          theme(legend.key = element_blank()) + xlab(xlab) + ylab(ylab) + ggtitle(title) +
-          scale_color_manual("Line Legend", values = c("1" = "gray", "2" = "cornflowerblue"), guide = FALSE) +
-          scale_size_manual("Line Legend", values = c("1" = 0.75, "2" = 1.3), guide = FALSE)
+        p3 <- make_linCom(fpca.obj, PCweights, response_scale)
 
       })
 
@@ -240,7 +210,7 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
 
       scoredata = as.data.frame(cbind(fpca.obj$scores))
       colnames(scoredata) = c(paste0("PC", 1:fpca.obj$npc))
-      scoredata = mutate(scoredata, id = unique(Yhat_df$id))
+      scoredata = mutate(scoredata, id = unique(Y$id))
 
       scoredata_new <- reactive({
         PCX_num = as.numeric(input$PCX)

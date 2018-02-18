@@ -22,23 +22,19 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_dat
   fpca.obj <- obj$fpca_obj
 
   ## NULLify global values called in ggplot
-  iteration = value = tstar = t_hat = index = NULL
+  iteration = value = tstar = t_hat = index = pop_mean = Y.hat = yhat_inv_link = NULL
 
   ## establish inverse link function for plotting
   inv_link = createInvLink(family <- fpca.obj$family)
 
   ## data management. Probably should think about generalizing this to other distributions.
   Y = obj$Y
-  Yhat_df = fpca.obj$Yhat
   Y = mutate(Y, pop_mean = rep(inv_link(fpca.obj$mu), length.out = dim(Y)[1]),
              Y.hat = fpca.obj$Yhat$value,
              yhat_inv_link = inv_link(Y.hat))
 
-  ## define global fpca objects
-
   if(thin_data){
     Y = thin_functional_data(Y)
-    Yhat_df = thin_functional_data(Yhat_df)
   }
   ################################
   ## code for processing tabs
@@ -76,7 +72,7 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_dat
   # subject fits plot
   subjects.help = "Plot shows observed data and fitted values for the subject selected below."
   subjects.call = eval(call("selectInput", inputId = "subject", label = ("Select Subject"),
-                            choices = unique(Yhat_df$id), selected = unique(Yhat_df$id)[1]))
+                            choices = unique(Y$id), selected = unique(Y$id)[1]))
 
   # scoreplot (need to edit this in both versions)
   scoredata = as.data.frame(fpca.obj$scores)
@@ -194,15 +190,6 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_dat
 
       callModule(tabPanelModule, "warps", plotObject = plotInputWarps, plotName = "warps",
                  plotObject2 = plotInputWarpSelect, is.plotly = TRUE)
-
-
-      #################################
-      ## Define fpca objects
-      #################################
-
-
-      ## prep objects for plotting on response scale; used in subject plot tabs
-      Yhat_df_inv_link = mutate(Yhat_df, value = inv_link(value))
 
 
       #################################
