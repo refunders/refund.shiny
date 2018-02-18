@@ -44,6 +44,12 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
   	Yhat_df = fpca.obj$Yhat
   }
 
+  Y = fpca.obj$Y
+  Y = mutate(Y, pop_mean = rep(inv_link(fpca.obj$mu), length.out = dim(Y)[1]),
+             Y.hat = fpca.obj$Yhat$value,
+             yhat_inv_link = inv_link(Y.hat))
+
+
   ################################
   ## code for processing tabs
   ################################
@@ -214,14 +220,15 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
       #################################
 
       plotInputSubject <- reactive({
-        subjectnum = input$subject
+        subjectnum = as.numeric(input$subject)
 
-        p4 = ggplot(data = mu_df_inv_link, aes(x = index, y = value)) + geom_line(lwd = 0.5, color = "gray") +
-          geom_line(data = filter(Yhat_df_inv_link, id == subjectnum), size = 1, color = "cornflowerblue") +
-          geom_point(data = filter(Y_df, id == subjectnum), color = "blue", alpha = 1/3) +
-          theme_bw() + xlab(xlab) + ylab(ylab) + ylim(c(range(Y_df$value)[1], range(Y_df$value)[2])) +
-          scale_x_continuous(breaks = seq(0, length(fpca.obj$mu) - 1, length = 6), labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1)))
+        Y_sub = filter(Y, id == subjectnum)
 
+        p4 = ggplot(Y_sub, aes(index, pop_mean)) +
+          geom_line(lwd = 0.5, color = "gray") +
+          geom_line(aes(y = yhat_inv_link), size = 1, color = "cornflowerblue") +
+          geom_point(aes(y = value), color = "blue", alpha = 1/3) +
+          theme_bw() + xlab(xlab) + ylab(ylab)
       })
 
       callModule(tabPanelModule, "subjects", plotObject = plotInputSubject, plotName = "subjects")

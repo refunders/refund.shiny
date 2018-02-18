@@ -28,24 +28,17 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_dat
   inv_link = createInvLink(family <- fpca.obj$family)
 
   ## data management. Probably should think about generalizing this to other distributions.
-  Y <- obj$Y
-  Y$Y.hat <- fpca.obj$Yhat$value
-  Y$pi.hat <- inv_link(Y$Y.hat)
-  Yhat_df <- fpca.obj$Yhat
-  Y_df <- fpca.obj$Y
-  Y = mutate(Y, pi_mean = rep(inv_link(fpca.obj$mu), length.out = dim(Y)[1]))
+  Y = obj$Y
+  Yhat_df = fpca.obj$Yhat
+  Y = mutate(Y, pop_mean = rep(inv_link(fpca.obj$mu), length.out = dim(Y)[1]),
+             Y.hat = fpca.obj$Yhat$value,
+             yhat_inv_link = inv_link(Y.hat))
 
   ## define global fpca objects
-  mu_df = as_refundObj(matrix(fpca.obj$mu, nrow = 1), index = fpca.obj$argvals)
-  efunctions = matrix(fpca.obj$efunctions, ncol = fpca.obj$npc)
-  sqrt.evalues = diag(sqrt(fpca.obj$evalues), fpca.obj$npc, fpca.obj$npc)
-  scaled_efunctions = efunctions %*% sqrt.evalues
 
   if(thin_data){
     Y = thin_functional_data(Y)
     Yhat_df = thin_functional_data(Yhat_df)
-    Y_df = thin_functional_data(Y_df)
-    mu_df = thin_functional_data(mu_df)
   }
   ################################
   ## code for processing tabs
@@ -179,8 +172,8 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_dat
           Y.clicked = filter(Y, id %in% clicked$key)
           p = plot_ly(data = group_by(Y.clicked, id), x = ~t_hat, y = ~value, type = "scatter",
                   alpha = 0.25, mode = 'markers') %>%
-            add_trace(y = ~pi.hat, mode = 'lines') %>%
-            add_trace(x = ~tstar, y = ~pi_mean, mode = 'lines') %>%
+            add_trace(y = ~yhat_inv_link, mode = 'lines') %>%
+            add_trace(x = ~tstar, y = ~pop_mean, mode = 'lines') %>%
             layout(dragmode = "select", showlegend = FALSE)
 
           p$elementId <- NULL
@@ -190,8 +183,8 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_dat
           p = plot_ly(data = filter(Y, id == first(Y$id)), x = ~t_hat, y = ~value,
                       type = "scatter",
                   alpha = 0.25, mode = 'markers') %>%
-            add_trace(y = ~pi.hat, mode = 'lines') %>%
-            add_trace(x = ~tstar, y = ~pi_mean, mode = 'lines') %>%
+            add_trace(y = ~yhat_inv_link, mode = 'lines') %>%
+            add_trace(x = ~tstar, y = ~pop_mean, mode = 'lines') %>%
             layout(dragmode = "select", showlegend = FALSE)
 
           p$elementId <- NULL
@@ -209,21 +202,8 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_dat
 
 
       ## prep objects for plotting on response scale; used in subject plot tabs
-      mu_df_inv_link = mutate(mu_df, value = inv_link(value))
       Yhat_df_inv_link = mutate(Yhat_df, value = inv_link(value))
 
-      ## define plot defaults
-      ## set y axes to be max(2 SDs from mu of PC1, fitted values)
-      max.y = max(fpca.obj$mu + 2 * abs(scaled_efunctions[, 1]))
-      min.y = min(fpca.obj$mu - 2 * abs(scaled_efunctions[, 1]))
-
-      plotDefaults = list(theme = theme_bw(),
-                          title = theme(plot.title = element_text(size = 20)),
-                          xlab = xlab(xlab),
-                          ylab = ylab(ylab),
-                          ylim = ylim(c(min(min.y, range(Yhat_df$value)[1]), max(max.y,range(Yhat_df$value)[2]))),
-                          x_scale = scale_x_continuous(breaks = seq(0, length(fpca.obj$mu) - 1, length = 6),
-                                                       labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1))))
 
       #################################
       ## Code for plot of fpca mean +/- PCs
@@ -249,16 +229,15 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_dat
       #################################
 
       plotInputSubject <- reactive({
-        subjectnum = input$subject
+        subjectnum = as.numeric(input$subject)
 
-        #p4 = make_subjectPlot()
+        Y_sub = filter(Y, id == subjectnum)
 
-        p4 = ggplot(data = mu_df_inv_link, aes(x = index, y = value)) + geom_line(lwd = 0.5, color = "gray") +
-          geom_line(data = filter(Yhat_df_inv_link, id == subjectnum), size = 1, color = "cornflowerblue") +
-          geom_point(data = filter(Y_df, id == subjectnum), color = "blue", alpha = 1/3) +
-          theme_bw() + xlab(xlab) + ylab(ylab) + ylim(c(range(Y_df$value)[1], range(Y_df$value)[2])) +
-          scale_x_continuous(breaks = seq(0, length(fpca.obj$mu) - 1, length = 6), labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1)))
-
+        p4 = ggplot(Y_sub, aes(index, pop_mean)) +
+          geom_line(lwd = 0.5, color = "gray") +
+          geom_line(aes(y = yhat_inv_link), size = 1, color = "cornflowerblue") +
+          geom_point(aes(y = value), color = "blue", alpha = 1/3) +
+          theme_bw() + xlab(xlab) + ylab(ylab)
       })
 
       callModule(tabPanelModule, "subjects", plotObject = plotInputSubject, plotName = "subjects")
@@ -287,8 +266,8 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_dat
           Y.clicked = filter(Y, id %in% clicked$key)
           p = plot_ly(data = group_by(Y.clicked, id), x = ~t_hat, y = ~value, type = "scatter",
                       alpha = 0.25, mode = 'markers') %>%
-            add_trace(y = ~pi.hat, mode = 'lines') %>%
-            add_trace(x = ~tstar, y = ~pi_mean, mode = 'lines') %>%
+            add_trace(y = ~yhat_inv_link, mode = 'lines') %>%
+            add_trace(x = ~tstar, y = ~pop_mean, mode = 'lines') %>%
             layout(dragmode = "select", showlegend = FALSE)
 
           p$elementId <- NULL
@@ -298,8 +277,8 @@ plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_dat
           p = plot_ly(data = filter(Y, id == first(Y$id)), x = ~t_hat,
                       y = ~value, type = "scatter",
                       alpha = 0.25, mode = 'markers') %>%
-            add_trace(y = ~pi.hat, mode = 'lines') %>%
-            add_trace(x = ~tstar, y = ~pi_mean, mode = 'lines') %>%
+            add_trace(y = ~yhat_inv_link, mode = 'lines') %>%
+            add_trace(x = ~tstar, y = ~pop_mean, mode = 'lines') %>%
             layout(dragmode = "select", showlegend = FALSE)
 
           p$elementId <- NULL
