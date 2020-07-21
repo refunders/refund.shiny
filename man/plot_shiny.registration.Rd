@@ -5,7 +5,7 @@
 \title{Interactive Plotting for Registration Objects}
 \usage{
 \method{plot_shiny}{registration}(obj, xlab = "", ylab = "", title = "",
-  ...)
+  thin_data = FALSE, ...)
 }
 \arguments{
 \item{obj}{registration object to be plotted.}
@@ -15,6 +15,8 @@
 \item{ylab}{y axis label}
 
 \item{title}{plot title}
+
+\item{thin_data}{If TRUE data is thinned for each subject to make plotting faster. Defaults to FALSE.}
 
 \item{...}{additional arguments passed to plotting functions}
 }
@@ -26,6 +28,5 @@ Our registration method uses FPCA, the FPCA is plotted as well.
 \code{\link{plot_shiny}}
 }
 \author{
-Julia Wrobel \email{jw3134@cumc.columbia.edu},
-Jeff Goldsmith \email{jeff.goldsmith@columbia.edu}
+Julia Wrobel \email{jw3134@cumc.columbia.edu}
 }

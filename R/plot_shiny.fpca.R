@@ -7,6 +7,7 @@
 #' @param xlab x axis label
 #' @param ylab y axis label
 #' @param title plot title
+#' @param thin_data If TRUE data is thinned for each subject to make plotting faster. Defaults to FALSE.
 #' @param ... additional arguments passed to plotting functions
 #'
 #' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu},
@@ -18,24 +19,24 @@
 #'
 #' @export
 #'
-plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
+plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", thin_data = FALSE, ...) {
 
   fpca.obj <- obj
 
   ## NULLify global values called in ggplot
-  PCX = PCY = V1 = V2 = k = lambda = value = subj = index = NULL
+  PCX = PCY = V1 = V2 = k = lambda = value = subj = index = pop_mean = yhat_inv_link = Y.hat = NULL
 
   ## establish inverse link function for plotting
-  inv_link = createInvLink(family = fpca.obj$family)
+  inv_link = createInvLink(family <- fpca.obj$family)
 
   ################################
   ## convert matrices storing functional data to dfs
   ################################
 
   if (is.matrix(fpca.obj$Y)) {
-  	Y_df = as_refundObj(fpca.obj$Y, index = fpca.obj$argvals)
+  	Y = as_refundObj(fpca.obj$Y, index = fpca.obj$argvals)
   } else {
-  	Y_df = fpca.obj$Y
+  	Y = fpca.obj$Y
   }
 
   if (is.matrix(fpca.obj$Yhat)) {
@@ -44,6 +45,14 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
   	Yhat_df = fpca.obj$Yhat
   }
 
+  Yhat_df = mutate(Yhat_df,
+                   yhat_inv_link = inv_link(value),
+                   pop_mean = rep(inv_link(fpca.obj$mu), length.out = dim(Yhat_df)[1]))
+
+  if(thin_data){
+    Y = thin_functional_data(Y)
+    Yhat_df = thin_functional_data(Yhat_df)
+  }
   ################################
   ## code for processing tabs
   ################################
@@ -78,13 +87,13 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
 
   ## Tab 4: subject fits
   subjects.help = "Plot shows observed data and fitted values for the subject selected below."
-  subjects.call = eval(call("selectInput", inputId = "subject", label = ("Select Subject"), choices = unique(Yhat_df$id), selected = unique(Yhat_df$id)[1]))
+  subjects.call = eval(call("selectInput", inputId = "subject", label = ("Select Subject"), choices = unique(Y$id), selected = unique(Y$id)[1]))
 
   ## Tab 5: score plots
   score.help1 = "Use the drop down menus to select FPCs for the X and Y axis. Plot shows observed score
                                              scatterplot for selected FPCs; click and drag on the scatterplot to select subjects."
-  score.help2 = "Black curves are fitted values for all subjects. Blue curves correspond to subjects
-                                                  selected in the graph above. If no points are selected, the mean curve is shown."
+  score.help2 = "Blue curves are fitted values for all subjects. Orange curves correspond to subjects
+                                                  selected in the graph above."
 
   score.call = tagList(  selectInput("PCX", label = ("Select X-axis FPC"), choices = 1:fpca.obj$npc, selected = 1),
     selectInput("PCY", label = ("Select Y-axis FPC"), choices = 1:fpca.obj$npc, selected = 2) )
@@ -126,58 +135,22 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
 
     server = function(input, output){
 
-      ## define global objects
-      mu_df = as_refundObj(matrix(fpca.obj$mu, nrow = 1), index = fpca.obj$argvals)
-      efunctions = matrix(fpca.obj$efunctions, ncol = fpca.obj$npc)
-      sqrt.evalues = diag(sqrt(fpca.obj$evalues), fpca.obj$npc, fpca.obj$npc)
-      scaled_efunctions = efunctions %*% sqrt.evalues
-
-      ## prep objects for plotting on response scale; used in subject plot tabs
-      mu_df_inv_link = mu_df
-      mu_df_inv_link = mutate(mu_df_inv_link, value = inv_link(value))
-
-      Yhat_df_inv_link = Yhat_df
-      Yhat_df_inv_link = mutate(Yhat_df_inv_link, value = inv_link(value))
-
-      ## define plot defaults
-      ## set y axes to be max(2 SDs from mu of PC1, fitted values)
-      max.y = max(fpca.obj$mu + 2 * abs(scaled_efunctions[, 1]))
-      min.y = min(fpca.obj$mu - 2 * abs(scaled_efunctions[, 1]))
-
-      plotDefaults = list(theme = theme_bw(),
-                          title = theme(plot.title = element_text(size = 20)),
-                          xlab = xlab(xlab),
-                          ylab = ylab(ylab),
-                          ylim = ylim(c(min(min.y, range(Yhat_df$value)[1]), max(max.y,range(Yhat_df$value)[2]))),
-                          x_scale = scale_x_continuous(breaks = seq(0, length(fpca.obj$mu) - 1, length = 6),
-                                                       labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1))))
-
       #################################
       ## Code for mu PC plot
       #################################
 
+      fpca.obj$Y = Y
+      fpca.obj$Yhat = Yhat_df
       plotInputMuPC <- reactive({
         PCchoice = as.numeric(input$PCchoice)
-        scaled_efuncs = scaled_efunctions[,PCchoice]
-
-        df_plus = as_refundObj(matrix(fpca.obj$mu + 2 * scaled_efuncs, nrow = 1), index = fpca.obj$argvals)
-        df_plus$id = 2
-
-        df_minus = as_refundObj(matrix(fpca.obj$mu - 2 * scaled_efuncs, nrow = 1), index = fpca.obj$argvals)
-        df_minus$id = 3
-
-        plot_df = bind_rows(mu_df, df_plus, df_minus) %>%
-          mutate(id = as.character(id))
 
         if (!(is.null(fpca.obj$family) || fpca.obj$family == "gaussian") && input[["muPC_scale"]] == "Response") {
-          plot_df = mutate(plot_df, value = inv_link(value))
-          plotDefaults[["ylim"]] = ylim(c(range(Y_df$value)[1], range(Y_df$value)[2]))
+          response_scale = TRUE
+        }else{
+          response_scale = FALSE
         }
 
-        p1 <- ggplot(filter(plot_df, id == "1"), aes(x = index, y = value)) + geom_line(lwd = 1) + plotDefaults +
-          geom_point(data = filter(plot_df, id == "2"), color = "blue", size = 4, shape = '+') +
-          geom_point(data = filter(plot_df, id == "3"), color = "indianred", size = 4, shape = "-") +
-          ggtitle(bquote(psi[.(input$PCchoice)]~(t) ~ "," ~.(100*round(fpca.obj$evalues[as.numeric(input$PCchoice)]/sum(fpca.obj$evalues),3)) ~ "% Variance"))
+        p1 <- make_muPC(fpca.obj, PCchoice, response_scale)
       })
 
       callModule(tabPanelModule, "muPC", plotObject = plotInputMuPC, plotName = "muPC")
@@ -201,21 +174,14 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
       plotInputLinCom <- reactive({
         PCweights = rep(NA, length(PCs))
         for (i in 1:length(PCs)) {PCweights[i] = input[[PCs[i]]]}
-        df = as_refundObj(matrix(fpca.obj$mu, nrow = 1) + t(efunctions %*% sqrt.evalues %*% PCweights),
-                          index = fpca.obj$argvals)
-        df$id = 2
-        plot_df = bind_rows(mu_df, df) %>%
-          mutate(id = as.character(id))
 
         if (!(is.null(fpca.obj$family) || fpca.obj$family == "gaussian") && input[["lincom_scale"]] == "Response") {
-          plot_df = mutate(plot_df, value = inv_link(value))
-          plotDefaults[["ylim"]] = ylim(c(range(Y_df$value)[1], range(Y_df$value)[2]))
+          response_scale = TRUE
+        }else{
+          response_scale = FALSE
         }
 
-        p3 <- ggplot(plot_df, aes(x = index, y = value, color = id, lwd = id)) + geom_line() + plotDefaults +
-          theme(legend.key = element_blank()) + xlab(xlab) + ylab(ylab) + ggtitle(title) +
-          scale_color_manual("Line Legend", values = c("1" = "gray", "2" = "cornflowerblue"), guide = FALSE) +
-          scale_size_manual("Line Legend", values = c("1" = 0.75, "2" = 1.3), guide = FALSE)
+        p3 <- make_linCom(fpca.obj, PCweights, response_scale)
 
       })
 
@@ -226,14 +192,18 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
       #################################
 
       plotInputSubject <- reactive({
-        subjectnum = input$subject
+        subjectnum = as.numeric(input$subject)
 
-        p4 = ggplot(data = mu_df_inv_link, aes(x = index, y = value)) + geom_line(lwd = 0.5, color = "gray") +
-          geom_line(data = filter(Yhat_df_inv_link, id == subjectnum), size = 1, color = "cornflowerblue") +
-          geom_point(data = filter(Y_df, id == subjectnum), color = "blue", alpha = 1/3) +
-          theme_bw() + xlab(xlab) + ylab(ylab) + ylim(c(range(Y_df$value)[1], range(Y_df$value)[2])) +
-          scale_x_continuous(breaks = seq(0, length(fpca.obj$mu) - 1, length = 6), labels = paste0(c(0, 0.2, 0.4, 0.6, 0.8, 1)))
+        Y_sub = filter(Y, id == subjectnum)
 
+        p4 = ggplot(Y_sub, aes(index, value)) +
+          geom_point(color = "blue", alpha = 1/3) +
+          geom_line(data = filter(Yhat_df, id == subjectnum),
+                    aes(y = pop_mean), lwd = 0.5, color = "gray") +
+          geom_line(data = filter(Yhat_df, id == subjectnum),
+                    aes(y = yhat_inv_link), size = 1, color = "cornflowerblue") +
+          theme_bw() + xlab(xlab) + ylab(ylab) +
+          ylim(min(fpca.obj$Y$value), max(fpca.obj$Y$value))
       })
 
       callModule(tabPanelModule, "subjects", plotObject = plotInputSubject, plotName = "subjects")
@@ -245,7 +215,7 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
 
       scoredata = as.data.frame(cbind(fpca.obj$scores))
       colnames(scoredata) = c(paste0("PC", 1:fpca.obj$npc))
-      scoredata = mutate(scoredata, id = unique(Yhat_df$id))
+      scoredata = mutate(scoredata, id = unique(Y$id))
 
       scoredata_new <- reactive({
         PCX_num = as.numeric(input$PCX)
@@ -255,32 +225,35 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", ...) {
 
       ## Tab 5 Plot
       scoreplot1Input <- reactive({
-        gg1 <- ggplot(scoredata_new(), aes(x = PCX, y = PCY, key = id)) +
-          geom_point(color = "blue", alpha = 1/5, size = 3, aes(text = id)) +
-          xlab(paste("Scores for FPC", input$PCX)) + ylab(paste("Scores for FPC", input$PCY)) + theme_bw()
-
-        ggplotly(gg1, source = "scoreplot") %>% layout(dragmode = "select")
+        key = scoredata_new()$id
+        p = plot_ly(data = scoredata_new(), x = ~PCX, y = ~PCY, type = "scatter",
+                    mode = 'markers', source = "scoreplot", key = ~key,
+                    hoverinfo = 'text', text = ~paste('Id: ', id)) %>%
+          layout(dragmode = "select")
+        p$elementId <- NULL
+        p
       })
 
       ### second score plot
-      baseplot = ggplot(Yhat_df, aes(x = index, y = value, group = id)) +
-        geom_line(alpha = 1/5, color = "black", aes(text = id)) +
-        plotDefaults
-
+      baseplot = plot_ly(data = group_by(Yhat_df, id), x = ~index, y = ~value, type = "scatter",
+                         mode = 'lines', alpha = 0.15, hoverinfo = 'text', text = ~paste('Id: ', id))
 
       scoreplot2Input <- reactive({
+        clicked <- event_data("plotly_click", source = "scoreplot")
+        brushed <- event_data("plotly_selected", source = "scoreplot")
+        selected_ids = c(clicked$key, brushed$key)
 
-        brush <- event_data("plotly_selected", source = "scoreplot")
+        if(!is.null(selected_ids)){
+          Y.clicked = filter(Yhat_df, id %in% selected_ids)
 
-        if (is.null(brush)) {
-          brushed_subjs = NULL
-          baseplot.gg = baseplot
-        }else{
-          brushed_subjs = brush$key
-          baseplot.gg = baseplot + geom_line(data = filter(Yhat_df, id %in% brushed_subjs), color = "cornflowerblue")
+          baseplot = baseplot %>%
+            add_trace(data = group_by(Y.clicked, id), x = ~index, y = ~value, mode = 'lines', alpha = 0.75)
         }
-        ggplotly(baseplot.gg)
+        baseplot$elementId <- NULL
+        baseplot %>% layout(showlegend = FALSE)
+
       })
+
 
       callModule(tabPanelModule, "scoreplots", plotObject = scoreplot1Input, plotName = "scoreplots", plotObject2 = scoreplot2Input, is.plotly = TRUE)
 

@@ -11,7 +11,7 @@ registerLasagna(data)
 }
 \description{
 Get registered and unregistered lasagna plots for binary data. Note: should make this compatible
-for other data types as well. Requires data to have t.hat and t.star variables.
+for other data types as well. Requires data to have t_hat and tstar variables.
 }
 \author{
 Julia Wrobel \email{jw3134@cumc.columbia.edu}

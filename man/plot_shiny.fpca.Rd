@@ -4,7 +4,8 @@
 \alias{plot_shiny.fpca}
 \title{Interactive Plotting for Functional Principal Component Analysis}
 \usage{
-\method{plot_shiny}{fpca}(obj, xlab = "", ylab = "", title = "", ...)
+\method{plot_shiny}{fpca}(obj, xlab = "", ylab = "", title = "",
+  thin_data = FALSE, ...)
 }
 \arguments{
 \item{obj}{fpca object to be plotted.}
@@ -14,6 +15,8 @@
 \item{ylab}{y axis label}
 
 \item{title}{plot title}
+
+\item{thin_data}{If TRUE data is thinned for each subject to make plotting faster. Defaults to FALSE.}
 
 \item{...}{additional arguments passed to plotting functions}
 }
