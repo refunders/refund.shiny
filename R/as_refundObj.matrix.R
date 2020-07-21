@@ -45,7 +45,7 @@ as_refundObj.matrix = function(obj, index = NULL, ...) {
 
 	df = df[complete.cases(df),]
 
-	class(df) = c("data.frame", "refund_object")
+	class(df) = c("data.frame")
 
 	df
 }
