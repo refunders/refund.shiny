@@ -10,7 +10,6 @@ The primary function is `plot_shiny`, which calls other functions depending on t
 
 This [paper](http://arxiv.org/abs/1602.04091) describes the functionality in the package. 
 
-
 ---------------
 
 ### Installation
