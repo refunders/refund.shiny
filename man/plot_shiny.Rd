@@ -15,7 +15,7 @@ plot_shiny(obj, ...)
 Interactive Plotting for Functional Data
 }
 \details{
-Function for interactive plotting of functional data analysis results.
+Function for interactive plotting of functional data analysis results. 
 
 This package builds on the \code{refund} package: tools in \code{refund} are used to 
 conduct analyses and functions in this package create interactive visualizations of the results

@@ -4,8 +4,7 @@
 \alias{plot_shiny.registration}
 \title{Interactive Plotting for Registration Objects}
 \usage{
-\method{plot_shiny}{registration}(obj, xlab = "", ylab = "", title = "",
-  thin_data = FALSE, ...)
+\method{plot_shiny}{registration}(obj, xlab = "", ylab = "", title = "", thin_data = FALSE, ...)
 }
 \arguments{
 \item{obj}{registration object to be plotted.}

@@ -4,8 +4,7 @@
 \alias{plot_shiny.fpca}
 \title{Interactive Plotting for Functional Principal Component Analysis}
 \usage{
-\method{plot_shiny}{fpca}(obj, xlab = "", ylab = "", title = "",
-  thin_data = FALSE, ...)
+\method{plot_shiny}{fpca}(obj, xlab = "", ylab = "", title = "", thin_data = FALSE, ...)
 }
 \arguments{
 \item{obj}{fpca object to be plotted.}

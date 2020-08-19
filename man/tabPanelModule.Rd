@@ -4,9 +4,17 @@
 \alias{tabPanelModule}
 \title{download Plot as PDF or ggplot Object, modularized server}
 \usage{
-tabPanelModule(input, output, session, plotObject = NULL, plotName = NULL,
-  plotObject2 = NULL, plotName2 = NULL, is.plotly = FALSE,
-  is.grid = FALSE)
+tabPanelModule(
+  input,
+  output,
+  session,
+  plotObject = NULL,
+  plotName = NULL,
+  plotObject2 = NULL,
+  plotName2 = NULL,
+  is.plotly = FALSE,
+  is.grid = FALSE
+)
 }
 \arguments{
 \item{input}{gets user input from UI}

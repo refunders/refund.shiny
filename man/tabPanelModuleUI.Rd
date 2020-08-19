@@ -4,10 +4,19 @@
 \alias{tabPanelModuleUI}
 \title{modularized UI for creating a new tab}
 \usage{
-tabPanelModuleUI(id, tabTitle, icon = NULL, calls = NULL,
-  helperText = NULL, twoPlots = FALSE, calls2 = NULL,
-  helperText2 = NULL, title2 = NULL, brushName = NULL,
-  is.plotly = FALSE)
+tabPanelModuleUI(
+  id,
+  tabTitle,
+  icon = NULL,
+  calls = NULL,
+  helperText = NULL,
+  twoPlots = FALSE,
+  calls2 = NULL,
+  helperText2 = NULL,
+  title2 = NULL,
+  brushName = NULL,
+  is.plotly = FALSE
+)
 }
 \arguments{
 \item{id}{Name of module. Allows each call of this module to be uniquely identified.}
