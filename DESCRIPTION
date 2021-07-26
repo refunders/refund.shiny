@@ -1,6 +1,6 @@
 Package: refund.shiny
 Title: Interactive Plotting for Functional Data Analyses
-Version: 0.3.0
+Version: 0.4.0
 Authors@R: c(
     person("Julia", "Wrobel", role = c("aut", "cre"), email = "julia.wrobel@cuanschutz.edu"),
     person("Jeff", "Goldsmith", role = "aut", email = "jeff.goldsmith@columbia.edu")
