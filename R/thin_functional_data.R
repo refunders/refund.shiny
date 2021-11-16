@@ -7,7 +7,7 @@
 #' @param Y functional dataframe
 #' @param length_out number of points per subject for dataframe that is returned
 #'
-#' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu}
+#' @author Julia Wrobel \email{julia.wrobel@@cuanschutz.edu}
 #'
 #' @importFrom dplyr group_by slice n
 #'

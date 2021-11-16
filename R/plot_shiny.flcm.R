@@ -10,7 +10,7 @@
 #' @param ... additional arguments passed to plotting functions
 #'
 #' @author Jeff Goldsmith \email{jeff.goldsmith@@columbia.edu},
-#' Julia Wrobel \email{jw3134@@cumc.columbia.edu}
+#' Julia Wrobel \email{julia.wrobel@@cuanschutz.edu}
 #'
 #' @seealso \code{\link{plot_shiny}}
 #' @import shiny

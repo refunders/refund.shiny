@@ -9,7 +9,7 @@
 #' @param title plot title
 #' @param ... additional arguments passed to plotting functions
 #'
-#' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu},
+#' @author Julia Wrobel \email{julia.wrobel@@cuanschutz.edu},
 #' Jeff Goldsmith \email{jeff.goldsmith@@columbia.edu}
 #'
 #' @seealso \code{\link{plot_shiny}}

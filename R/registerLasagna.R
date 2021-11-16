@@ -16,7 +16,7 @@ getWidth = function(z){
 #' for other data types as well. Requires data to have t_hat and tstar variables.
 #'
 #' @param data Dataset for lasagna plot.
-#' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu}
+#' @author Julia Wrobel \email{julia.wrobel@@cuanschutz.edu}
 #'
 #' @import ggplot2
 #'

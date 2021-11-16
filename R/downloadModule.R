@@ -3,7 +3,7 @@
 #' Internal method that creates UI with buttons to download a plot as a PDF or ggplot object.
 #'
 #' @param id name of module. Allows each call of this module to be uniquely identified.
-#' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu}
+#' @author Julia Wrobel \email{julia.wrobel@@cuanschutz.edu}
 #'
 downloadModuleUI <-function(id) {
 ns <- NS(id)
@@ -22,7 +22,7 @@ tagList(
 #' @param session Shiny variable for server modules
 #' @param plotObject Reactive plot object defined elsewhere in the server function.
 #' @param plotName Character string designating name of the plot for PDF output.
-#' 
+#'
 #' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu}
 #'
 downloadModule <- function(input, output, session, plotObject, plotName){

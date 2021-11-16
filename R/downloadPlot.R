@@ -6,7 +6,7 @@
 #' @param title new name for the plot, and name of the PDF file created
 #' @param plotName name of the ggplot object
 #'
-#' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu}
+#' @author Julia Wrobel \email{julia.wrobel@@cuanschutz.edu}
 #'
 
 savePDF = function(title, plotName){
