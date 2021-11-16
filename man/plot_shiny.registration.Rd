@@ -27,5 +27,5 @@ Our registration method uses FPCA, the FPCA is plotted as well.
 \code{\link{plot_shiny}}
 }
 \author{
-Julia Wrobel \email{jw3134@cumc.columbia.edu}
+Julia Wrobel \email{julia.wrobel@cuanschutz.edu}
 }

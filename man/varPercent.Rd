@@ -15,10 +15,10 @@ varPercent(level, plotObj)
 a list of numbers that indicate percent variance for selected level.
 }
 \description{
-Internal method that calculates percent variance of eigenvalues for specified level (1, 2, or total) for 
+Internal method that calculates percent variance of eigenvalues for specified level (1, 2, or total) for
 plot_shiny.mfpca(). The desired level is passed in as an argument (level = 12 for total) and a list of percent
 variances is returned.
 }
 \author{
-Julia Wrobel \email{jw3134@cumc.columbia.edu}
+Julia Wrobel \email{julia.wrobel@cuanschutz.edu}
 }

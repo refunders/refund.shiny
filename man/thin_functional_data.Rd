@@ -16,5 +16,5 @@ Takes a dense functional dataset in long form and thins it so that there are 100
 subject, equally spaced.
 }
 \author{
-Julia Wrobel \email{jw3134@cumc.columbia.edu}
+Julia Wrobel \email{julia.wrobel@cuanschutz.edu}
 }

@@ -11,15 +11,13 @@ bakeLasagna(data, data.long, covariate = NULL)
 
 \item{data.long}{Sorted longform dataset for lasagna plot output by \code{makeLasagna()} function.}
 
-\item{covariate}{User-selected covariate for sorting the rows in the lasagna plot. 
+\item{covariate}{User-selected covariate for sorting the rows in the lasagna plot.
 Defaults to NULL, in which case data is sorted by row number.}
 }
 \description{
-Internal method used in conjunction with \code{makeLasagna()} to create side-by-side lasagna plot and distribution plot. 
+Internal method used in conjunction with \code{makeLasagna()} to create side-by-side lasagna plot and distribution plot.
 The distribution plot gives distribution of sorting covariate.
 }
 \author{
-Julia Wrobel \email{jw3134@cumc.columbia.edu}
-
-Nicole Marie Lapointe Jameson
+Julia Wrobel \email{julia.wrobel@cuanschutz.edu}
 }

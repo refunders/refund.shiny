@@ -1,6 +1,6 @@
 Package: refund.shiny
 Title: Interactive Plotting for Functional Data Analyses
-Version: 0.4.0
+Version: 0.4.1
 Authors@R: c(
     person("Julia", "Wrobel", role = c("aut", "cre"), email = "julia.wrobel@cuanschutz.edu"),
     person("Jeff", "Goldsmith", role = "aut", email = "jeff.goldsmith@columbia.edu")
@@ -17,9 +17,10 @@ Imports:
     gridExtra,
     lme4,
     plotly,
-    refund
+    refund,
+    registr
 License: GPL (>= 2)
-LazyData: true
+Encoding: UTF-8
 Repository: CRAN
-RoxygenNote: 7.1.1
-Suggests: testthat, registr
+RoxygenNote: 7.1.2
+Suggests: testthat

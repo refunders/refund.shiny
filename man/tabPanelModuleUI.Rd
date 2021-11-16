@@ -37,15 +37,15 @@ tabPanelModuleUI(
 
 \item{title2}{plot title for the (optional) second plot}
 
-\item{brushName}{character vector indicating the name of brush if you want brushing for the plot. For use in score scatterplots 
+\item{brushName}{character vector indicating the name of brush if you want brushing for the plot. For use in score scatterplots
 for \code{plot_shiny.fpca()} and \code{plot_shiny.mfpca()}.}
 
 \item{is.plotly}{Indicates if plots are plotly generated. Defaults to FALSE.}
 }
 \description{
-Creates a UI tab with helptext, widgets for user input, a plot, and standardized layout. The default is to create one plot, but if the 
+Creates a UI tab with helptext, widgets for user input, a plot, and standardized layout. The default is to create one plot, but if the
 argument 'twoPlots' is set to TRUE, then the layout allows for two plots, where each can have separate helper text and Shiny widget calls.
 }
 \author{
-Julia Wrobel \email{jw3134@cumc.columbia.edu}
+Julia Wrobel \email{julia.wrobel@cuanschutz.edu}
 }

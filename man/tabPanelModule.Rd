@@ -33,7 +33,7 @@ tabPanelModule(
 
 \item{is.plotly}{Indicates if plots are plotly generated. Defaults to FALSE.}
 
-\item{is.grid}{Indicates if plot is generated using grid.arrange() to arrange ggplot objects. 
+\item{is.grid}{Indicates if plot is generated using grid.arrange() to arrange ggplot objects.
 If TRUE, prints plot object implicitly rather than explicitly.}
 }
 \description{

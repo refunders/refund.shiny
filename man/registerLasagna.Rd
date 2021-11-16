@@ -14,5 +14,5 @@ Get registered and unregistered lasagna plots for binary data. Note: should make
 for other data types as well. Requires data to have t_hat and tstar variables.
 }
 \author{
-Julia Wrobel \email{jw3134@cumc.columbia.edu}
+Julia Wrobel \email{julia.wrobel@cuanschutz.edu}
 }

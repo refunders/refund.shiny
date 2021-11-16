@@ -11,16 +11,14 @@ makeLasagna(data, outcome, covariate = NULL)
 
 \item{outcome}{Matrix of values where each row represents a functional observation.}
 
-\item{covariate}{User-selected covariate for sorting the rows in the lasagna plot. 
+\item{covariate}{User-selected covariate for sorting the rows in the lasagna plot.
 Defaults to NULL, in which case data is sorted by row number.}
 }
 \description{
-Internal method that takes a dataframe of observed data with an outcome matrix and user-selected covariate, 
-sorts outcome by the selected covariate, and assigns heights to each row based on value of the selected covariate. 
+Internal method that takes a dataframe of observed data with an outcome matrix and user-selected covariate,
+sorts outcome by the selected covariate, and assigns heights to each row based on value of the selected covariate.
 The resulting dataframe is used with \code{bakeLasagna()} to create lasagna plot.
 }
 \author{
-Julia Wrobel \email{jw3134@cumc.columbia.edu}
-
-Nicole Marie Lapointe Jameson
+Julia Wrobel \email{julia.wrobel@cuanschutz.edu}
 }
