@@ -137,7 +137,7 @@ plot_shiny.mfpca = function(obj, xlab = "", ylab="", title = "", ...) {
                                tabPanelModuleUI("scree1", tabTitle = "Level 1", helperText = scree.help1 ),
                                tabPanelModuleUI("scree2", tabTitle = "Level 2", helperText = scree.help2 )
                               ) ),
-                    tabPanel("Linear Combinations", icon = icon("line-chart"), withMathJax(),
+                    tabPanel("Linear Combinations", icon = icon("chart-line"), withMathJax(),
                              column(3, h4("Sliders for Levels 1 and 2"),
                                     helpText("Plot shows the linear combination of mean and FPCs with the scores
                                              specified using the sliders below. Black curve is population mean; blue curve

@@ -92,7 +92,7 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
                                tabPanelModuleUI("lasagna", tabTitle = "Lasagna Plot", calls = lasagna.call,
                                                 helperText = lasagna.help)
                              ) ),
-                    tabPanelModuleUI("fitted", tabTitle = "Fitted Values", icon("line-chart"), calls = fitted.call,helperText = fitted.help ),
+                    tabPanelModuleUI("fitted", tabTitle = "Fitted Values", icon("chart-line"), calls = fitted.call,helperText = fitted.help ),
                     tabPanelModuleUI("coef", tabTitle = "Coefficient Functions", icon("area-chart"), calls = coef.call, helperText = coef.help),
                     tabPanelModuleUI("residuals", tabTitle = "Residuals", icon("medkit"), calls = residuals.call,helperText = residuals.help )
                     ##### end tabs

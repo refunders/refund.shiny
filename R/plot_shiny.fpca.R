@@ -121,7 +121,7 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", thin_data = FALS
                                      helperText = muPC.help ),
                     tabPanelModuleUI("screeplots", tabTitle = "Scree Plots", icon = icon("medkit"), calls = NULL,
                                      helperText = scree.help),
-                    tabPanelModuleUI("LinCom", tabTitle = "Linear Combinations", icon = icon("line-chart"), calls = LinCom.call,
+                    tabPanelModuleUI("LinCom", tabTitle = "Linear Combinations", icon = icon("chart-line"), calls = LinCom.call,
                                      helperText = LinCom.help ),
                     tabPanelModuleUI("subjects",tabTitle = "Subject Fits", icon = icon("user"), calls = subjects.call,
                                      helperText = subjects.help ),
