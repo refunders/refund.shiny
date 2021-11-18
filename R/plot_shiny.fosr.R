@@ -19,8 +19,8 @@
 #' @importFrom stats model.matrix terms
 #'
 #' @export
-
-#utils::globalVariables(c("value", "subj", "covariate"))
+#'
+#' @return No object is returned. This function takes in objects of class 'fosr' and outputs a shiny application for that object.
 
 plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
 
@@ -93,7 +93,7 @@ plot_shiny.fosr = function(obj, xlab = "", ylab="", title = "", ...) {
                                                 helperText = lasagna.help)
                              ) ),
                     tabPanelModuleUI("fitted", tabTitle = "Fitted Values", icon("chart-line"), calls = fitted.call,helperText = fitted.help ),
-                    tabPanelModuleUI("coef", tabTitle = "Coefficient Functions", icon("area-chart"), calls = coef.call, helperText = coef.help),
+                    tabPanelModuleUI("coef", tabTitle = "Coefficient Functions", icon("chart-area"), calls = coef.call, helperText = coef.help),
                     tabPanelModuleUI("residuals", tabTitle = "Residuals", icon("medkit"), calls = residuals.call,helperText = residuals.help )
                     ##### end tabs
                     ),

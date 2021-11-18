@@ -8,7 +8,7 @@
 #' if FALSE results are plotted on natural scale.
 #'
 #' @import ggplot2
-#' @export
+#'
 make_muPC = function(obj, pc_choice, response_scale = FALSE){
 
   ## NULLify global values called in ggplot

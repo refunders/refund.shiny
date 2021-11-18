@@ -20,7 +20,7 @@ getWidth = function(z){
 #'
 #' @import ggplot2
 #'
-#' @export
+#'
 #'
 
 registerLasagna = function(data){

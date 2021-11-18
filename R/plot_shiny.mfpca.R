@@ -20,7 +20,7 @@
 #' @importFrom reshape2 melt
 #'
 #' @export
-#'
+#' @return No object is returned. This function takes in objects of class 'mfpca' and outputs a shiny application for that object.
 #'
 plot_shiny.mfpca = function(obj, xlab = "", ylab="", title = "", ...) {
 

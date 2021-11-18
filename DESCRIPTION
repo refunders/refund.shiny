@@ -5,7 +5,7 @@ Authors@R: c(
     person("Julia", "Wrobel", role = c("aut", "cre"), email = "julia.wrobel@cuanschutz.edu"),
     person("Jeff", "Goldsmith", role = "aut", email = "jeff.goldsmith@columbia.edu")
     )
-Description: Interactive plotting for functional data analyses.
+Description: Refund.shiny produces shiny applications for different types of popular functional data analyses. The functional data analyses are implemented in the refund package, then refund.shiny reads in the refund object and implements an object-specific set of plots based on the object class using S3.
 Depends:
     R (>= 3.0.1)
 Imports:

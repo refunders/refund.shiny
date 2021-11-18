@@ -9,7 +9,7 @@
 #' if FALSE results are plotted on natural scale.
 #'
 #' @import ggplot2
-#' @export
+#'
 make_linCom = function(obj, pc_weights, response_scale = FALSE){
   ## NULLify global values called in ggplot
   lincom = mu = index = NULL

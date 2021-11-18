@@ -19,6 +19,9 @@
 
 \item{...}{additional arguments passed to plotting functions}
 }
+\value{
+No object is returned. This function takes in objects of class 'registration' and outputs a shiny application for that object.
+}
 \description{
 Produces an interactive plot illustrating functional data before and after registration.
 Our registration method uses FPCA, the FPCA is plotted as well.

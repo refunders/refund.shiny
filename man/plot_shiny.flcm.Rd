@@ -17,6 +17,9 @@
 
 \item{...}{additional arguments passed to plotting functions}
 }
+\value{
+No object is returned. This function takes in objects of class 'fosr' and outputs a shiny application for that object
+}
 \description{
 Produces an interactive plot illustrating a functional linear concurrent
 regression analysis.

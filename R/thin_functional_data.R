@@ -11,7 +11,7 @@
 #'
 #' @importFrom dplyr group_by slice n
 #'
-#' @export
+#'
 #'
 thin_functional_data = function(Y, length_out = 100){
   Y_grouped = group_by(Y, id)

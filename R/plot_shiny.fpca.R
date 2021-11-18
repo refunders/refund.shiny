@@ -18,6 +18,7 @@
 #' @importFrom plotly ggplotly event_data layout as.widget
 #'
 #' @export
+#' @return No object is returned. This function takes in objects of class 'fpca' and outputs a shiny application for that object.
 #'
 plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", thin_data = FALSE, ...) {
 

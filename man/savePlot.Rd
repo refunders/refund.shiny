@@ -16,5 +16,5 @@ Internal method that saves ggplot plots as .RData files.Can be used with all plo
 name of the plot object and it's name to be saved under are passed in and the plot is saved as an RData file.
 }
 \author{
-Julia Wrobel \email{jw3134@cumc.columbia.edu}
+Julia Wrobel \email{julia.wrobel@cuanschutz.edu}
 }

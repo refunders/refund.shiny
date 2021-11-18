@@ -17,6 +17,8 @@
 #' @importFrom plotly plot_ly event_data layout add_trace
 #'
 #' @export
+#' @return No object is returned. This function takes in objects of class 'registration' and outputs a shiny application for that object.
+#'
 plot_shiny.registration = function(obj, xlab = "", ylab="", title = "", thin_data = FALSE, ...){
 
   fpca.obj <- obj$fpca_obj

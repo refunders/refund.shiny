@@ -25,13 +25,13 @@ Convert matrices to dataframes for use in functional data analyses
 }
 \examples{
 
-\dontrun{
+
 library(ggplot2)
 library(refund)
 
 cca_df = as_refundObj(DTI$cca)
 ggplot(cca_df, aes(x = index, y = value, group = id)) + geom_line()
-}
+
 
 }
 \author{

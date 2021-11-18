@@ -20,6 +20,7 @@
 #' @importFrom stats model.matrix terms
 #'
 #' @export
+#' @return No object is returned. This function takes in objects of class 'fosr' and outputs a shiny application for that object
 
 #utils::globalVariables(c("value", "subj", "covariate"))
 

@@ -32,10 +32,10 @@
 #' @import dplyr
 #' @export plot_shiny
 #'
+#' @return This function outputs a shiny app based on the class of the input object.
 #' @examples
 #'
-#' \dontrun{
-#'
+#'\dontrun{
 #' library(refund)
 #' library(dplyr)
 #'
@@ -45,42 +45,8 @@
 #' SC = fpca.sc(cd4)
 #' plot_shiny(SC)
 #'
-#' ##### FPCA Examples on simulated data #####
 #'
-#' set.seed(2678695)
-#' n = 101
-#' m = 101
-#' s1 = 20
-#' s2 = 10
-#' s = 4
-#' t = seq(-1, 1, l=m)
-#' v1 = t + sin(pi*t)
-#' v2 = cos(3*pi*t)
-#' V = cbind(v1/sqrt(sum(v1^2)), v2/sqrt(sum(v2^2)))
-#' U = matrix(rnorm(n*2), n, 2)
-#' D = diag(c(s1^2, s2^2))
-#' eps = matrix(rnorm(m*n, sd=s), n, m)
-#' Y = U%*%D%*%t(V) + eps
-#'
-#' SC = fpca.sc(Y)
-#' FACE = fpca.face(Y)
-#' SSVD = fpca.ssvd(Y, verbose=FALSE)
-#' S = fpca2s(Y)
-#'
-#' plot_shiny(SC)
-#' plot_shiny(FACE)
-#' plot_shiny(SSVD)
-#' plot_shiny(S)
-#'
-#' #' ##### MFPCA Example #####
-#'
-#' data(DTI)
-#' Y = DTI$cca
-#' id = DTI$ID
-#'
-#' mfpca.dti = mfpca.sc(Y=Y, id = id, twoway = FALSE)
-#' plot_shiny(mfpca.dti)
-#'
+
 #' ##### FoSR Example #####
 #'
 #' data(DTI)
@@ -129,9 +95,8 @@
 #'                        LongiModel.method = 'fpca.sc',
 #'                        mFPCA.pve = 0.80, sFPCA.pve = 0.80)
 #' plot_shiny(lfpca.dti2)
+#'}
 #'
-#'
-#' }
 #'
 plot_shiny <- function(obj, ...){
   UseMethod("plot_shiny")

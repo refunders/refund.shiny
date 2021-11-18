@@ -40,5 +40,5 @@ If TRUE, prints plot object implicitly rather than explicitly.}
 Internal method that creates UI with buttons to download a plot as a PDF or ggplot object.
 }
 \author{
-Julia Wrobel \email{jw3134@cumc.columbia.edu}
+Julia Wrobel \email{julia.wrobel@cuanschutz.edu}
 }

@@ -95,7 +95,7 @@ tabPanelModuleUI <- function(id, tabTitle, icon = NULL, calls = NULL, helperText
 #'
 #' @importFrom plotly plotlyOutput renderPlotly as.widget
 #'
-#' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu}
+#' @author Julia Wrobel \email{julia.wrobel@@cuanschutz.edu}
 #'
 tabPanelModule <- function(input,output, session, plotObject = NULL, plotName = NULL, plotObject2 = NULL, plotName2 = NULL,
                            is.plotly = FALSE, is.grid = FALSE){

@@ -28,7 +28,7 @@ savePDF = function(title, plotName){
 #' @param title new name for the plot, and name of the RData file created.
 #' @param plotName name of the ggplot object.
 #'
-#' @author Julia Wrobel \email{jw3134@@cumc.columbia.edu}
+#' @author Julia Wrobel \email{julia.wrobel@@cuanschutz.edu}
 #'
 savePlot = function(title, plotName){
   PLOT <- downloadHandler(
