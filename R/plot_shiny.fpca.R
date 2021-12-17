@@ -19,7 +19,7 @@
 #'
 #' @export
 #'
-plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", thin_data = FALSE, ...) {
+plot_shiny.fpca = function(obj, xlab = "", ylab = "", title = "", thin_data = FALSE, ...) {
 
   fpca.obj <- obj
 
@@ -192,7 +192,7 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", thin_data = FALS
       #################################
 
       plotInputSubject <- reactive({
-        subjectnum = as.numeric(input$subject)
+        subjectnum = input$subject
 
         Y_sub = filter(Y, id == subjectnum)
 
@@ -203,7 +203,7 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", thin_data = FALS
           geom_line(data = filter(Yhat_df, id == subjectnum),
                     aes(y = yhat_inv_link), size = 1, color = "cornflowerblue") +
           theme_bw() + xlab(xlab) + ylab(ylab) +
-          ylim(min(fpca.obj$Y$value), max(fpca.obj$Y$value))
+          ylim(min(Y$value), max(Y$value))
       })
 
       callModule(tabPanelModule, "subjects", plotObject = plotInputSubject, plotName = "subjects")
@@ -260,4 +260,3 @@ plot_shiny.fpca = function(obj, xlab = "", ylab="", title = "", thin_data = FALS
     } ## end server
   )
 }
-
