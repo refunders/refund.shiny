@@ -26,19 +26,18 @@
 #' @author Jeff Goldsmith \email{jeff.goldsmith@@columbia.edu},
 #' Julia Wrobel \email{julia.wrobel@@cuanschutz.edu}
 #' @seealso \code{\link{plot_shiny.fpca}}, \code{\link{plot_shiny.mfpca}},  \code{\link{plot_shiny.fosr}}
-#' @import refund
 #' @import shiny
 #' @import ggplot2
 #' @import dplyr
+#' @importFrom refund fpca.sc bayes_fosr fpca.lfda fpca.sc mfpca.sc
 #' @export plot_shiny
 #'
 #' @return This function outputs a shiny app based on the class of the input object.
 #' @examples
 #'
 #'\dontrun{
-#' library(refund)
 #' library(dplyr)
-#'
+#  library(refund)
 #' ##### FPCA Example on real data #####
 #'
 #' data(cd4)
@@ -51,7 +50,7 @@
 #'
 #' data(DTI)
 #' DTI = DTI[complete.cases(DTI),]
-#' fit.fosr = bayes_fosr(cca ~ pasat + sex, data = DTI)
+#' fit.fosr = refund::bayes_fosr(cca ~ pasat + sex, data = DTI)
 #' plot_shiny(fit.fosr)
 #'
 #' ##### FoSR Example with outliers #####

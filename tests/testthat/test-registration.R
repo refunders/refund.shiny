@@ -19,7 +19,7 @@ test_that("no errors arise for gaussian registration plots",{
   skip_on_travis()
   registration_data = simulate_unregistered_curves(I = 20, D = 50, seed = 2018)
   registration_data$value = registration_data$latent_mean
-  gaussian_registration = register_fpca(Y = registration_data, family = "gaussian")
+  gaussian_registration = register_fpca(Y = registration_data, family = "gaussian", npc = 2)
 
   expect_error(plot_shiny(gaussian_registration), NA)
 

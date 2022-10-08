@@ -38,9 +38,7 @@ reconstructions for each subject; and score scatterplots for levels 1 and 2.}
 \examples{
 
 \dontrun{
-library(refund)
 library(dplyr)
-
 ##### FPCA Example on real data #####
 
 data(cd4)
@@ -52,7 +50,7 @@ plot_shiny(SC)
 
 data(DTI)
 DTI = DTI[complete.cases(DTI),]
-fit.fosr = bayes_fosr(cca ~ pasat + sex, data = DTI)
+fit.fosr = refund::bayes_fosr(cca ~ pasat + sex, data = DTI)
 plot_shiny(fit.fosr)
 
 ##### FoSR Example with outliers #####

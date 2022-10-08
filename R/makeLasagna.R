@@ -20,8 +20,8 @@ makeLasagna <- function(data, outcome, covariate = NULL){
     covariate = "indexList"
     data$indexList = 1:dim(data)[1]}
   ## convert categorical data to numeric
-  if(class(data[[covariate]]) == "character") { data[[covariate]] = factor(data[[covariate]]) }
-  if(class(data[[covariate]]) == "factor"){
+  if(inherits(data[[covariate]], "character")) { data[[covariate]] = factor(data[[covariate]]) }
+  if(inherits(data[[covariate]], "factor")){
     factor.levels = nlevels(data[[covariate]])
     type.breaks = seq(from = 0.5, to = factor.levels + 0.5, length.out = factor.levels + 1)
     data[[covariate]] = as.numeric(data[[covariate]])

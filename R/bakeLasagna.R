@@ -20,7 +20,8 @@ bakeLasagna <- function(data, data.long, covariate = NULL){
     covariate = "indexList"
     data$indexList = factor("id")
   }
-  if(class(data[[covariate]]) == "character") { data[[covariate]] = factor(data[[covariate]]) }
+  if(inherits(data[[covariate]], "character")) { data[[covariate]] = factor(data[[covariate]]) }
+
 
   data = data[order(as.numeric(data[[covariate]])),]
 
@@ -47,7 +48,7 @@ bakeLasagna <- function(data, data.long, covariate = NULL){
 
   ## histogram
   d <-ggplot(data, aes(x = data[[covariate]])) + {
-    if(class(data[[covariate]]) == "factor") geom_bar(colour="#FF9912", fill="#FFE4B5", width = 1)
+    if(inherits(data[[covariate]], "factor")) geom_bar(colour="#FF9912", fill="#FFE4B5", width = 1)
     else geom_density(colour="#FF9912", fill="#FFE4B5", alpha=.3) } +
     #ggtitle("Covariate") +
     coord_flip() +
