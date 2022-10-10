@@ -1,3 +1,9 @@
+## Edits for cran submission 1.0
+
+Fixed the following: 
+ The Description field should not start with the package name,
+   'This package' or similar.
+
 ## R CMD check results
 
 0 errors | 0 warnings | 1 note
