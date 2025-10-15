@@ -6,12 +6,12 @@
 #' conduct analyses and functions in this package create interactive visualizations of the results
 #' of those analyses. There are four major categories of analyses that can be viewed:
 #' \enumerate{
-#' \item{Functional principal components analyses implemented by \code{\link{fpca.sc}}, \code{\link{fpca.face}},
-#' \code{\link{fpca.ssvd}}, and \code{\link{fpca2s}}. Plots show the mean +/- 2SD times each FPC; scree plots;
+#' \item{Functional principal components analyses implemented by \code{\link[refund:fpca.sc]{fpca.sc()}}, \code{\link[refund:fpca.face]{fpca.face()}},
+#' \code{\link[refund:fpca.ssvd]{fpca.ssvd()}}, and \code{\link[refund:fpca2s]{fpca2s()}}. Plots show the mean +/- 2SD times each FPC; scree plots;
 #' linear combinations of score values and FPCs; reconstructions for each subject; and score scatterplots.}
-#' \item{Function-on-scalar regression analyses implemented by \code{\link{bayes_fosr}}. Plots show the raw data
+#' \item{Function-on-scalar regression analyses implemented by \code{\link[refund:bayes_fosr]{bayes_fosr()}}. Plots show the raw data
 #' colored by covariate values; fitted values depending on covariates; coefficient functions; and residuals.}
-#' \item{Multilevel functional principal components analyses implemented by \code{\link{mfpca.sc}}.  Plots show the
+#' \item{Multilevel functional principal components analyses implemented by \code{\link[refund:mfpca.sc]{mfpca.sc()}}.  Plots show the
 #' mean +/- 2SD times each FPC; scree plots; linear combinations of score values and FPCs;
 #' reconstructions for each subject; and score scatterplots for levels 1 and 2.}
 #' #' \item{Longitudinal functional principal components analyses}

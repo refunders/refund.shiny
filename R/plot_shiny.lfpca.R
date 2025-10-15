@@ -20,6 +20,10 @@
 #' @importFrom grDevices rainbow
 #' @importFrom utils sessionInfo
 #'
+#' @export
+#' @method plot_shiny lfpca
+#'
+#'
 plot_shiny.lfpca <- function(obj, xlab = "", ylab="", title = "", ...){
 
   ##################################
