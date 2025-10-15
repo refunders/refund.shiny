@@ -1,9 +1,9 @@
 Package: refund.shiny
 Title: Interactive Plotting for Functional Data Analyses
-Version: 1.0
-Date: 2022-10-07
+Version: 1.1
+Date: 2025-10-15
 Authors@R: c(
-    person("Julia", "Wrobel", role = c("aut", "cre"), email = "julia.wrobel@cuanschutz.edu"),
+    person("Julia", "Wrobel", role = c("aut", "cre"), email = "julia.wrobel@emory.edu"),
     person("Jeff", "Goldsmith", role = "aut", email = "jeff.goldsmith@columbia.edu")
     )
 Description: Produces Shiny applications for different types of popular functional data analyses. The functional data analyses are implemented in the refund package, then refund.shiny reads in the refund object and implements an object-specific set of plots based on the object class using S3.
@@ -24,6 +24,6 @@ Encoding: UTF-8
 Repository: CRAN
 URL: https://github.com/refunders/refund.shiny
 BugReports: https://github.com/refunders/refund.shiny/issues
-RoxygenNote: 7.2.0
+RoxygenNote: 7.3.3
 Suggests: testthat,
           registr
