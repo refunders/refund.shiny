@@ -97,6 +97,8 @@
 #'}
 #'
 #'
+utils::globalVariables("id")
+
 plot_shiny <- function(obj, ...){
   UseMethod("plot_shiny")
 }
