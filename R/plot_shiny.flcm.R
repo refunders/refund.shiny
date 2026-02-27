@@ -23,6 +23,7 @@
 #' @return No object is returned. This function takes in objects of class 'fosr' and outputs a shiny application for that object
 
 #utils::globalVariables(c("value", "subj", "covariate"))
+utils::globalVariables("id")
 
 
 plot_shiny.flcm = function(obj, xlab = "", ylab="", title = "", ...) {
